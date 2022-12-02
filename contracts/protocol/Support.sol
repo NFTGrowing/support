@@ -72,7 +72,7 @@ contract Support is
     // while there is indexed event 
     // https://ethereum.stackexchange.com/questions/8658/what-does-the-indexed-keyword-do
 
-    //TODO 2 - stack may overflow if array keep increasing?
+    //TODO - stack may overflow if array keep increasing?
     // LongTermSupportTx[] supportedList;
 
     Balance balance;
