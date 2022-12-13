@@ -44,6 +44,8 @@ contract Support is
   ContextUpgradeable,
   StakingStorageExt
 {
+  //TODO - 改成 map
+  /*
   struct Balance{
     uint256 etherAmount;
     uint256 wethAmount;
@@ -54,6 +56,11 @@ contract Support is
     // TODO - whether change all the members tobe arr members
     uint256[16] amountGap;
   }
+  */
+  struct Balance{
+    // Key belong to SupportAssetType
+    mapping(uint => uint) assetMap;
+  }
 
   struct LongTermSupportTx{
     address supporter;
@@ -62,11 +69,33 @@ contract Support is
     uint256 assetAmount;
   }
 
+  struct SupportSlot {
+    address beneficiary;
+    bool claimed;
+    Balance balance;
+  }
+
+  struct IssueSupport {
+    // TODO - check whether this would cause problems while upgrading based on proxy
+    SupportSlot[] slots;
+  }
+
+
+  //IssueData of one collection; active IssueNo start from 1
+  // current IssueNo = baseIssueNo + (block.timestamp - baseStartTime)/issueDurationTime
+  // if block.timestamp > baseStartTime
+  struct IssueSchedule {
+    uint baseIssueNo;
+    uint baseStartTime;
+    uint issueDurationTime;
+  }
+
   struct CollectionSupport {
     
     //TODO - initial , update 
     bool supporting;
     uint256 startedTimeStamp;
+    IssueSchedule issueSchedule;
 
     //TODO - check to determine whether this is necessary 
     // while there is indexed event 
@@ -75,8 +104,27 @@ contract Support is
     //TODO - stack may overflow if array keep increasing?
     // LongTermSupportTx[] supportedList;
 
+    //include long-term & case-by-case part
     Balance balance;
+    // TODO - check whether to record this accumulate number
     Balance accumulateBalance;
+
+    //case by case support; key - issue id; value - issue support info
+    mapping(uint32 => IssueSupport) issues;
+    
+
+  }
+
+  // for return 
+  struct CollectionIssueNo{
+    address collectionAddr;
+    uint issueNo;
+  }
+
+  // for return 
+  struct CollectionIssueSchedule{
+    address collectionAddr;
+    IssueSchedule issueSchedule;
   }
 
   uint constant AssetTypeLimit = 20;
@@ -148,9 +196,11 @@ contract Support is
    * @dev get CollectionSupport info
    * @param nftAsset The address of the collection
    **/
+  /*
   function getCollectionSupport(address nftAsset) public view returns(CollectionSupport memory){
     return _nftSupport[nftAsset];
   }
+  */
 
   /**
    * @dev set asset address
@@ -192,41 +242,26 @@ contract Support is
     uint256 supportAmount
   ) external payable override nonReentrant whenNotPaused{
     //require msg.value > 0 or supportAmount > 0
-    //require(msg.value > 0 || supportAmount > 0, Errors.VL_INVALID_AMOUNT);
-    //require(_nftSupport[nftAsset].supporting, Errors.VL_COLLECTION_NOT_LIST);
+    require(msg.value > 0 || supportAmount > 0, Errors.VL_INVALID_AMOUNT);
+    require(_nftSupport[nftAsset].supporting, Errors.VL_COLLECTION_NOT_LIST);
 
     //assetType(uint8) to SupportAssetType(Enum) check 
     SupportAssetType assetTypeEnum = SupportAssetType(assetType);
     uint256 actualSupportAmount = supportAmount;
 
-    //转移相关资产到合约内
+    //
     if (assetTypeEnum == SupportAssetType.ETH){
         require(msg.value > 0, Errors.VL_INVALID_AMOUNT);
 
         //add balance, accumulate Balance
-        _nftSupport[nftAsset].balance.etherAmount += msg.value;
-        _nftSupport[nftAsset].accumulateBalance.etherAmount += msg.value;
+        _nftSupport[nftAsset].balance.assetMap[assetType] += msg.value;
+        _nftSupport[nftAsset].accumulateBalance.assetMap[assetType] += msg.value;
         actualSupportAmount = msg.value;
-
-    } else if(assetTypeEnum == SupportAssetType.WETH) {
-        require(supportAmount > 0, Errors.VL_INVALID_AMOUNT);
-        // transfer ERC20-WETH to this contract
-        address assetAddr = _assetAddr[assetType];
-        //TODO - safeTransferFrom
-        IERC20Upgradeable(assetAddr).transferFrom(
-          msg.sender,
-          address(this),
-          supportAmount
-        );
-
-        //add balance, accumulate Balance
-        _nftSupport[nftAsset].balance.wethAmount += supportAmount;
-        _nftSupport[nftAsset].accumulateBalance.wethAmount += supportAmount;
-
-    } else if(assetTypeEnum == SupportAssetType.USDC) {
+    }
+    else if ( assetTypeEnum < SupportAssetType.Last ) {
         require(supportAmount > 0, Errors.VL_INVALID_AMOUNT);
 
-        // transfer ERC20-USDC to this contract
+        // transfer ERC20  to this contract
         address assetAddr = _assetAddr[assetType];
         IERC20Upgradeable(assetAddr).transferFrom(
           msg.sender,
@@ -235,30 +270,16 @@ contract Support is
         );
 
         //add balance, accumulate Balance
-        _nftSupport[nftAsset].balance.usdcAmount += supportAmount;
-        _nftSupport[nftAsset].accumulateBalance.usdcAmount += supportAmount;
-    } else if(assetTypeEnum == SupportAssetType.USDT) {
-        require(supportAmount > 0, Errors.VL_INVALID_AMOUNT);
-
-        // transfer ERC20-USDC to this contract
-        address assetAddr = _assetAddr[assetType];
-        IERC20Upgradeable(assetAddr).transferFrom(
-          msg.sender,
-          address(this),
-          supportAmount
-        );
-
-        //add balance, accumulate Balance
-        _nftSupport[nftAsset].balance.usdtAmount += supportAmount;
-        _nftSupport[nftAsset].accumulateBalance.usdtAmount += supportAmount;
-    } else {
+        _nftSupport[nftAsset].balance.assetMap[assetType] += supportAmount;
+        _nftSupport[nftAsset].accumulateBalance.assetMap[assetType] += supportAmount;
+    }
+    else {
         // revert
         revert("The assetType is not supported");
     }
     
-    // TODO - tx 可能不需要用 storage 来维护
-    
-    emit LongTermSupport(_msgSender(), nftAsset, assetType, actualSupportAmount, block.timestamp);
+    uint issueNo = _getCollectionIssueNo(nftAsset);
+    emit LongTermSupport(_msgSender(), nftAsset, issueNo, assetType, actualSupportAmount, block.timestamp);
     
   }
 
@@ -280,5 +301,148 @@ contract Support is
   }
 
   //TODO - add address provide code 
+
+  //TODO - Add multiple operating account to do clearing in addressProvider 
   
+
+  //setup issue data
+  /**
+   * @dev Update the supporting issue info of collection
+   * @param collection The addresses of the NFT to be updated
+   * @param baseIssueNo baseIssueNo of the Issue Data
+   * @param baseStartTime baseStartTime of the Issue Data
+   * @param issueDurationTime issueDurationTime of the Issue Data
+  **/
+  function updateCollectionIssueSchedule(
+    address collection, 
+    uint baseIssueNo,
+    uint baseStartTime,
+    uint issueDurationTime) external override nonReentrant onlySupportConfigurator {
+      require(issueDurationTime > 0, Errors.VL_INVALID_AMOUNT); 
+      _nftSupport[collection].issueSchedule.baseIssueNo = baseIssueNo;
+      _nftSupport[collection].issueSchedule.baseStartTime = baseStartTime;
+      _nftSupport[collection].issueSchedule.issueDurationTime = issueDurationTime;
+  }
+  
+  /**
+   * @dev  get issue no of collections
+   * @param collections The addresses of the NFT to be updated
+  **/
+  function getCollectionsIssueNo(address[] calldata collections  ) public view returns (CollectionIssueNo[] memory){
+    require(collections.length > 0, Errors.VL_INVALID_AMOUNT);
+    CollectionIssueNo[] memory collectionsIssueNo = new CollectionIssueNo[](collections.length);
+    for (uint i = 0; i < collections.length; i++){
+      collectionsIssueNo[i].collectionAddr = collections[i];
+      collectionsIssueNo[i].issueNo = _getCollectionIssueNo(collections[i]);
+    }
+    return collectionsIssueNo;
+  }
+
+  //get issueSchedule of collections
+  /**
+   * @dev  the supporting issue info of collection
+   * @param collections The addresses of the NFT to be updated
+  **/
+  function getCollectionsIssueSchedule(address[] calldata collections  ) public view returns (CollectionIssueSchedule[] memory){
+    require(collections.length > 0, Errors.VL_INVALID_AMOUNT);
+    CollectionIssueSchedule[] memory collectionsIssueSchedule = new CollectionIssueSchedule[](collections.length);
+    for (uint i = 0; i < collections.length; i++){
+      collectionsIssueSchedule[i].collectionAddr = collections[i];
+      collectionsIssueSchedule[i].issueSchedule = _nftSupport[collections[i]].issueSchedule;
+    }
+    return collectionsIssueSchedule;
+  }
+
+  /**
+   * @dev  the current issue no of collection
+   * @param collectionAddr The addresses of the NFT to be updated
+  **/
+  function _getCollectionIssueNo(address collectionAddr) internal view returns (uint ){
+    IssueSchedule storage issueSchedule = _nftSupport[collectionAddr].issueSchedule;
+    if (issueSchedule.baseStartTime <= 0 || issueSchedule.issueDurationTime <= 0) {
+      //no valid schedule for this collection currently
+      return 0;
+    }
+    else {
+      if (block.timestamp <= issueSchedule.baseStartTime){
+        return issueSchedule.baseIssueNo;
+      } 
+      else {
+        return issueSchedule.baseIssueNo + (block.timestamp - issueSchedule.baseStartTime)/issueSchedule.issueDurationTime;
+      }
+    }
+  }
+
+  // Case by case support 
+  /**
+   * @dev Depositor support the collection case by case by ether, usdc, or usdt
+   * @param nftAsset The address of the NFT to be supported
+   * @param assetType asset using to support; 
+   * @param supportAmount The amount of the above asset
+   * @param issueNo only the current issue or the previous one is supportable 
+   * @param slotId The slotid of the supported item in this issue [0,30]
+   **/
+  function caseByCaseSupport(
+    address nftAsset,  
+    uint8 assetType,
+    uint256 supportAmount,
+    uint32 issueNo,
+    uint32 slotId
+  ) external payable override nonReentrant whenNotPaused{
+    require(msg.value > 0 || supportAmount > 0, Errors.VL_INVALID_AMOUNT);
+    require(_nftSupport[nftAsset].supporting, Errors.VL_COLLECTION_NOT_LIST);
+    
+    // check issueNo & 
+    require(issueNo > 0, Errors.VL_INVALID_ISSUE_NO);
+    uint currentIssueNo = _getCollectionIssueNo(nftAsset);
+    require(currentIssueNo > 0, Errors.VL_INVALID_CURRENT_ISSUE_NO);
+    require((issueNo == currentIssueNo) || (issueNo == (currentIssueNo - 1)), Errors.VL_INVALID_ISSUE_NO);
+
+    // check slot id 
+    require(slotId >= 1 && slotId <= 30, Errors.VL_INVALID_SLOTID);
+
+    //assetType(uint8) to SupportAssetType(Enum) check 
+    SupportAssetType assetTypeEnum = SupportAssetType(assetType);
+    uint256 actualSupportAmount = supportAmount;
+
+    // 
+    if (assetTypeEnum == SupportAssetType.ETH){
+        require(msg.value > 0, Errors.VL_INVALID_AMOUNT);
+
+        //add balance, accumulate Balance
+        _nftSupport[nftAsset].issues[issueNo].slots[slotId].balance.assetMap[assetType] += msg.value;
+        _nftSupport[nftAsset].balance.assetMap[assetType] += msg.value;
+        _nftSupport[nftAsset].accumulateBalance.assetMap[assetType] += msg.value;
+        actualSupportAmount = msg.value;
+    }
+    else if ( assetTypeEnum < SupportAssetType.Last ){
+        require(supportAmount > 0, Errors.VL_INVALID_AMOUNT);
+
+        // transfer ERC20  to this contract
+        address assetAddr = _assetAddr[assetType];
+        IERC20Upgradeable(assetAddr).transferFrom(
+          msg.sender,
+          address(this),
+          supportAmount
+        );
+
+        //add balance, accumulate Balance
+        _nftSupport[nftAsset].issues[issueNo].slots[slotId].balance.assetMap[assetType] += supportAmount;
+        _nftSupport[nftAsset].balance.assetMap[assetType] += supportAmount;
+        _nftSupport[nftAsset].accumulateBalance.assetMap[assetType] += supportAmount;
+    }
+    else {
+        // revert
+        revert("The assetType is not supported");
+    }
+    
+    // uint currentIssueNo = _getCollectionIssueNo(nftAsset);
+    emit CaseByCaseSupport(_msgSender(), nftAsset, issueNo, slotId, assetType, actualSupportAmount, block.timestamp);
+    
+  }
+  
+  // TODO - settle the Collection Issue
+  // 
+
 }
+
