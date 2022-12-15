@@ -148,7 +148,20 @@ contract Support is
     SlotView[DefaultSlotUpperLimit] slotsView;
   }
 
-  
+  struct BalanceView {
+    uint[AssetTypeLimit] assetsArray;
+  }
+
+  // for return 
+  struct CollectionSupportView {
+    bool supporting;
+    uint256 startedTimeStamp;
+    IssueSchedule issueSchedule;
+
+    //include long-term & case-by-case part
+    BalanceView balances;
+  }
+
   bool public _paused;
   IStakingAddressesProvider public _addressesProvider;
 
@@ -221,15 +234,33 @@ contract Support is
     _slotUpperLimit = DefaultSlotUpperLimit;
   }
 
+  function _converBalanceFromMapToArray( 
+    Balance storage balanceStorage ) internal view returns(BalanceView memory) { 
+    BalanceView memory balanceView;
+
+    for(uint256 k = uint256(SupportAssetType.ETH); k < uint256(SupportAssetType.Last); k++){
+      balanceView.assetsArray[k] = balanceStorage.assetMap[k];
+    }
+
+    return balanceView;     
+  }
+
   /**
    * @dev get CollectionSupport info
    * @param nftAsset The address of the collection
    **/
-  /*
-  function getCollectionSupport(address nftAsset) public view returns(CollectionSupport memory){
-    return _nftSupport[nftAsset];
+  function getCollectionSupport(address nftAsset) public view returns(CollectionSupportView memory){
+    CollectionSupportView memory collectionSupportView;
+    CollectionSupport storage collectionSupport = _nftSupport[nftAsset];
+    
+    collectionSupportView.supporting = collectionSupport.supporting;
+    collectionSupportView.startedTimeStamp = collectionSupport.startedTimeStamp;
+    collectionSupportView.issueSchedule = collectionSupport.issueSchedule;
+    
+    collectionSupportView.balances = _converBalanceFromMapToArray(collectionSupport.balance);
+    return collectionSupportView;
   }
-  */
+
 
   /**
    * @dev set asset address
@@ -477,9 +508,6 @@ contract Support is
     emit CaseByCaseSupport(_msgSender(), nftAsset, issueNo, slotId, assetType, actualSupportAmount, block.timestamp);
     
   }
-
-  
-  
 
   // get the collection's issues info
   /**

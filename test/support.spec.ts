@@ -86,7 +86,8 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     const supportAddr = (await getSupport()).address;
     console.log("stakingAddr", supportAddr);
 
-    //Setup the addr of the supported asset
+
+    //-- Setup the addr of the supported asset
     const zeroAddr = Address.zero().toString();
     // const mockedAddrUSDC = createRandomAddress();
     // const mockedAddrUSDT = createRandomAddress();
@@ -105,14 +106,16 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
           )
       );
 
-    // get the WETH, USDT, USDC contract  
-    // const allTokenAsset = getAllMockedTokens();
-    // const contractUSDC = allTokenAsset[TokenContractId.USDC];
-    // const contractUSDT = allTokenAsset[TokenContractId.USDT];
 
-    // Mint and approve token for test acount
-    // console.log("weth address: ", weth.address);
-    // console.log("weth: ", weth );
+    //-- check asset addr
+    const assetAddr = await support.getAssetsAddr();
+    expect(assetAddr[0], "ETH is default as zero").to.be.eq(zeroAddr);
+    expect(assetAddr[1], "WETH addr is set as expected").to.be.eq(mockedAddrWETH);
+    expect(assetAddr[2], "Second addr is set as expected").to.be.eq(mockedAddrUSDC);
+    expect(assetAddr[3], "Third addr is set as expected").to.be.eq(mockedAddrUSDT);
+
+
+    //-- Mint and approve token for test acount
     await weth.connect(depositor.signer).mint(await convertToCurrencyDecimals(weth.address, "100"));
     await weth.connect(depositor.signer).transfer(collectionSupporter.address, await convertToCurrencyDecimals(weth.address, "10"))
     await weth.connect(collectionSupporter.signer).approve(support.address, await convertToCurrencyDecimals(weth.address, "10"));
@@ -127,18 +130,11 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     await usdt.connect(collectionSupporter.signer).approve(support.address, await convertToCurrencyDecimals(usdt.address, "10"));
     console.log("usdt allowance: ", await usdt.allowance(collectionSupporter.address, support.address));
 
-    //check asset addr
-    const assetAddr = await support.getAssetsAddr();
-    expect(assetAddr[0], "ETH is default as zero").to.be.eq(zeroAddr);
-    expect(assetAddr[1], "WETH addr is set as expected").to.be.eq(mockedAddrWETH);
-    expect(assetAddr[2], "Second addr is set as expected").to.be.eq(mockedAddrUSDC);
-    expect(assetAddr[3], "Third addr is set as expected").to.be.eq(mockedAddrUSDT);
     
-    //TODO - Mock two addresses, active the first one
+    //-- Mock two addresses, active the first one
     const mockedAddressActive = createRandomAddress();
     const mockedAddressNotActive = createRandomAddress();
     expect(mockedAddressActive, "Two mocked addr is different").to.not.be.eq(mockedAddressNotActive);
-    
     
     //Enable the mockedAddressActive
     console.log("Enable the mockedAddressActive");
@@ -159,7 +155,7 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     //console.log("collectionSupportNotActive", SupportNotActive.supporting);
     
     
-    //support the active one
+    //-- support the active collection
     const depositSize = parseEther("1.05");
     const depositUSDCSize = await convertToCurrencyDecimals(usdc.address, "2.05")
     const depositUSDTSize = await convertToCurrencyDecimals(usdt.address, "3.05")
@@ -179,12 +175,14 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     );
 
     const supportWithETH = await support.getCollectionSupport(mockedAddressActive);
-    console.log("ETH:", supportWithETH.balance.etherAmount);
-    console.log("USDC:", supportWithETH.balance.usdcAmount);
-    console.log("USDT:", supportWithETH.balance.usdtAmount);
-    console.log("WETH:", supportWithETH.balance.wethAmount);
+    console.log("ETH:", supportWithETH.balances.assetsArray[0]);
+    console.log("WETH:", supportWithETH.balances.assetsArray[1]);
+    console.log("USDC:", supportWithETH.balances.assetsArray[2]);
+    console.log("USDT:", supportWithETH.balances.assetsArray[3]);
+
+    console.log("183");
     
-    expect(supportWithETH.balance.etherAmount).to.be.eq(depositSize);
+    expect(supportWithETH.balances.assetsArray[0]).to.be.eq(depositSize);
 
 
     //Support WETH
@@ -200,12 +198,12 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     );
 
     const supportWithWETH = await support.getCollectionSupport(mockedAddressActive);
-    console.log("ETH:", supportWithWETH.balance.etherAmount);
-    console.log("USDC:", supportWithWETH.balance.usdcAmount);
-    console.log("USDT:", supportWithWETH.balance.usdtAmount);
-    console.log("WETH:", supportWithWETH.balance.wethAmount);
+    console.log("ETH:", supportWithWETH.balances.assetsArray[0]);
+    console.log("WETH:", supportWithWETH.balances.assetsArray[1]);
+    console.log("USDC:", supportWithWETH.balances.assetsArray[2]);
+    console.log("USDT:", supportWithWETH.balances.assetsArray[3]);
     
-    expect(supportWithWETH.balance.wethAmount).to.be.eq(depositWETHSize);
+    expect(supportWithWETH.balances.assetsArray[1]).to.be.eq(depositWETHSize);
     const balanceOfWETH = await weth.balanceOf(support.address);
     expect(balanceOfWETH).to.be.eq(depositWETHSize);
  
@@ -221,12 +219,12 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     );
 
     const supportWithUSDC = await support.getCollectionSupport(mockedAddressActive);
-    console.log("ETH:", supportWithUSDC.balance.etherAmount);
-    console.log("USDC:", supportWithUSDC.balance.usdcAmount);
-    console.log("USDT:", supportWithUSDC.balance.usdtAmount);
-    console.log("WETH:", supportWithUSDC.balance.wethAmount);
+    console.log("ETH:", supportWithUSDC.balances.assetsArray[0]);
+    console.log("WETH:", supportWithUSDC.balances.assetsArray[1]);
+    console.log("USDC:", supportWithUSDC.balances.assetsArray[2]);
+    console.log("USDT:", supportWithUSDC.balances.assetsArray[3]);
     
-    expect(supportWithUSDC.balance.usdcAmount).to.be.eq(depositUSDCSize);
+    expect(supportWithUSDC.balances.assetsArray[2]).to.be.eq(depositUSDCSize);
     const balanceOfUSDC = await usdc.balanceOf(support.address);
     expect(balanceOfUSDC).to.be.eq(depositUSDCSize);
 
@@ -242,12 +240,12 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     );
 
     const supportWithUSDT = await support.getCollectionSupport(mockedAddressActive);
-    console.log("ETH:", supportWithUSDT.balance.etherAmount);
-    console.log("USDC:", supportWithUSDT.balance.usdcAmount);
-    console.log("USDT:", supportWithUSDT.balance.usdtAmount);
-    console.log("WETH:", supportWithUSDT.balance.wethAmount);
+    console.log("ETH:", supportWithUSDT.balances.assetsArray[0]);
+    console.log("WETH:", supportWithUSDT.balances.assetsArray[1]);
+    console.log("USDC:", supportWithUSDT.balances.assetsArray[2]);
+    console.log("USDT:", supportWithUSDT.balances.assetsArray[3]);
     
-    expect(supportWithUSDT.balance.usdtAmount).to.be.eq(depositUSDTSize);
+    expect(supportWithUSDT.balances.assetsArray[3]).to.be.eq(depositUSDTSize);
     const balanceOfUSDT = await usdt.balanceOf(support.address);
     expect(balanceOfUSDT).to.be.eq(depositUSDTSize);
 
@@ -268,7 +266,143 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
 
     */
 
-  // console.log("l90");
-  expect(true).to.be.eq(true);
+  
+    //-- updateCollectionIssueSchedule
+    // every two weeks' tuesday 0am is the starting point - 
+    // Date and time (GMT): Tuesday, December 13, 2022 12:00:00 AM
+    const baseStartTime = 1670889600;
+    // Two weeks
+    const issueDurationTime = 1209600;
+
+    //updateCollectionIssueSchedule
+    console.log("updateCollectionIssueSchedule");
+    await waitForTx(
+        await support
+          .connect(poolAdminSigner)
+          .updateCollectionIssueSchedule(
+            mockedAddressActive,
+            1,
+            baseStartTime,
+            issueDurationTime
+          )
+      );
+    
+    //Get and print the issue schedule
+    const collectionsIssueSchedule = await support.getCollectionsIssueSchedule([mockedAddressActive]);
+    console.log(collectionsIssueSchedule);
+
+
+    //-- case by case support
+    const depositSizeCase = parseEther("1.05");
+    const depositUSDCCase = await convertToCurrencyDecimals(usdc.address, "2.05")
+    const depositUSDTCase = await convertToCurrencyDecimals(usdt.address, "3.05")
+    const depositWETHCase = await convertToCurrencyDecimals(weth.address, "4.05")
+
+    console.log("support the active one");
+    //Support ETH
+    await waitForTx(
+      await support
+        .connect(collectionSupporter.signer)
+        .caseByCaseSupport(
+            mockedAddressActive,
+            0,
+            0,
+            1,
+            1,
+            { value: depositSizeCase }
+        )
+    );
+    const supportWithETHCase = await support.getCollectionSupport(mockedAddressActive);
+    console.log("ETH:", supportWithETHCase.balances.assetsArray[0]);
+    console.log("WETH:", supportWithETHCase.balances.assetsArray[1]);
+    console.log("USDC:", supportWithETHCase.balances.assetsArray[2]);
+    console.log("USDT:", supportWithETHCase.balances.assetsArray[3]);
+
+    expect(supportWithETHCase.balances.assetsArray[0]).to.be.eq(depositSize.add(depositSizeCase));
+
+    
+    //Support WETH
+    console.log("depositWETHSize: ", depositWETHSize);
+    await waitForTx(
+      await support
+        .connect(collectionSupporter.signer)
+        .caseByCaseSupport(
+            mockedAddressActive,
+            1,
+            depositWETHCase,
+            1,
+            2
+        )
+    );
+
+    const supportWithWETHCase = await support.getCollectionSupport(mockedAddressActive);
+    console.log("ETH:", supportWithWETHCase.balances.assetsArray[0]);
+    console.log("WETH:", supportWithWETHCase.balances.assetsArray[1]);
+    console.log("USDC:", supportWithWETHCase.balances.assetsArray[2]);
+    console.log("USDT:", supportWithWETHCase.balances.assetsArray[3]);
+    
+    expect(supportWithWETHCase.balances.assetsArray[1]).to.be.eq(depositWETHSize.add(depositWETHCase));
+    const balanceOfWETHCase = await weth.balanceOf(support.address);
+    expect(balanceOfWETHCase).to.be.eq(depositWETHSize.add(depositWETHCase));
+ 
+    //Support USDC
+    await waitForTx(
+      await support
+        .connect(collectionSupporter.signer)
+        .caseByCaseSupport(
+            mockedAddressActive,
+            2,
+            depositUSDCCase,
+            1,
+            3
+        )
+    );
+
+    const supportWithUSDCCase = await support.getCollectionSupport(mockedAddressActive);
+    console.log("ETH:", supportWithUSDCCase.balances.assetsArray[0]);
+    console.log("WETH:", supportWithUSDCCase.balances.assetsArray[1]);
+    console.log("USDC:", supportWithUSDCCase.balances.assetsArray[2]);
+    console.log("USDT:", supportWithUSDCCase.balances.assetsArray[3]);
+    
+    expect(supportWithUSDCCase.balances.assetsArray[2]).to.be.eq(depositUSDCSize.add(depositUSDCCase));
+    const balanceOfUSDCCase = await usdc.balanceOf(support.address);
+    expect(balanceOfUSDCCase).to.be.eq(depositUSDCSize.add(depositUSDCCase));
+
+    //Support USDT
+    await waitForTx(
+      await support
+        .connect(collectionSupporter.signer)
+        .caseByCaseSupport(
+            mockedAddressActive,
+            3,
+            depositUSDTCase,
+            1,
+            4
+        )
+    );
+
+    const supportWithUSDTCase = await support.getCollectionSupport(mockedAddressActive);
+    console.log("ETH:", supportWithUSDTCase.balances.assetsArray[0]);
+    console.log("WETH:", supportWithUSDTCase.balances.assetsArray[1]);
+    console.log("USDC:", supportWithUSDTCase.balances.assetsArray[2]);
+    console.log("USDT:", supportWithUSDTCase.balances.assetsArray[3]);
+    
+    expect(supportWithUSDTCase.balances.assetsArray[3]).to.be.eq(depositUSDTSize.add(depositUSDTCase));
+    const balanceOfUSDTCase = await usdt.balanceOf(support.address);
+    expect(balanceOfUSDTCase).to.be.eq(depositUSDTSize.add(depositUSDTCase));
+
+
+
+    //-- get slot info for checking
+    const collectionIssueData = await support.getCollectionIssuesData(mockedAddressActive, 1, 1);
+    console.log("issue inf ", 
+    collectionIssueData[0].slotsView[0],
+    collectionIssueData[0].slotsView[1],
+    collectionIssueData[0].slotsView[2],
+    collectionIssueData[0].slotsView[3],
+    collectionIssueData[0].slotsView[4]
+    );
+
+    
   });
 });
