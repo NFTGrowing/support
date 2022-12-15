@@ -44,6 +44,13 @@ contract Support is
   ContextUpgradeable,
   StakingStorageExt
 {
+
+
+  uint256 public constant AssetTypeLimit = 20;
+  uint256 public constant SlotLowerLimit = 1;
+  uint256 public constant DefaultSlotUpperLimit = 30;
+  uint256 public _slotUpperLimit = DefaultSlotUpperLimit;
+
   //TODO - 改成 map
   /*
   struct Balance{
@@ -59,15 +66,17 @@ contract Support is
   */
   struct Balance{
     // Key belong to SupportAssetType
-    mapping(uint => uint) assetMap;
+    mapping(uint256 => uint256) assetMap;
   }
 
+  /*
   struct LongTermSupportTx{
     address supporter;
     uint256 supportedTimeStamp;
     SupportAssetType assetType;
     uint256 assetAmount;
   }
+  */
 
   struct SupportSlot {
     address beneficiary;
@@ -77,7 +86,7 @@ contract Support is
 
   struct IssueSupport {
     // TODO - check whether this would cause problems while upgrading based on proxy
-    SupportSlot[] slots;
+    mapping(uint256 => SupportSlot) slots;
   }
 
 
@@ -85,9 +94,9 @@ contract Support is
   // current IssueNo = baseIssueNo + (block.timestamp - baseStartTime)/issueDurationTime
   // if block.timestamp > baseStartTime
   struct IssueSchedule {
-    uint baseIssueNo;
-    uint baseStartTime;
-    uint issueDurationTime;
+    uint256 baseIssueNo;
+    uint256 baseStartTime;
+    uint256 issueDurationTime;
   }
 
   struct CollectionSupport {
@@ -111,14 +120,14 @@ contract Support is
 
     //case by case support; key - issue id; value - issue support info
     mapping(uint32 => IssueSupport) issues;
-    
 
+    // TODO - whether add some gap here?
   }
 
   // for return 
   struct CollectionIssueNo{
     address collectionAddr;
-    uint issueNo;
+    uint256 issueNo;
   }
 
   // for return 
@@ -127,13 +136,26 @@ contract Support is
     IssueSchedule issueSchedule;
   }
 
-  uint constant AssetTypeLimit = 20;
-  bool internal _paused;
-  IStakingAddressesProvider internal _addressesProvider;
+  // for return 
+  struct SlotView {
+    uint256 slotID;
+    uint256[AssetTypeLimit] balance ;
+  }
 
-  //Flexiable length may overlap the memory when SupportAssetType extend on upgrading
-  address[AssetTypeLimit] internal _assetAddr;
-  // mapping(uint => address) internal _assetAddr;
+  // for return 
+  struct IssueSupportView {
+    uint256 issueID;
+    SlotView[DefaultSlotUpperLimit] slotsView;
+  }
+
+  
+  bool public _paused;
+  IStakingAddressesProvider public _addressesProvider;
+
+  //TODO - Does flexiable length overlap the memory when SupportAssetType extend on upgrading
+  address[AssetTypeLimit] public _assetAddr;
+  
+  // mapping(uint256 => address) internal _assetAddr;
   mapping(address => CollectionSupport) internal _nftSupport;
   
 
@@ -172,6 +194,12 @@ contract Support is
     _;
   }
 
+  receive() external payable {
+      emit Received(msg.sender, msg.value);
+  }
+
+  fallback() external payable { }
+
   function _whenNotPaused() internal view {
     require(!_paused, Errors.LP_IS_PAUSED);
   }
@@ -190,6 +218,7 @@ contract Support is
    **/
   function initialize(IStakingAddressesProvider provider) public initializer {
     _addressesProvider = provider;
+    _slotUpperLimit = DefaultSlotUpperLimit;
   }
 
   /**
@@ -209,7 +238,7 @@ contract Support is
   function setAssetsAddr(address[] calldata addrList) external override nonReentrant onlySupportConfigurator{
     require(addrList.length <= _assetAddr.length, Errors.VL_INVALID_AMOUNT);
     
-    for (uint i = 0; i < _assetAddr.length; i++){
+    for (uint256 i = 0; i < _assetAddr.length; i++){
       if (i < addrList.length){ 
         _assetAddr[i] = addrList[i];
       }
@@ -220,11 +249,19 @@ contract Support is
   }
 
   /**
+   * @dev set _slotUpperLimit
+   * @param slotUpperLimit New slotUpperLimit to cover the existing
+   */
+  function setSlotUpperLimit(uint256 slotUpperLimit) external override nonReentrant onlySupportConfigurator{
+    _slotUpperLimit = slotUpperLimit;
+  }
+
+  /**
    * @dev get asset address
    */
   function getAssetsAddr() external view override returns (address[] memory){
     address[] memory addrReturn = new address[](AssetTypeLimit);
-    for (uint i = 0; i < AssetTypeLimit; i++){
+    for (uint256 i = 0; i < AssetTypeLimit; i++){
       addrReturn[i] = _assetAddr[i];
     }  
     return addrReturn;
@@ -278,7 +315,7 @@ contract Support is
         revert("The assetType is not supported");
     }
     
-    uint issueNo = _getCollectionIssueNo(nftAsset);
+    uint256 issueNo = _getCollectionIssueNo(nftAsset);
     emit LongTermSupport(_msgSender(), nftAsset, issueNo, assetType, actualSupportAmount, block.timestamp);
     
   }
@@ -294,7 +331,7 @@ contract Support is
   ) external override nonReentrant onlySupportConfigurator{
     require(collections.length > 0, Errors.VL_INVALID_AMOUNT);
     
-    for (uint i=0; i<collections.length; i++){
+    for (uint256 i=0; i<collections.length; i++){
       _nftSupport[collections[i]].supporting = newStatus;
 
     }
@@ -315,9 +352,9 @@ contract Support is
   **/
   function updateCollectionIssueSchedule(
     address collection, 
-    uint baseIssueNo,
-    uint baseStartTime,
-    uint issueDurationTime) external override nonReentrant onlySupportConfigurator {
+    uint256 baseIssueNo,
+    uint256 baseStartTime,
+    uint256 issueDurationTime) external override nonReentrant onlySupportConfigurator {
       require(issueDurationTime > 0, Errors.VL_INVALID_AMOUNT); 
       _nftSupport[collection].issueSchedule.baseIssueNo = baseIssueNo;
       _nftSupport[collection].issueSchedule.baseStartTime = baseStartTime;
@@ -331,7 +368,7 @@ contract Support is
   function getCollectionsIssueNo(address[] calldata collections  ) public view returns (CollectionIssueNo[] memory){
     require(collections.length > 0, Errors.VL_INVALID_AMOUNT);
     CollectionIssueNo[] memory collectionsIssueNo = new CollectionIssueNo[](collections.length);
-    for (uint i = 0; i < collections.length; i++){
+    for (uint256 i = 0; i < collections.length; i++){
       collectionsIssueNo[i].collectionAddr = collections[i];
       collectionsIssueNo[i].issueNo = _getCollectionIssueNo(collections[i]);
     }
@@ -346,7 +383,7 @@ contract Support is
   function getCollectionsIssueSchedule(address[] calldata collections  ) public view returns (CollectionIssueSchedule[] memory){
     require(collections.length > 0, Errors.VL_INVALID_AMOUNT);
     CollectionIssueSchedule[] memory collectionsIssueSchedule = new CollectionIssueSchedule[](collections.length);
-    for (uint i = 0; i < collections.length; i++){
+    for (uint256 i = 0; i < collections.length; i++){
       collectionsIssueSchedule[i].collectionAddr = collections[i];
       collectionsIssueSchedule[i].issueSchedule = _nftSupport[collections[i]].issueSchedule;
     }
@@ -357,7 +394,7 @@ contract Support is
    * @dev  the current issue no of collection
    * @param collectionAddr The addresses of the NFT to be updated
   **/
-  function _getCollectionIssueNo(address collectionAddr) internal view returns (uint ){
+  function _getCollectionIssueNo(address collectionAddr) internal view returns (uint256 ){
     IssueSchedule storage issueSchedule = _nftSupport[collectionAddr].issueSchedule;
     if (issueSchedule.baseStartTime <= 0 || issueSchedule.issueDurationTime <= 0) {
       //no valid schedule for this collection currently
@@ -394,12 +431,12 @@ contract Support is
     
     // check issueNo & 
     require(issueNo > 0, Errors.VL_INVALID_ISSUE_NO);
-    uint currentIssueNo = _getCollectionIssueNo(nftAsset);
+    uint256 currentIssueNo = _getCollectionIssueNo(nftAsset);
     require(currentIssueNo > 0, Errors.VL_INVALID_CURRENT_ISSUE_NO);
     require((issueNo == currentIssueNo) || (issueNo == (currentIssueNo - 1)), Errors.VL_INVALID_ISSUE_NO);
 
     // check slot id 
-    require(slotId >= 1 && slotId <= 30, Errors.VL_INVALID_SLOTID);
+    require(slotId >= SlotLowerLimit && slotId <= _slotUpperLimit, Errors.VL_INVALID_SLOTID);
 
     //assetType(uint8) to SupportAssetType(Enum) check 
     SupportAssetType assetTypeEnum = SupportAssetType(assetType);
@@ -436,13 +473,48 @@ contract Support is
         revert("The assetType is not supported");
     }
     
-    // uint currentIssueNo = _getCollectionIssueNo(nftAsset);
+    // uint256 currentIssueNo = _getCollectionIssueNo(nftAsset);
     emit CaseByCaseSupport(_msgSender(), nftAsset, issueNo, slotId, assetType, actualSupportAmount, block.timestamp);
     
   }
-  
-  // TODO - settle the Collection Issue
-  // 
 
+  
+  
+
+  // get the collection's issues info
+  /**
+   * @dev get the collection's issues info
+   * @param collection The address of the NFT to be supported
+   * @param issueFrom starting issue
+   * @param issueTo ending issue
+   **/
+  function getCollectionIssuesData(
+    address collection,  
+    uint256 issueFrom,
+    uint256 issueTo) public view returns (IssueSupportView[] memory){
+      require(issueFrom > 0 && issueTo > 0 && issueFrom <= issueTo, Errors.VL_INVALID_ISSUE_NO);
+      IssueSupportView[] memory issuesView = new IssueSupportView[](issueTo - issueFrom + 1);
+      mapping(uint32 => IssueSupport) storage issues = _nftSupport[collection].issues; 
+      for (uint256 i = issueFrom; i <= issueTo; i++)
+      {
+        IssueSupportView memory issue;
+        issue.issueID = i;
+
+        // If the actural slot number is bigger than default value, it can't be fetched by this func
+        for(uint256 j = SlotLowerLimit; j <= DefaultSlotUpperLimit; j++){
+          SlotView memory slotView;
+          slotView.slotID = j;
+
+          for(uint256 k = uint256(SupportAssetType.ETH); k < uint256(SupportAssetType.Last); k++){
+            slotView.balance[k] = issues[uint32(i)].slots[j].balance.assetMap[k];
+          }  
+          issue.slotsView[j-1] = slotView;
+        }
+        issuesView[issueFrom - i] = issue;
+      }
+      return issuesView;
+    }
+
+    // TODO - settle the Collection Issue
 }
 

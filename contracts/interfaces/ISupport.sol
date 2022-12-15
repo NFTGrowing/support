@@ -3,8 +3,6 @@ pragma solidity 0.8.4;
 
 interface ISupport {
 
-
-  
   // important: limit is 20 kind of assets, check _assetAddr in Support.sol
   enum SupportAssetType{
     ETH,
@@ -13,18 +11,6 @@ interface ISupport {
     USDT,
     Last //this indicates the length of this enum, not a valid type
   }
-
-  /**
-   * @dev set asset address
-   * @param addrList New addrList to cover the existing arr
-   */
-  function setAssetsAddr(address[] calldata addrList) external;
-
-  /**
-   * @dev get asset address
-   */
-  function getAssetsAddr() external view returns (address[] memory);
-
 
   /**
    * @dev Emitted on longTermSupport()
@@ -38,11 +24,18 @@ interface ISupport {
   event LongTermSupport(
     address indexed supporter,
     address indexed nftAsset,
-    uint indexed issueNo,
+    uint256 indexed issueNo,
     uint8 assetType,
     uint256 supportAmount,
     uint256 supportedTimeStamp
   );
+
+  /**
+   * @dev Emitted in receive funciton for ether depositing
+   * @param depositor depositor
+   * @param amount amount
+   **/
+  event Received(address depositor, uint256 amount);
 
   /**
    * @dev Emitted on caseByCaseSupport()
@@ -56,12 +49,29 @@ interface ISupport {
   event CaseByCaseSupport(
     address indexed supporter,
     address indexed nftAsset,
-    uint indexed issueNo,
+    uint256 indexed issueNo,
     uint32 slotId,
     uint8 assetType,
     uint256 supportAmount,
     uint256 supportedTimeStamp
   );
+
+  /**
+   * @dev set asset address
+   * @param addrList New addrList to cover the existing arr
+   */
+  function setAssetsAddr(address[] calldata addrList) external;
+
+  /**
+   * @dev get asset address
+   */
+  function getAssetsAddr() external view returns (address[] memory);
+
+  /**
+   * @dev set _slotUpperLimit
+   * @param slotUpperLimit New slotUpperLimit to cover the existing
+   */
+  function setSlotUpperLimit(uint256 slotUpperLimit) external;
 
   /**
    * @dev Depositor support the collection by ether, usdc, or usdt
@@ -95,9 +105,9 @@ interface ISupport {
   **/
   function updateCollectionIssueSchedule(
     address collection, 
-    uint baseIssueNo,
-    uint baseStartTime,
-    uint issueDurationTime) external;
+    uint256 baseIssueNo,
+    uint256 baseStartTime,
+    uint256 issueDurationTime) external;
 
 
   // Case by case support 
