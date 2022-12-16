@@ -50,6 +50,7 @@ library Errors {
   string public constant VL_INVALID_ISSUE_NO = "321";
   string public constant VL_INVALID_CURRENT_ISSUE_NO = "322";
   string public constant VL_INVALID_SLOTID = "323";
+  string public constant VL_INVALID_ASSETARRAY_LENGTH = "323";
 
   //lend pool errors
   string public constant LP_CALLER_NOT_SUPPORT_CONFIGURATOR = "400"; // 'The caller of the function is not the lending pool configurator'
@@ -126,4 +127,11 @@ library Errors {
   //address provider erros
   string public constant LPAPR_PROVIDER_NOT_REGISTERED = "760"; // 'Provider is not registered'
   string public constant LPAPR_INVALID_ADDRESSES_PROVIDER_ID = "761";
+
+  //Support module error
+  string public constant SUPPORT_INVALID_WITHDRAW_BALANCE = "800";
+  string public constant SUPPORT_INVALID_ADDRESS = "801";
+  string public constant SUPPORT_TRANSFER_FAILED = "802"; 
+
+
 }

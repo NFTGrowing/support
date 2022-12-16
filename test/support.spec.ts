@@ -73,6 +73,8 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     const depositor = users[0];
     const collectionSupporter = users[2];
 
+    const settleOperator = users[6];
+
     /*
     // WETH
     await mintERC20(testEnv, depositor, "WETH", "10");
@@ -319,7 +321,8 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     console.log("USDT:", supportWithETHCase.balances.assetsArray[3]);
 
     expect(supportWithETHCase.balances.assetsArray[0]).to.be.eq(depositSize.add(depositSizeCase));
-
+    const balanceOfETHCase = await ethers.provider.getBalance(support.address);
+    expect(balanceOfETHCase).to.be.eq(depositSize.add(depositSizeCase));
     
     //Support WETH
     console.log("depositWETHSize: ", depositWETHSize);
@@ -404,5 +407,69 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     );
 
     
+    //-- withdrawForOneIssue
+    // settleOperator
+    const withdrawSize = parseEther("1.2");
+    const withdrawWETHSize = await convertToCurrencyDecimals(weth.address, "1.3");
+    const withdrawUSDCSize = await convertToCurrencyDecimals(usdc.address, "1.4");
+    const withdrawUSDTSize = await convertToCurrencyDecimals(usdt.address, "1.5");
+
+    await waitForTx(
+      await support
+        .connect(poolAdminSigner)
+        .withdrawForOneIssue(
+          mockedAddressActive,
+          1,
+          settleOperator.address,
+          [withdrawSize, withdrawWETHSize, withdrawUSDCSize, withdrawUSDTSize]
+        )
+    );
+
+    const withdrawForIssueResult = await support.getCollectionSupport(mockedAddressActive);
+    // check balance
+    // expect(supportWithETHCase.balances.assetsArray[0]).to.be.eq(depositSize.add(depositSizeCase));
+    //eth
+    const ethWithdrawResultExpec = balanceOfETHCase.sub(withdrawSize);
+    const actualAfterWithdrawETH = await ethers.provider.getBalance(support.address);
+    const recordAfterWithdrawETH = withdrawForIssueResult.balances.assetsArray[0];
+    const actualOperatorETH = await ethers.provider.getBalance(settleOperator.address);
+
+    expect(ethWithdrawResultExpec).to.be.eq(actualAfterWithdrawETH);
+    expect(ethWithdrawResultExpec).to.be.eq(recordAfterWithdrawETH);
+    console.log("ETH expec, actual, record, actualOperator", 
+        ethWithdrawResultExpec, actualAfterWithdrawETH, recordAfterWithdrawETH, actualOperatorETH)
+
+    //weth
+    const wethWithdrawResultExpec = balanceOfWETHCase.sub(withdrawWETHSize);
+    const actualAfterWithdrawWETH = await weth.balanceOf(support.address);
+    const recordAfterWithdrawWETH = withdrawForIssueResult.balances.assetsArray[1];
+    const actualOperatorWETH = await weth.balanceOf(settleOperator.address);
+
+    expect(wethWithdrawResultExpec).to.be.eq(actualAfterWithdrawWETH);
+    expect(wethWithdrawResultExpec).to.be.eq(recordAfterWithdrawWETH);
+    console.log("WETH expec, actual, record, actualOperator", 
+      wethWithdrawResultExpec, actualAfterWithdrawWETH, recordAfterWithdrawWETH, actualOperatorWETH)
+
+    //usdc
+    const usdcWithdrawResultExpec = balanceOfUSDCCase.sub(withdrawUSDCSize);
+    const actualAfterWithdrawUSDC = await usdc.balanceOf(support.address);
+    const recordAfterWithdrawUSDC = withdrawForIssueResult.balances.assetsArray[2];
+    const actualOperatorUSDC = await usdc.balanceOf(settleOperator.address);
+
+    expect(usdcWithdrawResultExpec).to.be.eq(actualAfterWithdrawUSDC);
+    expect(usdcWithdrawResultExpec).to.be.eq(recordAfterWithdrawUSDC);
+    console.log("USDC expec, actual, record, actualOperator", 
+      usdcWithdrawResultExpec, actualAfterWithdrawUSDC, recordAfterWithdrawUSDC, actualOperatorUSDC)
+    
+    //usdt
+    const usdtWithdrawResultExpec = balanceOfUSDTCase.sub(withdrawUSDTSize);
+    const actualAfterWithdrawUSDT = await usdt.balanceOf(support.address);
+    const recordAfterWithdrawUSDT = withdrawForIssueResult.balances.assetsArray[3];
+    const actualOperatorUSDT = await usdt.balanceOf(settleOperator.address);
+
+    expect(usdtWithdrawResultExpec).to.be.eq(actualAfterWithdrawUSDT);
+    expect(usdtWithdrawResultExpec).to.be.eq(recordAfterWithdrawUSDT);
+    console.log("USDT expec, actual, record, actualOperator", 
+      usdtWithdrawResultExpec, actualAfterWithdrawUSDT, recordAfterWithdrawUSDT, actualOperatorUSDT)
   });
 });

@@ -543,6 +543,70 @@ contract Support is
       return issuesView;
     }
 
-    // TODO - settle the Collection Issue
+    // TODO - settle the Collection Issue - Delayed
+
+    // Withdraw asset for collection issue supporting
+    
+    /**
+     * @dev get the collection's issues info
+     * @param collection The address of the NFT to withdraw
+     * @param issueNo withdraw for this issue
+     * @param operatorAddr withdraw to this operator for handling
+     * @param assetsAmount assets amount to withdraw; see SupportAssetType
+     **/
+    function withdrawForOneIssue(
+      address collection,
+      uint32 issueNo,
+      address operatorAddr,
+      uint[] memory assetsAmount
+    ) external override nonReentrant onlySupportConfigurator {
+        require(assetsAmount.length > 0 && assetsAmount.length <= uint32(SupportAssetType.Last), 
+                Errors.VL_INVALID_ASSETARRAY_LENGTH);
+
+        require(operatorAddr != address(0), Errors.SUPPORT_INVALID_ADDRESS);
+
+
+        CollectionSupport storage collectionSupport = _nftSupport[collection];
+        for(uint256 i = 0; i < assetsAmount.length; i++){
+          require(collectionSupport.balance.assetMap[i] >= assetsAmount[i], Errors.SUPPORT_INVALID_WITHDRAW_BALANCE);
+
+          //transfer
+          if (assetsAmount[i] <= 0){ 
+            continue; 
+          }
+
+          //assetType(uint8) to SupportAssetType(Enum) check 
+          SupportAssetType assetTypeEnum = SupportAssetType(i);
+          // uint256 actualTransferAmount = assetsAmount;
+
+          //
+          if (assetTypeEnum == SupportAssetType.ETH){
+              
+              collectionSupport.balance.assetMap[i] -= assetsAmount[i];
+              
+              //transfer ETH
+              payable(operatorAddr).transfer(assetsAmount[i]);
+              emit WithdrawForIssue(collection, issueNo, msg.sender, operatorAddr, uint8(assetTypeEnum), address(0), assetsAmount[i]);
+              
+          }
+          else if ( assetTypeEnum < SupportAssetType.Last ) {
+              // transfer ERC20  to this contract
+              collectionSupport.balance.assetMap[i] -= assetsAmount[i];
+
+              address assetAddr = _assetAddr[i];
+              bool transferResult = IERC20Upgradeable(assetAddr).transfer(operatorAddr, assetsAmount[i]);
+              require(transferResult, Errors.SUPPORT_TRANSFER_FAILED);
+              emit WithdrawForIssue(collection, issueNo, msg.sender, operatorAddr, uint8(assetTypeEnum), assetAddr, assetsAmount[i]);
+          }
+          else {
+              // revert
+              revert("The assetType is not supported");
+          }          
+        }
+    }
+    
+    
+
+
 }
 

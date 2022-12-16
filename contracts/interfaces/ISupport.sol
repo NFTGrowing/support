@@ -57,6 +57,27 @@ interface ISupport {
   );
 
   /**
+   * @dev Emitted on settlement withdrawral for one issue 
+   * @param collection withdraw from this collection
+   * @param issueNo being handled issue no
+   * @param msgSender sender of this withdrawral
+   * @param operatorAddr operator Address to handle the withdrawed asset
+   * @param assetType asset type is withdrawed
+   * @param assetAddress asset address is withdrawed
+   * @param assetsAmount The amount of the above asset
+   **/
+  event WithdrawForIssue(
+    address indexed collection,
+    uint256 indexed issueNo,
+    address msgSender,
+    address operatorAddr,
+    uint8 assetType,
+    address assetAddress,
+    uint256 assetsAmount
+  );
+
+  
+  /**
    * @dev set asset address
    * @param addrList New addrList to cover the existing arr
    */
@@ -127,4 +148,18 @@ interface ISupport {
     uint32 slotId
   ) external payable;
 
+
+  /**
+   * @dev get the collection's issues info
+   * @param collection The address of the NFT to withdraw
+   * @param issueNo withdraw for this issue
+   * @param operatorAddr withdraw to this operator for handling
+   * @param assetsAmount assets amount to withdraw; see SupportAssetType
+   **/
+  function withdrawForOneIssue(
+    address collection,
+    uint32 issueNo,
+    address operatorAddr,
+    uint[] memory assetsAmount
+  ) external;
 }
