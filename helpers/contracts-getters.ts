@@ -16,7 +16,7 @@ import {
 import { IERC20DetailedFactory } from "../types/IERC20DetailedFactory";
 //import { IERC721DetailedFactory } from "../types/IERC721DetailedFactory";
 import { getEthersSigners, MockTokenMap, MockNftMap } from "./contracts-helpers";
-import { DRE, getDb, notFalsyOrZeroAddress, omit } from "./misc-utils";
+import { DRE, getDb, notFalsyOrZeroAddress } from "./misc-utils";
 import { eContractid, PoolConfiguration, tEthereumAddress, TokenContractId, NftContractId } from "./types";
 
 export const getFirstSigner = async () => (await getEthersSigners())[0];
@@ -143,33 +143,33 @@ export const getQuoteCurrencies = (oracleQuoteCurrency: string): string[] => {
   }
 };
 
-export const getPairsTokenAggregator = (
-  allAssetsAddresses: {
-    [tokenSymbol: string]: tEthereumAddress;
-  },
-  aggregatorsAddresses: { [tokenSymbol: string]: tEthereumAddress },
-  oracleQuoteCurrency: string
-): [string[], string[]] => {
-  const assetsWithoutQuoteCurrency = omit(allAssetsAddresses, getQuoteCurrencies(oracleQuoteCurrency));
+// export const getPairsTokenAggregator = (
+//   allAssetsAddresses: {
+//     [tokenSymbol: string]: tEthereumAddress;
+//   },
+//   aggregatorsAddresses: { [tokenSymbol: string]: tEthereumAddress },
+//   oracleQuoteCurrency: string
+// ): [string[], string[]] => {
+//   const assetsWithoutQuoteCurrency = omit(allAssetsAddresses, getQuoteCurrencies(oracleQuoteCurrency));
 
-  const pairs = Object.entries(assetsWithoutQuoteCurrency).map(([tokenSymbol, tokenAddress]) => {
-    //if (true/*tokenSymbol !== 'WETH' && tokenSymbol !== 'ETH' && tokenSymbol !== 'LpWETH'*/) {
-    const aggregatorAddressIndex = Object.keys(aggregatorsAddresses).findIndex((value) => value === tokenSymbol);
-    if (aggregatorAddressIndex < 0) {
-      throw Error(`can not find aggregator for ${tokenSymbol}`);
-    }
-    const [, aggregatorAddress] = (Object.entries(aggregatorsAddresses) as [string, tEthereumAddress][])[
-      aggregatorAddressIndex
-    ];
-    return [tokenAddress, aggregatorAddress];
-    //}
-  }) as [string, string][];
+//   const pairs = Object.entries(assetsWithoutQuoteCurrency).map(([tokenSymbol, tokenAddress]) => {
+//     //if (true/*tokenSymbol !== 'WETH' && tokenSymbol !== 'ETH' && tokenSymbol !== 'LpWETH'*/) {
+//     const aggregatorAddressIndex = Object.keys(aggregatorsAddresses).findIndex((value) => value === tokenSymbol);
+//     if (aggregatorAddressIndex < 0) {
+//       throw Error(`can not find aggregator for ${tokenSymbol}`);
+//     }
+//     const [, aggregatorAddress] = (Object.entries(aggregatorsAddresses) as [string, tEthereumAddress][])[
+//       aggregatorAddressIndex
+//     ];
+//     return [tokenAddress, aggregatorAddress];
+//     //}
+//   }) as [string, string][];
 
-  const mappedPairs = pairs.map(([asset]) => asset);
-  const mappedAggregators = pairs.map(([, source]) => source);
+//   const mappedPairs = pairs.map(([asset]) => asset);
+//   const mappedAggregators = pairs.map(([, source]) => source);
 
-  return [mappedPairs, mappedAggregators];
-};
+//   return [mappedPairs, mappedAggregators];
+// };
 
 /*
 export const getNftLogic = async (address?: tEthereumAddress) =>

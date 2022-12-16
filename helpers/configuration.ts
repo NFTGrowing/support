@@ -14,7 +14,7 @@ import { CommonsConfig } from "../markets/bend/commons";
 import { DRE, notFalsyOrZeroAddress } from "./misc-utils";
 import { tEthereumAddress } from "./types";
 import { getParamPerNetwork } from "./contracts-helpers";
-import { deployWETH9, deployWrappedPunk, deployCryptoPunksMarket } from "./contracts-deployments";
+import { deployWETH9 } from "./contracts-deployments";
 import { ZERO_ADDRESS } from "./constants";
 
 export enum ConfigNames {
@@ -106,31 +106,31 @@ export const getWrappedNativeTokenAddress = async (config: ICommonConfiguration)
   return weth.address;
 };
 
-export const getWrappedPunkTokenAddress = async (config: ICommonConfiguration, punk: tEthereumAddress) => {
-  const currentNetwork = process.env.MAINNET_FORK === "true" ? "main" : DRE.network.name;
-  const wpunkAddress = getParamPerNetwork(config.WrappedPunkToken, <eNetwork>currentNetwork);
-  if (wpunkAddress) {
-    return wpunkAddress;
-  }
-  if (currentNetwork.includes("main")) {
-    throw new Error("WPUNKS not set at mainnet configuration.");
-  }
-  if (!notFalsyOrZeroAddress(punk)) {
-    throw new Error("PUNK not set at dev or testnet configuration.");
-  }
-  const wpunk = await deployWrappedPunk([punk]);
-  return wpunk.address;
-};
+// export const getWrappedPunkTokenAddress = async (config: ICommonConfiguration, punk: tEthereumAddress) => {
+//   const currentNetwork = process.env.MAINNET_FORK === "true" ? "main" : DRE.network.name;
+//   const wpunkAddress = getParamPerNetwork(config.WrappedPunkToken, <eNetwork>currentNetwork);
+//   if (wpunkAddress) {
+//     return wpunkAddress;
+//   }
+//   if (currentNetwork.includes("main")) {
+//     throw new Error("WPUNKS not set at mainnet configuration.");
+//   }
+//   if (!notFalsyOrZeroAddress(punk)) {
+//     throw new Error("PUNK not set at dev or testnet configuration.");
+//   }
+//   const wpunk = await deployWrappedPunk([punk]);
+//   return wpunk.address;
+// };
 
-export const getCryptoPunksMarketAddress = async (config: ICommonConfiguration) => {
-  const currentNetwork = process.env.MAINNET_FORK === "true" ? "main" : DRE.network.name;
-  const punkAddress = getParamPerNetwork(config.CryptoPunksMarket, <eNetwork>currentNetwork);
-  if (punkAddress) {
-    return punkAddress;
-  }
-  if (currentNetwork.includes("main")) {
-    throw new Error("CryptoPunksMarket not set at mainnet configuration.");
-  }
-  const punk = await deployCryptoPunksMarket([]);
-  return punk.address;
-};
+// export const getCryptoPunksMarketAddress = async (config: ICommonConfiguration) => {
+//   const currentNetwork = process.env.MAINNET_FORK === "true" ? "main" : DRE.network.name;
+//   const punkAddress = getParamPerNetwork(config.CryptoPunksMarket, <eNetwork>currentNetwork);
+//   if (punkAddress) {
+//     return punkAddress;
+//   }
+//   if (currentNetwork.includes("main")) {
+//     throw new Error("CryptoPunksMarket not set at mainnet configuration.");
+//   }
+//   const punk = await deployCryptoPunksMarket([]);
+//   return punk.address;
+// };

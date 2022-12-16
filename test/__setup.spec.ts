@@ -34,12 +34,6 @@ import {
   deployChainlinkMockAggregator,
 } from "../helpers/oracles-helpers";
 import { DRE, waitForTx } from "../helpers/misc-utils";
-import {
-  initReservesByHelper,
-  configureReservesByHelper,
-  initNftsByHelper,
-  configureNftsByHelper,
-} from "../helpers/init-helpers";
 import BendConfig from "../markets/bend";
 import {
   getSecondSigner,

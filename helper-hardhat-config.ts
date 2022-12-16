@@ -4,7 +4,7 @@ import { eEthereumNetwork, iParamsPerNetwork } from "./helpers/types";
 
 require("dotenv").config();
 
-const INFURA_KEY = process.env.INFURA_KEY || "";
+const INFURA_KEY = process.env.INFURA_KEY || "1a882cabd3ba45e684d591eaa5d5c4c2";
 const ALCHEMY_KEY = process.env.ALCHEMY_KEY || "";
 const TENDERLY_FORK_ID = process.env.TENDERLY_FORK_ID || "";
 const FORK = process.env.FORK || "";
@@ -35,9 +35,13 @@ export const NETWORKS_RPC_URL: iParamsPerNetwork<string> = {
   [eEthereumNetwork.kovan]: ALCHEMY_KEY
     ? `https://eth-kovan.alchemyapi.io/v2/${ALCHEMY_KEY}`
     : `https://kovan.infura.io/v3/${INFURA_KEY}`,
+  [eEthereumNetwork.sepolia]: ALCHEMY_KEY
+    ? `https://eth-sepolia.alchemyapi.io/v2/${ALCHEMY_KEY}`
+    : `https://sepolia.infura.io/v3/${INFURA_KEY}`,
   [eEthereumNetwork.main]: ALCHEMY_KEY
     ? `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`
     : `https://mainnet.infura.io/v3/${INFURA_KEY}`,
+  
   [eEthereumNetwork.coverage]: "http://localhost:8555",
   [eEthereumNetwork.hardhat]: "http://localhost:8545",
   [eEthereumNetwork.localhost]: "http://localhost:8545",
@@ -47,6 +51,7 @@ export const NETWORKS_DEFAULT_GAS: iParamsPerNetwork<number> = {
   [eEthereumNetwork.develop]: 65 * GWEI,
   [eEthereumNetwork.rinkeby]: 65 * GWEI,
   [eEthereumNetwork.kovan]: 65 * GWEI,
+  [eEthereumNetwork.sepolia]: 2 * GWEI,
   [eEthereumNetwork.main]: 25 * GWEI,
   [eEthereumNetwork.coverage]: 65 * GWEI,
   [eEthereumNetwork.hardhat]: 65 * GWEI,
@@ -57,6 +62,7 @@ export const BLOCK_TO_FORK: iParamsPerNetwork<number | undefined> = {
   [eEthereumNetwork.main]: 13623705,
   [eEthereumNetwork.rinkeby]: 0,
   [eEthereumNetwork.kovan]: 0,
+  [eEthereumNetwork.sepolia]: 0,
   [eEthereumNetwork.develop]: 0,
   [eEthereumNetwork.coverage]: 0,
   [eEthereumNetwork.hardhat]: 0,
