@@ -28,8 +28,7 @@ import { createRandomAddress } from "../../helpers/misc-utils";
 
 task("dev:initialize-support", "Initialize support.")
   .addFlag("verify", "Verify contracts at Etherscan")
-  .addParam("pool", `Pool name to retrieve configuration, supported: ${Object.values(ConfigNames)}`)
-  .setAction(async ({ verify, pool }, localBRE) => {
+  .setAction(async ({ }, localBRE) => {
     await localBRE.run("set-DRE");
     const network = <eNetwork>localBRE.network.name;
     
@@ -62,6 +61,7 @@ task("dev:initialize-support", "Initialize support.")
 
     //Enable the mockedAddressActive
     const mockedAddressActive = createRandomAddress();
+    console.log("the mocked addr is:", mockedAddressActive)
     console.log("Enable the mockedAddressActive");
     await waitForTx(
         await support
@@ -71,6 +71,7 @@ task("dev:initialize-support", "Initialize support.")
             true
             )
         );
+    
     
     //Enable -- 
     //-- updateCollectionIssueSchedule

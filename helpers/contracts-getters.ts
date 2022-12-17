@@ -35,6 +35,8 @@ export const getEmergencyAdminSigner = async () => (await getEthersSigners())[1]
 
 export const getProxyAdminSigner = async () => (await getEthersSigners())[2];
 
+export const getSupporter = async () => (await getEthersSigners())[5];
+
 export const getStakingAddressesProvider = async (address?: tEthereumAddress) => {
   return await StakingAddressesProviderFactory.connect(
     address || (await getDb(DRE.network.name).get(`${eContractid.StakingAddressesProvider}`).value()).address,
