@@ -29,9 +29,14 @@ import { convertToCurrencyDecimals } from "../../helpers/contracts-helpers";
 import { parseEther } from "ethers/lib/utils";
 // import { ethers, waffle} from "hardhat";
 
-const enabled_collection = "0x1bcCDA21c15dd7e20F4b89446936AadFE39e64A0";
 
-task("verify:support", "mint and approve token for support")
+const collection_1 = "0x1bcCDA21c15dd7e20F4b89446936AadFE39e64A0";
+const collection_2 = "0x7D62d11eC5E625566Ff501AAd1304878C6AB3b64";
+const collection_3 = "0xbF15a45245a74Fc7e4Cc81b106CD369e81a6e9eD";
+
+const enabled_collection = collection_2;
+
+task("verify:mintApproveAsset", "mint and approve token for support")
   .setAction(async ({ }, localBRE) => {
     await localBRE.run("set-DRE");
     const network = <eNetwork>localBRE.network.name;
@@ -69,15 +74,17 @@ task("verify:support", "mint and approve token for support")
     // await weth.connect(poolAdminSigner).transfer(supporterAddr, await convertToCurrencyDecimals(weth.address, "10"))
     // await weth.connect(simulateSupporter).approve(support.address, await convertToCurrencyDecimals(weth.address, "10"));
 
-    await usdc.connect(poolAdminSigner).mint(await convertToCurrencyDecimals(usdc.address, "100"));
-    //TODO - Delay for some time 
-    await usdc.connect(poolAdminSigner).transfer(supporterAddr, await convertToCurrencyDecimals(usdc.address, "10"))
-    await usdc.connect(simulateSupporter).approve(support.address, await convertToCurrencyDecimals(usdc.address, "10"));
+    await usdc.connect(poolAdminSigner).mint(await convertToCurrencyDecimals(usdc.address, "10000"));
+    //Delay for some time 
+    await new Promise(f => setTimeout(f, 15000));
+    await usdc.connect(poolAdminSigner).transfer(supporterAddr, await convertToCurrencyDecimals(usdc.address, "1000"))
+    await usdc.connect(simulateSupporter).approve(support.address, await convertToCurrencyDecimals(usdc.address, "1000"));
 
-    await usdt.connect(poolAdminSigner).mint(await convertToCurrencyDecimals(usdt.address, "100"));
-    //TODO - Delay for some time 
-    await usdt.connect(poolAdminSigner).transfer(supporterAddr, await convertToCurrencyDecimals(usdt.address, "10"))
-    await usdt.connect(simulateSupporter).approve(support.address, await convertToCurrencyDecimals(usdt.address, "10"));
+    await usdt.connect(poolAdminSigner).mint(await convertToCurrencyDecimals(usdt.address, "10000"));
+    // Delay for some time 
+    await new Promise(f => setTimeout(f, 15000));
+    await usdt.connect(poolAdminSigner).transfer(supporterAddr, await convertToCurrencyDecimals(usdt.address, "1000"))
+    await usdt.connect(simulateSupporter).approve(support.address, await convertToCurrencyDecimals(usdt.address, "1000"));
 
 
   });
@@ -112,9 +119,21 @@ task("verify:listNewCollection", "Initialize support.")
     //-- updateCollectionIssueSchedule
     // every two weeks' tuesday 0am is the starting point - 
     // Date and time (GMT): Tuesday, December 13, 2022 12:00:00 AM
-    const baseStartTime = 1670889600;
+    // const baseStartTime = 1670889600;
+    // Two weeks
+    // const issueDurationTime = 1209600;
+
+
+    // // Date and time (GMT): Tuesday, November 29, 2022 12:00:00 AM
+    // const baseStartTime = 1669680000;
+    // // Two weeks
+    // const issueDurationTime = 1209600;
+
+    // Date and time (GMT): Tuesday, November 15, 2022 12:00:00 AM
+    const baseStartTime = 1668470400;
     // Two weeks
     const issueDurationTime = 1209600;
+    
 
     //updateCollectionIssueSchedule
     console.log("updateCollectionIssueSchedule");
@@ -257,10 +276,12 @@ task("verify:caseByCaseSupport", "caseByCaseSupport")
 
     //-- case by case support
     const depositSizeCase = parseEther("0.025");
+    const depositWETHCase = await convertToCurrencyDecimals(weth.address, "7.05")
     const depositUSDCCase = await convertToCurrencyDecimals(usdc.address, "5.05")
     const depositUSDTCase = await convertToCurrencyDecimals(usdt.address, "6.05")
-    const depositWETHCase = await convertToCurrencyDecimals(weth.address, "7.05")
 
+
+    const supportingIssueNo = 3;
     console.log("support the active one");
     //Support ETH
     await waitForTx(
@@ -270,16 +291,16 @@ task("verify:caseByCaseSupport", "caseByCaseSupport")
             enabled_collection,
             0,
             0,
-            1,
+            supportingIssueNo,
             1,
             { value: depositSizeCase }
         )
     );
-    const supportWithETHCase = await support.getCollectionSupport(enabled_collection);
-    console.log("ETH:", supportWithETHCase.balances.assetsArray[0]);
-    console.log("WETH:", supportWithETHCase.balances.assetsArray[1]);
-    console.log("USDC:", supportWithETHCase.balances.assetsArray[2]);
-    console.log("USDT:", supportWithETHCase.balances.assetsArray[3]);
+    // const supportWithETHCase = await support.getCollectionSupport(enabled_collection);
+    // console.log("ETH:", supportWithETHCase.balances.assetsArray[0]);
+    // console.log("WETH:", supportWithETHCase.balances.assetsArray[1]);
+    // console.log("USDC:", supportWithETHCase.balances.assetsArray[2]);
+    // console.log("USDT:", supportWithETHCase.balances.assetsArray[3]);
 
     //Support WETH
     // console.log("depositWETHSize: ", depositWETHCase);
@@ -303,7 +324,7 @@ task("verify:caseByCaseSupport", "caseByCaseSupport")
             enabled_collection,
             2,
             depositUSDCCase,
-            1,
+            supportingIssueNo,
             3
         )
     );
@@ -316,14 +337,14 @@ task("verify:caseByCaseSupport", "caseByCaseSupport")
             enabled_collection,
             3,
             depositUSDTCase,
-            1,
+            supportingIssueNo,
             4
         )
     );
 
 
     //-- get slot info for checking
-    const collectionIssueData = await support.getCollectionIssuesData(enabled_collection, 1, 1);
+    const collectionIssueData = await support.getCollectionIssuesData(enabled_collection, supportingIssueNo, supportingIssueNo);
     console.log("issue inf ", 
     collectionIssueData[0].slotsView[0],
     collectionIssueData[0].slotsView[1],
