@@ -359,3 +359,19 @@ task("verify:caseByCaseSupport", "caseByCaseSupport")
     console.log("After USDC:", afterLongTermSupport.balances.assetsArray[2]);
     console.log("After USDT:", afterLongTermSupport.balances.assetsArray[3]);
   });
+
+task("verify:getCollectionsIssueNo", "getCollectionsIssueNo")
+  .setAction(async ({ }, localBRE) => {
+    await localBRE.run("set-DRE");
+
+    //   testEnv.support = await getSupport(); 
+    const support = await getSupport();
+
+    //Support ETH
+    const getResult = await support.getCollectionsIssueNo(
+            [collection_1, collection_2, collection_3] );
+    console.log("IssueNo", getResult);
+    
+  });
+
+  
