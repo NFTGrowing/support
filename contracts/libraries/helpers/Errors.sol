@@ -51,6 +51,7 @@ library Errors {
   string public constant VL_INVALID_CURRENT_ISSUE_NO = "322";
   string public constant VL_INVALID_SLOTID = "323";
   string public constant VL_INVALID_ASSETARRAY_LENGTH = "323";
+  string public constant VL_INVALID_STRING_PARA = "324";
 
   //lend pool errors
   string public constant LP_CALLER_NOT_SUPPORT_CONFIGURATOR = "400"; // 'The caller of the function is not the lending pool configurator'
@@ -131,7 +132,19 @@ library Errors {
   //Support module error
   string public constant SUPPORT_INVALID_WITHDRAW_BALANCE = "800";
   string public constant SUPPORT_INVALID_ADDRESS = "801";
-  string public constant SUPPORT_TRANSFER_FAILED = "802"; 
+  string public constant SUPPORT_TRANSFER_FAILED = "802";
 
-
+  //Copyright module error
+  string public constant C_REGISTRY_INVALID_ID = "900";
+  string public constant C_REGISTRY_SIGNATURE_ERROR = "901";
+  string public constant C_REGISTRY_LV2_REGISTERED = "902";
+  string public constant C_REGISTRY_LV1_REGISTERED = "903";
+  string public constant C_REGISTRY_INVALID_BENEFICIARY = "904";
+  string public constant C_REGISTRY_BENEFICIARY_NE_SENDER = "905";
+  string public constant C_REGISTRY_LENGTH_ERROR = "906";
+  string public constant C_REGISTRY_NOT_ACTIVE_WORK = "907";
+  string public constant C_REGISTRY_WRONG_LV2_TOKENID = "908";
+  string public constant C_REGISTRY_CLAIMED_ALREADY = "909";
+  string public constant C_REGISTRY_AMOUNT_ERROR = "910";
+  string public constant C_REGISTRY_WRONG_LV1_TOKENID = "911";
 }

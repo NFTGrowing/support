@@ -11,6 +11,8 @@ import {
   CBProxyAdminFactory,
   CBUpgradeableProxyFactory,
   WETH9MockedFactory,
+  CopyrightRegistryFactory,
+  CopyrightFixedSupplyFactory,
   //NftLogicFactory,
 } from "../types";
 import { IERC20DetailedFactory } from "../types/IERC20DetailedFactory";
@@ -37,6 +39,8 @@ export const getProxyAdminSigner = async () => (await getEthersSigners())[2];
 
 export const getSupporter = async () => (await getEthersSigners())[6];
 
+export const getServiceSigner = async () => (await getEthersSigners())[4];
+
 export const getStakingAddressesProvider = async (address?: tEthereumAddress) => {
   return await StakingAddressesProviderFactory.connect(
     address || (await getDb(DRE.network.name).get(`${eContractid.StakingAddressesProvider}`).value()).address,
@@ -62,6 +66,15 @@ export const getSupport = async (address?: tEthereumAddress) =>
     address || (await getDb(DRE.network.name).get(`${eContractid.Support}`).value()).address,
     await getDeploySigner()
   );
+
+export const getCopyrightRegistry = async (address?: tEthereumAddress) =>
+  await CopyrightRegistryFactory.connect(
+    address || (await getDb(DRE.network.name).get(`${eContractid.CopyrightRegistryImpl}`).value()).address,
+    await getDeploySigner()
+  );
+
+export const getCopyrightFixedSupply = async (address: tEthereumAddress) =>
+  await CopyrightFixedSupplyFactory.connect(address, await getDeploySigner());
 
 export const getBNFT = async (address?: tEthereumAddress) =>
   await BNFTFactory.connect(
@@ -111,7 +124,7 @@ export const getWETHMocked = async (address?: tEthereumAddress) =>
   await WETH9MockedFactory.connect(
     address || (await getDb(DRE.network.name).get(`${eContractid.WETHMocked}`).value()).address,
     await getDeploySigner()
-    );
+  );
 
 export const getConfigMockedNfts = async (config: PoolConfiguration) => {
   const tokenSymbols = Object.keys(config.NftsConfig);
@@ -216,7 +229,6 @@ export const getBNFTRegistryImpl = async (address?: tEthereumAddress) => {
 
 export const getAddressById = async (id: string): Promise<tEthereumAddress | undefined> =>
   (await getDb(DRE.network.name).get(`${id}`).value())?.address || undefined;
-
 
 export const getIErc20Detailed = async (address: tEthereumAddress) =>
   await IERC20DetailedFactory.connect(

@@ -18,22 +18,19 @@ import {
   MintableERC20Factory,
   MintableERC721,
   MintableERC721Factory,
-
   BNFTFactory,
   BNFTRegistryFactory,
-
   StakingFactory,
   SupportFactory,
-  
   StakingAddressesProviderFactory,
-
   CBUpgradeableProxyFactory,
   CBProxyAdminFactory,
   StakeLogicFactory,
   WETH9MockedFactory,
   WETH9Factory,
+  CopyrightRegistryFactory,
   WETH9Mocked,
-  WETH9
+  WETH9,
 } from "../types";
 
 import {
@@ -63,7 +60,6 @@ export const deployStakingAddressesProviderRegistry = async (verify?: boolean) =
   );
 */
 
-
 export const deployCBLibraries = async (verify?: boolean) => {
   await deployStakingLibraries(verify);
   // await deployConfiguratorLibraries(verify);
@@ -79,7 +75,6 @@ export const deployStakingLibraries = async (verify?: boolean) => {
   const borrowLogic = await deployStakeLogicLibrary(verify);
   // const liquidateLogic = await deployLiquidateLogicLibrary(verify);
 };
-
 
 export const getStakingLibraries = async (verify?: boolean): Promise<StakingLibraryAddresses> => {
   // const reserveLogicAddress = await getContractAddressInDb(eContractid.ReserveLogic);
@@ -133,6 +128,12 @@ export const deploySupport = async (verify?: boolean) => {
   const supportImpl = await new SupportFactory(await getDeploySigner()).deploy();
   await insertContractAddressInDb(eContractid.SupportImpl, supportImpl.address);
   return withSaveAndVerify(supportImpl, eContractid.Support, [], verify);
+};
+
+export const deployCopyrightRegistry = async (verify?: boolean) => {
+  const copyrightRegistryImpl = await new CopyrightRegistryFactory(await getDeploySigner()).deploy();
+  await insertContractAddressInDb(eContractid.CopyrightRegistryImpl, copyrightRegistryImpl.address);
+  return withSaveAndVerify(copyrightRegistryImpl, eContractid.CopyrightRegistryImpl, [], verify);
 };
 
 export const deployStakingAddressesProvider = async (marketId: string, verify?: boolean) =>
@@ -217,37 +218,36 @@ export const deployWETHMocked = async (verify?: boolean) =>
 export const deployWETH9 = async (verify?: boolean) =>
   withSaveAndVerify(await new WETH9Factory(await getDeploySigner()).deploy(), eContractid.WETH, [], verify);
 
-  export const deployAllMockTokens = async (forTestCases: boolean, verify?: boolean) => {
-    const tokens: { [symbol: string]: MockContract | MintableERC20 | WETH9Mocked | WETH9 } = {};
-  
-    const protoConfigData = getReservesConfigByPool(BendPools.proto);
-  
-    for (const tokenSymbol of Object.keys(TokenContractId)) {
-      const tokenName = "Bend Mock " + tokenSymbol;
-  
-      if (tokenSymbol === "WETH") {
-        if (forTestCases) {
-          tokens[tokenSymbol] = await deployWETHMocked();
-        } else {
-          tokens[tokenSymbol] = await deployWETH9();
-        }
-        await registerContractInJsonDb(tokenSymbol.toUpperCase(), tokens[tokenSymbol]);
-        continue;
+export const deployAllMockTokens = async (forTestCases: boolean, verify?: boolean) => {
+  const tokens: { [symbol: string]: MockContract | MintableERC20 | WETH9Mocked | WETH9 } = {};
+
+  const protoConfigData = getReservesConfigByPool(BendPools.proto);
+
+  for (const tokenSymbol of Object.keys(TokenContractId)) {
+    const tokenName = "Bend Mock " + tokenSymbol;
+
+    if (tokenSymbol === "WETH") {
+      if (forTestCases) {
+        tokens[tokenSymbol] = await deployWETHMocked();
+      } else {
+        tokens[tokenSymbol] = await deployWETH9();
       }
-  
-      let decimals = "18";
-  
-      let configData = (<any>protoConfigData)[tokenSymbol];
-  
-      tokens[tokenSymbol] = await deployMintableERC20(
-        [tokenName, tokenSymbol, configData ? configData.reserveDecimals : decimals],
-        verify
-      );
       await registerContractInJsonDb(tokenSymbol.toUpperCase(), tokens[tokenSymbol]);
+      continue;
     }
-    return tokens;
-  };
-  
+
+    let decimals = "18";
+
+    let configData = (<any>protoConfigData)[tokenSymbol];
+
+    tokens[tokenSymbol] = await deployMintableERC20(
+      [tokenName, tokenSymbol, configData ? configData.reserveDecimals : decimals],
+      verify
+    );
+    await registerContractInJsonDb(tokenSymbol.toUpperCase(), tokens[tokenSymbol]);
+  }
+  return tokens;
+};
 
 export const deployMintableERC721 = async (args: [string, string], verify?: boolean): Promise<MintableERC721> =>
   withSaveAndVerify(
@@ -256,7 +256,6 @@ export const deployMintableERC721 = async (args: [string, string], verify?: bool
     args,
     verify
   );
-
 
 export const deployAllMockNfts = async (verify?: boolean) => {
   const tokens: { [symbol: string]: MockContract | MintableERC721 } = {};
@@ -279,7 +278,6 @@ export const deployAllMockNfts = async (verify?: boolean) => {
   }
   return tokens;
 };
-
 
 export const chooseBNFTDeployment = (id: eContractid) => {
   switch (id) {
@@ -333,4 +331,4 @@ export const deployCBUpgradeableProxy = async (
   );
 
 export const deployCBProxyAdmin = async (id: string, verify?: boolean) =>
-withSaveAndVerify(await new CBProxyAdminFactory(await getDeploySigner()).deploy(), id, [], verify);
+  withSaveAndVerify(await new CBProxyAdminFactory(await getDeploySigner()).deploy(), id, [], verify);

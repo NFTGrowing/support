@@ -14,6 +14,7 @@ export enum eEthereumNetwork {
   rinkeby = "rinkeby",
   kovan = "kovan",
   sepolia = "sepolia",
+  mumbai = "mumbai",
   main = "main",
 }
 
@@ -71,6 +72,7 @@ export enum eContractid {
   SelfdestructTransferMock = "SelfdestructTransferMock",
   StakingImpl = "StakingImpl",
   SupportImpl = "SupportImpl",
+  CopyrightRegistryImpl = "CopyrightRegistryImpl",
   LendPoolConfiguratorImpl = "LendPoolConfiguratorImpl",
   LendPoolLoanImpl = "LendPoolLoanImpl",
   BNFTRegistry = "BNFTRegistry",
@@ -241,7 +243,7 @@ export type iBendPoolAssets<T> = Pick<
   | "DAI"
   //| 'BUSD'
   | "USDC"
-  | 'USDT'
+  | "USDT"
 >;
 
 export type iMultiPoolsAssets<T> = iAssetCommon<T> | iBendPoolAssets<T>;
@@ -255,7 +257,7 @@ export enum TokenContractId {
   DAI = "DAI",
   // BUSD = 'BUSD',
   USDC = "USDC",
-  USDT = 'USDT',
+  USDT = "USDT",
 }
 
 export interface iNftCommon<T> {
@@ -350,6 +352,7 @@ export interface iEthereumParamsPerNetwork<T> {
   [eEthereumNetwork.rinkeby]: T;
   [eEthereumNetwork.kovan]: T;
   [eEthereumNetwork.sepolia]: T;
+  [eEthereumNetwork.mumbai]: T;
   [eEthereumNetwork.main]: T;
 }
 

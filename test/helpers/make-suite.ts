@@ -10,10 +10,12 @@ import {
   getSupport,
   getAllMockedTokens,
   getWETHMocked,
+  getCopyrightRegistry,
 } from "../../helpers/contracts-getters";
 import { eEthereumNetwork, eNetwork, tEthereumAddress, TokenContractId } from "../../helpers/types";
 import { Staking } from "../../types/Staking";
 import { Support } from "../../types/Support";
+import { CopyrightRegistry } from "../../types/CopyrightRegistry";
 
 import { MintableERC20 } from "../../types/MintableERC20";
 import { MintableERC721 } from "../../types/MintableERC721";
@@ -31,9 +33,7 @@ import { getParamPerNetwork } from "../../helpers/contracts-helpers";
 import { solidity } from "ethereum-waffle";
 import { BendConfig } from "../../markets/bend";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import {
-  BNFTRegistry,
-} from "../../types";
+import { BNFTRegistry } from "../../types";
 import { USD_ADDRESS } from "../../helpers/constants";
 import { SupportInfo } from "prettier";
 
@@ -51,12 +51,13 @@ export interface TestEnv {
   bnftRegistry: BNFTRegistry;
   pool: Staking;
   support: Support;
+  copyrightRegistry: CopyrightRegistry;
 
   weth: WETH9Mocked;
   dai: MintableERC20;
   usdc: MintableERC20;
   usdt: MintableERC20;
-  
+
   //wpunks: WPUNKSMocked;
   bPUNK: BNFT;
   bayc: MintableERC721;
@@ -80,6 +81,7 @@ const testEnv: TestEnv = {
   bnftRegistry: {} as BNFTRegistry,
   pool: {} as Staking,
   support: {} as Support,
+  copyrightRegistry: {} as CopyrightRegistry,
 
   weth: {} as WETH9Mocked,
   dai: {} as MintableERC20,
@@ -114,15 +116,16 @@ export async function initializeMakeSuite() {
   testEnv.bnftRegistry = await getBNFTRegistryProxy();
   testEnv.pool = await getStaking();
   testEnv.support = await getSupport();
+  testEnv.copyrightRegistry = await getCopyrightRegistry();
   testEnv.addressesProvider = await getStakingAddressesProvider();
 
-  // Tokens 
+  // Tokens
   const allTokens = await getAllMockedTokens();
   testEnv.dai = allTokens[TokenContractId.DAI];
   testEnv.usdc = allTokens[TokenContractId.USDC];
   testEnv.usdt = allTokens[TokenContractId.USDT];
   testEnv.weth = await getWETHMocked();
- 
+
   testEnv.tokenIdTracker = 100;
   testEnv.roundIdTracker = 1;
   testEnv.nowTimeTracker = Number(await getNowTimeInSeconds());

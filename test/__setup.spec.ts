@@ -14,6 +14,7 @@ import {
   deployAllMockNfts,
   deployCBProxyAdmin,
   deployCBLibraries,
+  deployCopyrightRegistry,
 } from "../helpers/contracts-deployments";
 
 import { Signer } from "ethers";
@@ -52,7 +53,6 @@ const ALL_ASSETS_INITIAL_PRICES = BendConfig.Mocks.AllAssetsInitialPrices;
 const USD_ADDRESS = BendConfig.ProtocolGlobalParams.UsdAddress;
 const ALL_NFTS_INITIAL_PRICES = BendConfig.Mocks.AllNftsInitialPrices;
 
-
 const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
   console.time("setup");
 
@@ -77,13 +77,13 @@ const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
     ...(await deployAllMockNfts(false)),
   };
 
-/*
+  /*
   const cryptoPunksMarket = await getCryptoPunksMarket();
   await waitForTx(await cryptoPunksMarket.allInitialOwnersAssigned());
   const wrappedPunk = await getWrappedPunk();
 */
 
-/*
+  /*
   console.log("-> Prepare mock external IncentivesController...");
   const mockIncentivesController = await deployMockIncentivesController();
   const incentivesControllerAddress = mockIncentivesController.address;
@@ -93,7 +93,6 @@ const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
   console.log("-> Prepare proxy admin...");
   const bendProxyAdmin = await deployCBProxyAdmin(eContractid.BendProxyAdminTest);
   console.log("bendProxyAdmin:", bendProxyAdmin.address);
-
 
   //////////////////////////////////////////////////////////////////////////////
   // !!! MUST BEFORE LendPoolConfigurator which will getBNFTRegistry from address provider when init
@@ -155,7 +154,7 @@ const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
   // configurator will create proxy for implement
   const StakingAddress = await addressesProvider.getStaking();
   const stakingProxy = await getStaking(StakingAddress);
-  await insertContractAddressInDb(eContractid.Staking, stakingProxy.address);  
+  await insertContractAddressInDb(eContractid.Staking, stakingProxy.address);
 
   console.log("-> Prepare Support...");
   const SupportImpl = await deploySupport();
@@ -163,14 +162,14 @@ const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
   // configurator will create proxy for implement
   const SupportAddress = await addressesProvider.getSupport();
   const supportProxy = await getSupport(SupportAddress);
-  await insertContractAddressInDb(eContractid.Support, supportProxy.address);  
+  await insertContractAddressInDb(eContractid.Support, supportProxy.address);
 
+  console.log("-> Prepare CopyrightRegistry...");
+  const copyrightRegistry = await deployCopyrightRegistry();
 
   console.timeEnd("setup");
 
-//todo - Mon search pool admin in bend
-
-
+  //todo - Mon search pool admin in bend
 };
 
 before(async () => {

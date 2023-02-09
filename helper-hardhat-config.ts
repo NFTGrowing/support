@@ -38,6 +38,12 @@ export const NETWORKS_RPC_URL: iParamsPerNetwork<string> = {
   [eEthereumNetwork.sepolia]: ALCHEMY_KEY
     ? `https://eth-sepolia.alchemyapi.io/v2/${ALCHEMY_KEY}`
     : `https://sepolia.infura.io/v3/${INFURA_KEY}`,
+  [eEthereumNetwork.sepolia]: ALCHEMY_KEY
+    ? `https://eth-sepolia.alchemyapi.io/v2/${ALCHEMY_KEY}`
+    : `https://sepolia.infura.io/v3/${INFURA_KEY}`,
+  [eEthereumNetwork.mumbai]: ALCHEMY_KEY
+    ? `https://polygon-mumbai.alchemyapi.io/v2/${ALCHEMY_KEY}`
+    : `https://polygon-mumbai.infura.io/v3/${INFURA_KEY}`,
   [eEthereumNetwork.main]: ALCHEMY_KEY
     ? `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`
     : `https://mainnet.infura.io/v3/${INFURA_KEY}`,
@@ -52,6 +58,7 @@ export const NETWORKS_DEFAULT_GAS: iParamsPerNetwork<number> = {
   [eEthereumNetwork.rinkeby]: 65 * GWEI,
   [eEthereumNetwork.kovan]: 65 * GWEI,
   [eEthereumNetwork.sepolia]: 2 * GWEI,
+  [eEthereumNetwork.mumbai]: 2 * GWEI,
   [eEthereumNetwork.main]: 25 * GWEI,
   [eEthereumNetwork.coverage]: 65 * GWEI,
   [eEthereumNetwork.hardhat]: 65 * GWEI,
@@ -63,6 +70,7 @@ export const BLOCK_TO_FORK: iParamsPerNetwork<number | undefined> = {
   [eEthereumNetwork.rinkeby]: 0,
   [eEthereumNetwork.kovan]: 0,
   [eEthereumNetwork.sepolia]: 0,
+  [eEthereumNetwork.mumbai]: 0,
   [eEthereumNetwork.develop]: 0,
   [eEthereumNetwork.coverage]: 0,
   [eEthereumNetwork.hardhat]: 0,
