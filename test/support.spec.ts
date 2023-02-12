@@ -74,12 +74,12 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     });
   });
 
-  it("Support NFT collection", async () => {
+  it("Support the theme", async () => {
     const { users, bayc, support, weth, usdc, usdt } = testEnv;
 
     const poolAdminSigner = await getPoolAdminSigner();
     const depositor = users[0];
-    const collectionSupporter = users[2];
+    const themeSupporter = users[2];
 
     const settleOperator = users[6];
 
@@ -90,9 +90,9 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     await deposit(testEnv, depositor, "", "WETH", "10", depositor.address, "success", "");
     */
 
-    const userBalanceBeforeSupport = await ethers.provider.getBalance(collectionSupporter.signer.getAddress());
+    const userBalanceBeforeSupport = await ethers.provider.getBalance(themeSupporter.signer.getAddress());
     console.log("supporter's bal", userBalanceBeforeSupport);
-    console.log("supporter.address", collectionSupporter.address);
+    console.log("supporter.address", themeSupporter.address);
     const supportAddr = (await getSupport()).address;
     console.log("stakingAddr", supportAddr);
 
@@ -122,46 +122,46 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     await weth.connect(depositor.signer).mint(await convertToCurrencyDecimals(weth.address, "100"));
     await weth
       .connect(depositor.signer)
-      .transfer(collectionSupporter.address, await convertToCurrencyDecimals(weth.address, "10"));
+      .transfer(themeSupporter.address, await convertToCurrencyDecimals(weth.address, "10"));
     await weth
-      .connect(collectionSupporter.signer)
+      .connect(themeSupporter.signer)
       .approve(support.address, await convertToCurrencyDecimals(weth.address, "10"));
 
     await usdc.connect(depositor.signer).mint(await convertToCurrencyDecimals(usdc.address, "100"));
     await usdc
       .connect(depositor.signer)
-      .transfer(collectionSupporter.address, await convertToCurrencyDecimals(usdc.address, "10"));
+      .transfer(themeSupporter.address, await convertToCurrencyDecimals(usdc.address, "10"));
     await usdc
-      .connect(collectionSupporter.signer)
+      .connect(themeSupporter.signer)
       .approve(support.address, await convertToCurrencyDecimals(usdc.address, "10"));
-    console.log("usdc allowance: ", await usdc.allowance(collectionSupporter.address, support.address));
+    console.log("usdc allowance: ", await usdc.allowance(themeSupporter.address, support.address));
 
     await usdt.connect(depositor.signer).mint(await convertToCurrencyDecimals(usdt.address, "100"));
     await usdt
       .connect(depositor.signer)
-      .transfer(collectionSupporter.address, await convertToCurrencyDecimals(usdt.address, "10"));
+      .transfer(themeSupporter.address, await convertToCurrencyDecimals(usdt.address, "10"));
     await usdt
-      .connect(collectionSupporter.signer)
+      .connect(themeSupporter.signer)
       .approve(support.address, await convertToCurrencyDecimals(usdt.address, "10"));
-    console.log("usdt allowance: ", await usdt.allowance(collectionSupporter.address, support.address));
+    console.log("usdt allowance: ", await usdt.allowance(themeSupporter.address, support.address));
 
     //-- Mock two addresses, active the first one
-    const mockedAddressActive = createRandomAddress();
-    const mockedAddressNotActive = createRandomAddress();
-    expect(mockedAddressActive, "Two mocked addr is different").to.not.be.eq(mockedAddressNotActive);
+    const themeIDActive = 1;
+    const themeIDNotActive = 2;
+    // expect(themeIDActive, "Two mocked addr is different").to.not.be.eq(themeIDNotActive);
 
     //Enable the mockedAddressActive
     console.log("Enable the mockedAddressActive");
-    await waitForTx(await support.connect(poolAdminSigner).updateStatus([mockedAddressActive], true));
+    await waitForTx(await support.connect(poolAdminSigner).updateStatus([themeIDActive], true));
 
-    const SupportActive = await support.getCollectionSupport(mockedAddressActive);
-    const SupportNotActive = await support.getCollectionSupport(mockedAddressNotActive);
+    const SupportActive = await support.getThemeSupport(themeIDActive);
+    const SupportNotActive = await support.getThemeSupport(themeIDNotActive);
     expect(SupportActive.supporting, "SupportActive Enabled").to.be.eq(true);
     expect(SupportNotActive.supporting, "SupportNotActive not Enabled").to.be.eq(false);
-    //console.log("collectionSupportActive", SupportActive.supporting);
-    //console.log("collectionSupportNotActive", SupportNotActive.supporting);
+    //console.log("themeSupportActive", SupportActive.supporting);
+    //console.log("themeSupportNotActive", SupportNotActive.supporting);
 
-    //-- support the active collection
+    //-- support the active theme
     const depositSize = parseEther("1.05");
     const depositUSDCSize = await convertToCurrencyDecimals(usdc.address, "2.05");
     const depositUSDTSize = await convertToCurrencyDecimals(usdt.address, "3.05");
@@ -170,12 +170,10 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     console.log("support the active one");
     //Support ETH
     await waitForTx(
-      await support
-        .connect(collectionSupporter.signer)
-        .longTermSupport(mockedAddressActive, 0, 0, { value: depositSize })
+      await support.connect(themeSupporter.signer).longTermSupport(themeIDActive, 0, 0, { value: depositSize })
     );
 
-    const supportWithETH = await support.getCollectionSupport(mockedAddressActive);
+    const supportWithETH = await support.getThemeSupport(themeIDActive);
     console.log("ETH:", supportWithETH.balances.assetsArray[0]);
     console.log("WETH:", supportWithETH.balances.assetsArray[1]);
     console.log("USDC:", supportWithETH.balances.assetsArray[2]);
@@ -187,11 +185,9 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
 
     //Support WETH
     console.log("depositWETHSize: ", depositWETHSize);
-    await waitForTx(
-      await support.connect(collectionSupporter.signer).longTermSupport(mockedAddressActive, 1, depositWETHSize)
-    );
+    await waitForTx(await support.connect(themeSupporter.signer).longTermSupport(themeIDActive, 1, depositWETHSize));
 
-    const supportWithWETH = await support.getCollectionSupport(mockedAddressActive);
+    const supportWithWETH = await support.getThemeSupport(themeIDActive);
     console.log("ETH:", supportWithWETH.balances.assetsArray[0]);
     console.log("WETH:", supportWithWETH.balances.assetsArray[1]);
     console.log("USDC:", supportWithWETH.balances.assetsArray[2]);
@@ -202,11 +198,9 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     expect(balanceOfWETH).to.be.eq(depositWETHSize);
 
     //Support USDC
-    await waitForTx(
-      await support.connect(collectionSupporter.signer).longTermSupport(mockedAddressActive, 2, depositUSDCSize)
-    );
+    await waitForTx(await support.connect(themeSupporter.signer).longTermSupport(themeIDActive, 2, depositUSDCSize));
 
-    const supportWithUSDC = await support.getCollectionSupport(mockedAddressActive);
+    const supportWithUSDC = await support.getThemeSupport(themeIDActive);
     console.log("ETH:", supportWithUSDC.balances.assetsArray[0]);
     console.log("WETH:", supportWithUSDC.balances.assetsArray[1]);
     console.log("USDC:", supportWithUSDC.balances.assetsArray[2]);
@@ -217,11 +211,9 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     expect(balanceOfUSDC).to.be.eq(depositUSDCSize);
 
     //Support USDT
-    await waitForTx(
-      await support.connect(collectionSupporter.signer).longTermSupport(mockedAddressActive, 3, depositUSDTSize)
-    );
+    await waitForTx(await support.connect(themeSupporter.signer).longTermSupport(themeIDActive, 3, depositUSDTSize));
 
-    const supportWithUSDT = await support.getCollectionSupport(mockedAddressActive);
+    const supportWithUSDT = await support.getThemeSupport(themeIDActive);
     console.log("ETH:", supportWithUSDT.balances.assetsArray[0]);
     console.log("WETH:", supportWithUSDT.balances.assetsArray[1]);
     console.log("USDC:", supportWithUSDT.balances.assetsArray[2]);
@@ -248,24 +240,25 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
 
     */
 
-    //-- updateCollectionIssueSchedule
-    // every two weeks' tuesday 0am is the starting point -
-    // Date and time (GMT): Tuesday, December 13, 2022 12:00:00 AM
-    const baseStartTime = 1670889600;
+    //-- updateThemeIssueSchedule
+    // https://www.epochconverter.com/
+    // Date and time (GMT): Tuesday, January 31, 2023 12:00:00 AM
+    // Date and time (your time zone): Tuesday, January 31, 2023 8:00:00 AM GMT+08:00
+    const baseStartTime = 1675123200;
     // Two weeks
     const issueDurationTime = 1209600;
 
-    //updateCollectionIssueSchedule
-    console.log("updateCollectionIssueSchedule");
+    //updateThemeIssueSchedule
+    console.log("updateThemeIssueSchedule");
     await waitForTx(
       await support
         .connect(poolAdminSigner)
-        .updateCollectionIssueSchedule(mockedAddressActive, 1, baseStartTime, issueDurationTime)
+        .updateThemeIssueSchedule(themeIDActive, 1, baseStartTime, issueDurationTime)
     );
 
     //Get and print the issue schedule
-    const collectionsIssueSchedule = await support.getCollectionsIssueSchedule([mockedAddressActive]);
-    console.log(collectionsIssueSchedule);
+    const themesIssueSchedule = await support.getThemesIssueSchedule([themeIDActive]);
+    console.log(themesIssueSchedule);
 
     //-- case by case support
     const depositSizeCase = parseEther("1.05");
@@ -277,10 +270,10 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     //Support ETH
     await waitForTx(
       await support
-        .connect(collectionSupporter.signer)
-        .caseByCaseSupport(mockedAddressActive, 0, 0, 1, 1, { value: depositSizeCase })
+        .connect(themeSupporter.signer)
+        .caseByCaseSupport(themeIDActive, 0, 0, 1, 1, { value: depositSizeCase })
     );
-    const supportWithETHCase = await support.getCollectionSupport(mockedAddressActive);
+    const supportWithETHCase = await support.getThemeSupport(themeIDActive);
     console.log("ETH:", supportWithETHCase.balances.assetsArray[0]);
     console.log("WETH:", supportWithETHCase.balances.assetsArray[1]);
     console.log("USDC:", supportWithETHCase.balances.assetsArray[2]);
@@ -293,10 +286,10 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     //Support WETH
     console.log("depositWETHSize: ", depositWETHSize);
     await waitForTx(
-      await support.connect(collectionSupporter.signer).caseByCaseSupport(mockedAddressActive, 1, depositWETHCase, 1, 2)
+      await support.connect(themeSupporter.signer).caseByCaseSupport(themeIDActive, 1, depositWETHCase, 1, 2)
     );
 
-    const supportWithWETHCase = await support.getCollectionSupport(mockedAddressActive);
+    const supportWithWETHCase = await support.getThemeSupport(themeIDActive);
     console.log("ETH:", supportWithWETHCase.balances.assetsArray[0]);
     console.log("WETH:", supportWithWETHCase.balances.assetsArray[1]);
     console.log("USDC:", supportWithWETHCase.balances.assetsArray[2]);
@@ -308,10 +301,10 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
 
     //Support USDC
     await waitForTx(
-      await support.connect(collectionSupporter.signer).caseByCaseSupport(mockedAddressActive, 2, depositUSDCCase, 1, 3)
+      await support.connect(themeSupporter.signer).caseByCaseSupport(themeIDActive, 2, depositUSDCCase, 1, 3)
     );
 
-    const supportWithUSDCCase = await support.getCollectionSupport(mockedAddressActive);
+    const supportWithUSDCCase = await support.getThemeSupport(themeIDActive);
     console.log("ETH:", supportWithUSDCCase.balances.assetsArray[0]);
     console.log("WETH:", supportWithUSDCCase.balances.assetsArray[1]);
     console.log("USDC:", supportWithUSDCCase.balances.assetsArray[2]);
@@ -323,10 +316,10 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
 
     //Support USDT
     await waitForTx(
-      await support.connect(collectionSupporter.signer).caseByCaseSupport(mockedAddressActive, 3, depositUSDTCase, 1, 4)
+      await support.connect(themeSupporter.signer).caseByCaseSupport(themeIDActive, 3, depositUSDTCase, 1, 4)
     );
 
-    const supportWithUSDTCase = await support.getCollectionSupport(mockedAddressActive);
+    const supportWithUSDTCase = await support.getThemeSupport(themeIDActive);
     console.log("ETH:", supportWithUSDTCase.balances.assetsArray[0]);
     console.log("WETH:", supportWithUSDTCase.balances.assetsArray[1]);
     console.log("USDC:", supportWithUSDTCase.balances.assetsArray[2]);
@@ -337,14 +330,14 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     expect(balanceOfUSDTCase).to.be.eq(depositUSDTSize.add(depositUSDTCase));
 
     //-- get slot info for checking
-    const collectionIssueData = await support.getCollectionIssuesData(mockedAddressActive, 1, 1);
+    const themeIssueData = await support.getThemeIssuesData(themeIDActive, 1, 1);
     console.log(
       "issue inf ",
-      collectionIssueData[0].slotsView[0],
-      collectionIssueData[0].slotsView[1],
-      collectionIssueData[0].slotsView[2],
-      collectionIssueData[0].slotsView[3],
-      collectionIssueData[0].slotsView[4]
+      themeIssueData[0].slotsView[0],
+      themeIssueData[0].slotsView[1],
+      themeIssueData[0].slotsView[2],
+      themeIssueData[0].slotsView[3],
+      themeIssueData[0].slotsView[4]
     );
 
     //-- withdrawForOneIssue
@@ -357,7 +350,7 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     await waitForTx(
       await support
         .connect(poolAdminSigner)
-        .withdrawForOneIssue(mockedAddressActive, 1, settleOperator.address, [
+        .withdrawForOneIssue(themeIDActive, 1, settleOperator.address, [
           withdrawSize,
           withdrawWETHSize,
           withdrawUSDCSize,
@@ -365,7 +358,7 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
         ])
     );
 
-    const withdrawForIssueResult = await support.getCollectionSupport(mockedAddressActive);
+    const withdrawForIssueResult = await support.getThemeSupport(themeIDActive);
     // check balance
     // expect(supportWithETHCase.balances.assetsArray[0]).to.be.eq(depositSize.add(depositSizeCase));
     //eth

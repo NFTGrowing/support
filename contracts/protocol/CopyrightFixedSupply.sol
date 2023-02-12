@@ -9,7 +9,6 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
  */
 contract CopyrightFixedSupply is ERC20 {
   uint8 private _decimals;
-  mapping(address => uint256) public mintValues;
 
   /**
    * @dev Emitted on setWorkURL()

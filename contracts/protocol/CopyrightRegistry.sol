@@ -92,7 +92,7 @@ contract CopyrightRegistry is Ownable, ICopyrightRegistry {
     if (lv2ID != 0) {
       require(_lv2Registry[lv2ID].lv2TokenID == address(0), Errors.C_REGISTRY_LV2_REGISTERED);
       //deploy ERC20
-      CopyrightFixedSupply copyrightFixedSupply = new CopyrightFixedSupply(name, symbol, 8, totalSupply);
+      CopyrightFixedSupply copyrightFixedSupply = new CopyrightFixedSupply(name, symbol, 18, totalSupply);
 
       _lv2Registry[lv2ID].isActive = true;
       _lv2Registry[lv2ID].symbol = symbol;

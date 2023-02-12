@@ -25,7 +25,7 @@ import {ContextUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/Cont
 /**
  * @title Support contract
  * @dev Main point of interaction with the support protocol -
- *      TODO - determine whether to deploy one contract instance for each collection.
+ *      TODO - determine whether to deploy one contract instance for each theme.
  * - Users can:
  *   # support
  *   # get support list
@@ -42,21 +42,8 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StakingStorageE
   uint256 public constant DefaultSlotUpperLimit = 30;
   uint256 public _slotUpperLimit = DefaultSlotUpperLimit;
 
-  //TODO - 改成 map
-  /*
-  struct Balance{
-    uint256 etherAmount;
-    uint256 wethAmount;
-    uint256 usdcAmount;
-    uint256 usdtAmount;
-    // Gap for upgrading, minus one while adding one new asset
-    // asset number limit is 20
-    // TODO - whether change all the members tobe arr members
-    uint256[16] amountGap;
-  }
-  */
   struct Balance {
-    // Key belong to SupportAssetType
+    // Key is SupportAssetType
     mapping(uint256 => uint256) assetMap;
   }
 
@@ -80,7 +67,7 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StakingStorageE
     mapping(uint256 => SupportSlot) slots;
   }
 
-  //IssueData of one collection; active IssueNo start from 1
+  //IssueData of one theme; active IssueNo start from 1
   // current IssueNo = baseIssueNo + (block.timestamp - baseStartTime)/issueDurationTime
   // if block.timestamp > baseStartTime
   struct IssueSchedule {
@@ -89,7 +76,7 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StakingStorageE
     uint256 issueDurationTime;
   }
 
-  struct CollectionSupport {
+  struct ThemeSupport {
     //TODO - initial , update
     bool supporting;
     uint256 startedTimeStamp;
@@ -112,14 +99,14 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StakingStorageE
   }
 
   // for return
-  struct CollectionIssueNo {
-    address collectionAddr;
+  struct ThemeIssueNo {
+    uint32 themeID;
     uint256 issueNo;
   }
 
   // for return
-  struct CollectionIssueSchedule {
-    address collectionAddr;
+  struct ThemeIssueSchedule {
+    uint32 themeAddr;
     IssueSchedule issueSchedule;
   }
 
@@ -140,7 +127,7 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StakingStorageE
   }
 
   // for return
-  struct CollectionSupportView {
+  struct ThemeSupportView {
     bool supporting;
     uint256 startedTimeStamp;
     IssueSchedule issueSchedule;
@@ -155,7 +142,7 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StakingStorageE
   address[AssetTypeLimit] public _assetAddr;
 
   // mapping(uint256 => address) internal _assetAddr;
-  mapping(address => CollectionSupport) internal _nftSupport;
+  mapping(uint32 => ThemeSupport) internal _themeSupport;
 
   /**
    * @dev Prevents a contract from calling itself, directly or indirectly.
@@ -228,19 +215,19 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StakingStorageE
   }
 
   /**
-   * @dev get CollectionSupport info
-   * @param nftAsset The address of the collection
+   * @dev get themeSupport info
+   * @param themeID The id of the theme
    **/
-  function getCollectionSupport(address nftAsset) public view returns (CollectionSupportView memory) {
-    CollectionSupportView memory collectionSupportView;
-    CollectionSupport storage collectionSupport = _nftSupport[nftAsset];
+  function getThemeSupport(uint32 themeID) public view returns (ThemeSupportView memory) {
+    ThemeSupportView memory themeSupportView;
+    ThemeSupport storage themeSupport = _themeSupport[themeID];
 
-    collectionSupportView.supporting = collectionSupport.supporting;
-    collectionSupportView.startedTimeStamp = collectionSupport.startedTimeStamp;
-    collectionSupportView.issueSchedule = collectionSupport.issueSchedule;
+    themeSupportView.supporting = themeSupport.supporting;
+    themeSupportView.startedTimeStamp = themeSupport.startedTimeStamp;
+    themeSupportView.issueSchedule = themeSupport.issueSchedule;
 
-    collectionSupportView.balances = _converBalanceFromMapToArray(collectionSupport.balance);
-    return collectionSupportView;
+    themeSupportView.balances = _converBalanceFromMapToArray(themeSupport.balance);
+    return themeSupportView;
   }
 
   /**
@@ -279,19 +266,19 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StakingStorageE
   }
 
   /**
-   * @dev Depositor support the collection by ether, usdc, or usdt
-   * @param nftAsset The address of the NFT to be supported
+   * @dev Depositor support the theme by ether, usdc, or usdt
+   * @param themeID The id of the NFT to be supported
    * @param assetType asset using to support;
    * @param supportAmount The amount of the above asset
    **/
   function longTermSupport(
-    address nftAsset,
+    uint32 themeID,
     uint8 assetType,
     uint256 supportAmount
   ) external payable override nonReentrant whenNotPaused {
     //require msg.value > 0 or supportAmount > 0
     require(msg.value > 0 || supportAmount > 0, Errors.VL_INVALID_AMOUNT);
-    require(_nftSupport[nftAsset].supporting, Errors.VL_COLLECTION_NOT_LIST);
+    require(_themeSupport[themeID].supporting, Errors.VL_COLLECTION_NOT_LIST);
 
     //assetType(uint8) to SupportAssetType(Enum) check
     SupportAssetType assetTypeEnum = SupportAssetType(assetType);
@@ -302,8 +289,8 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StakingStorageE
       require(msg.value > 0, Errors.VL_INVALID_AMOUNT);
 
       //add balance, accumulate Balance
-      _nftSupport[nftAsset].balance.assetMap[assetType] += msg.value;
-      _nftSupport[nftAsset].accumulateBalance.assetMap[assetType] += msg.value;
+      _themeSupport[themeID].balance.assetMap[assetType] += msg.value;
+      _themeSupport[themeID].accumulateBalance.assetMap[assetType] += msg.value;
       actualSupportAmount = msg.value;
     } else if (assetTypeEnum < SupportAssetType.Last) {
       require(supportAmount > 0, Errors.VL_INVALID_AMOUNT);
@@ -313,32 +300,32 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StakingStorageE
       IERC20Upgradeable(assetAddr).transferFrom(msg.sender, address(this), supportAmount);
 
       //add balance, accumulate Balance
-      _nftSupport[nftAsset].balance.assetMap[assetType] += supportAmount;
-      _nftSupport[nftAsset].accumulateBalance.assetMap[assetType] += supportAmount;
+      _themeSupport[themeID].balance.assetMap[assetType] += supportAmount;
+      _themeSupport[themeID].accumulateBalance.assetMap[assetType] += supportAmount;
     } else {
       // revert
       revert("The assetType is not supported");
     }
 
-    uint256 issueNo = _getCollectionIssueNo(nftAsset);
-    emit LongTermSupport(_msgSender(), nftAsset, issueNo, assetType, actualSupportAmount, block.timestamp);
+    uint256 issueNo = _getThemeIssueNo(themeID);
+    emit LongTermSupport(_msgSender(), themeID, issueNo, assetType, actualSupportAmount, block.timestamp);
   }
 
   /**
-   * @dev Update the supporting status of collections
-   * @param collections The addresses of the NFT to be updated
-   * @param newStatus set the collections to this status
+   * @dev Update the supporting status of themes
+   * @param themeIDs The ids of the theme to be updated
+   * @param newStatus set the themes to this status
    **/
-  function updateStatus(address[] calldata collections, bool newStatus)
+  function updateStatus(uint32[] calldata themeIDs, bool newStatus)
     external
     override
     nonReentrant
     onlySupportConfigurator
   {
-    require(collections.length > 0, Errors.VL_INVALID_AMOUNT);
+    require(themeIDs.length > 0, Errors.VL_INVALID_AMOUNT);
 
-    for (uint256 i = 0; i < collections.length; i++) {
-      _nftSupport[collections[i]].supporting = newStatus;
+    for (uint256 i = 0; i < themeIDs.length; i++) {
+      _themeSupport[themeIDs[i]].supporting = newStatus;
     }
   }
 
@@ -348,65 +335,61 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StakingStorageE
 
   //setup issue data
   /**
-   * @dev Update the supporting issue info of collection
-   * @param collection The addresses of the NFT to be updated
+   * @dev Update the supporting issue info of theme
+   * @param themeID The ids of the theme to be updated
    * @param baseIssueNo baseIssueNo of the Issue Data
    * @param baseStartTime baseStartTime of the Issue Data
    * @param issueDurationTime issueDurationTime of the Issue Data
    **/
-  function updateCollectionIssueSchedule(
-    address collection,
+  function updateThemeIssueSchedule(
+    uint32 themeID,
     uint256 baseIssueNo,
     uint256 baseStartTime,
     uint256 issueDurationTime
   ) external override nonReentrant onlySupportConfigurator {
     require(issueDurationTime > 0, Errors.VL_INVALID_AMOUNT);
-    _nftSupport[collection].issueSchedule.baseIssueNo = baseIssueNo;
-    _nftSupport[collection].issueSchedule.baseStartTime = baseStartTime;
-    _nftSupport[collection].issueSchedule.issueDurationTime = issueDurationTime;
+    _themeSupport[themeID].issueSchedule.baseIssueNo = baseIssueNo;
+    _themeSupport[themeID].issueSchedule.baseStartTime = baseStartTime;
+    _themeSupport[themeID].issueSchedule.issueDurationTime = issueDurationTime;
   }
 
   /**
-   * @dev  get issue no of collections
-   * @param collections The addresses of the NFT to be updated
+   * @dev  get issue no of themes
+   * @param themes The ids of the theme to be updated
    **/
-  function getCollectionsIssueNo(address[] calldata collections) public view returns (CollectionIssueNo[] memory) {
-    require(collections.length > 0, Errors.VL_INVALID_AMOUNT);
-    CollectionIssueNo[] memory collectionsIssueNo = new CollectionIssueNo[](collections.length);
-    for (uint256 i = 0; i < collections.length; i++) {
-      collectionsIssueNo[i].collectionAddr = collections[i];
-      collectionsIssueNo[i].issueNo = _getCollectionIssueNo(collections[i]);
+  function getThemesIssueNo(uint32[] calldata themes) public view returns (ThemeIssueNo[] memory) {
+    require(themes.length > 0, Errors.VL_INVALID_AMOUNT);
+    ThemeIssueNo[] memory themesIssueNo = new ThemeIssueNo[](themes.length);
+    for (uint256 i = 0; i < themes.length; i++) {
+      themesIssueNo[i].themeID = themes[i];
+      themesIssueNo[i].issueNo = _getThemeIssueNo(themes[i]);
     }
-    return collectionsIssueNo;
+    return themesIssueNo;
   }
 
-  //get issueSchedule of collections
+  //get issueSchedule of themes
   /**
-   * @dev  the supporting issue info of collection
-   * @param collections The addresses of the NFT to be updated
+   * @dev  the supporting issue info of theme
+   * @param themeIDs The ids of the theme to be updated
    **/
-  function getCollectionsIssueSchedule(address[] calldata collections)
-    public
-    view
-    returns (CollectionIssueSchedule[] memory)
-  {
-    require(collections.length > 0, Errors.VL_INVALID_AMOUNT);
-    CollectionIssueSchedule[] memory collectionsIssueSchedule = new CollectionIssueSchedule[](collections.length);
-    for (uint256 i = 0; i < collections.length; i++) {
-      collectionsIssueSchedule[i].collectionAddr = collections[i];
-      collectionsIssueSchedule[i].issueSchedule = _nftSupport[collections[i]].issueSchedule;
+  function getThemesIssueSchedule(uint32[] calldata themeIDs) public view returns (ThemeIssueSchedule[] memory) {
+    require(themeIDs.length > 0, Errors.VL_INVALID_AMOUNT);
+    ThemeIssueSchedule[] memory themesIssueSchedule = new ThemeIssueSchedule[](themeIDs.length);
+    for (uint256 i = 0; i < themeIDs.length; i++) {
+      themesIssueSchedule[i].themeAddr = themeIDs[i];
+      themesIssueSchedule[i].issueSchedule = _themeSupport[themeIDs[i]].issueSchedule;
     }
-    return collectionsIssueSchedule;
+    return themesIssueSchedule;
   }
 
   /**
-   * @dev  the current issue no of collection
-   * @param collectionAddr The addresses of the NFT to be updated
+   * @dev  the current issue no of theme
+   * @param themeID The id of the theme to be updated
    **/
-  function _getCollectionIssueNo(address collectionAddr) internal view returns (uint256) {
-    IssueSchedule storage issueSchedule = _nftSupport[collectionAddr].issueSchedule;
+  function _getThemeIssueNo(uint32 themeID) internal view returns (uint256) {
+    IssueSchedule storage issueSchedule = _themeSupport[themeID].issueSchedule;
     if (issueSchedule.baseStartTime <= 0 || issueSchedule.issueDurationTime <= 0) {
-      //no valid schedule for this collection currently
+      //no valid schedule for this theme currently
       return 0;
     } else {
       if (block.timestamp <= issueSchedule.baseStartTime) {
@@ -420,26 +403,26 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StakingStorageE
 
   // Case by case support
   /**
-   * @dev Depositor support the collection case by case by ether, usdc, or usdt
-   * @param nftAsset The address of the NFT to be supported
+   * @dev Depositor support the theme case by case by ether, usdc, or usdt
+   * @param themeID The id of the theme to be supported
    * @param assetType asset using to support;
    * @param supportAmount The amount of the above asset
    * @param issueNo only the current issue or the previous one is supportable
    * @param slotId The slotid of the supported item in this issue [0,30]
    **/
   function caseByCaseSupport(
-    address nftAsset,
+    uint32 themeID,
     uint8 assetType,
     uint256 supportAmount,
     uint32 issueNo,
     uint32 slotId
   ) external payable override nonReentrant whenNotPaused {
     require(msg.value > 0 || supportAmount > 0, Errors.VL_INVALID_AMOUNT);
-    require(_nftSupport[nftAsset].supporting, Errors.VL_COLLECTION_NOT_LIST);
+    require(_themeSupport[themeID].supporting, Errors.VL_COLLECTION_NOT_LIST);
 
     // check issueNo &
     require(issueNo > 0, Errors.VL_INVALID_ISSUE_NO);
-    uint256 currentIssueNo = _getCollectionIssueNo(nftAsset);
+    uint256 currentIssueNo = _getThemeIssueNo(themeID);
     require(currentIssueNo > 0, Errors.VL_INVALID_CURRENT_ISSUE_NO);
     require((issueNo == currentIssueNo) || (issueNo == (currentIssueNo - 1)), Errors.VL_INVALID_ISSUE_NO);
 
@@ -455,9 +438,9 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StakingStorageE
       require(msg.value > 0, Errors.VL_INVALID_AMOUNT);
 
       //add balance, accumulate Balance
-      _nftSupport[nftAsset].issues[issueNo].slots[slotId].balance.assetMap[assetType] += msg.value;
-      _nftSupport[nftAsset].balance.assetMap[assetType] += msg.value;
-      _nftSupport[nftAsset].accumulateBalance.assetMap[assetType] += msg.value;
+      _themeSupport[themeID].issues[issueNo].slots[slotId].balance.assetMap[assetType] += msg.value;
+      _themeSupport[themeID].balance.assetMap[assetType] += msg.value;
+      _themeSupport[themeID].accumulateBalance.assetMap[assetType] += msg.value;
       actualSupportAmount = msg.value;
     } else if (assetTypeEnum < SupportAssetType.Last) {
       require(supportAmount > 0, Errors.VL_INVALID_AMOUNT);
@@ -467,33 +450,33 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StakingStorageE
       IERC20Upgradeable(assetAddr).transferFrom(msg.sender, address(this), supportAmount);
 
       //add balance, accumulate Balance
-      _nftSupport[nftAsset].issues[issueNo].slots[slotId].balance.assetMap[assetType] += supportAmount;
-      _nftSupport[nftAsset].balance.assetMap[assetType] += supportAmount;
-      _nftSupport[nftAsset].accumulateBalance.assetMap[assetType] += supportAmount;
+      _themeSupport[themeID].issues[issueNo].slots[slotId].balance.assetMap[assetType] += supportAmount;
+      _themeSupport[themeID].balance.assetMap[assetType] += supportAmount;
+      _themeSupport[themeID].accumulateBalance.assetMap[assetType] += supportAmount;
     } else {
       // revert
       revert("The assetType is not supported");
     }
 
-    // uint256 currentIssueNo = _getCollectionIssueNo(nftAsset);
-    emit CaseByCaseSupport(_msgSender(), nftAsset, issueNo, slotId, assetType, actualSupportAmount, block.timestamp);
+    // uint256 currentIssueNo = _getThemeIssueNo(themeID);
+    emit CaseByCaseSupport(_msgSender(), themeID, issueNo, slotId, assetType, actualSupportAmount, block.timestamp);
   }
 
-  // get the collection's issues info
+  // get the theme's issues info
   /**
-   * @dev get the collection's issues info
-   * @param collection The address of the NFT to be supported
+   * @dev get the theme's issues info
+   * @param themeID The id of the theme to be supported
    * @param issueFrom starting issue
    * @param issueTo ending issue
    **/
-  function getCollectionIssuesData(
-    address collection,
+  function getThemeIssuesData(
+    uint32 themeID,
     uint256 issueFrom,
     uint256 issueTo
   ) public view returns (IssueSupportView[] memory) {
     require(issueFrom > 0 && issueTo > 0 && issueFrom <= issueTo, Errors.VL_INVALID_ISSUE_NO);
     IssueSupportView[] memory issuesView = new IssueSupportView[](issueTo - issueFrom + 1);
-    mapping(uint32 => IssueSupport) storage issues = _nftSupport[collection].issues;
+    mapping(uint32 => IssueSupport) storage issues = _themeSupport[themeID].issues;
     for (uint256 i = issueFrom; i <= issueTo; i++) {
       IssueSupportView memory issue;
       issue.issueID = i;
@@ -513,19 +496,19 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StakingStorageE
     return issuesView;
   }
 
-  // TODO - settle the Collection Issue - Delayed
+  // TODO - settle the Theme Issue - Delayed
 
-  // Withdraw asset for collection issue supporting
+  // Withdraw asset for theme issue supporting
 
   /**
-   * @dev get the collection's issues info
-   * @param collection The address of the NFT to withdraw
+   * @dev get the theme's issues info
+   * @param themeID The id of the theme to withdraw
    * @param issueNo withdraw for this issue
    * @param operatorAddr withdraw to this operator for handling
    * @param assetsAmount assets amount to withdraw; see SupportAssetType
    **/
   function withdrawForOneIssue(
-    address collection,
+    uint32 themeID,
     uint32 issueNo,
     address operatorAddr,
     uint256[] memory assetsAmount
@@ -537,9 +520,9 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StakingStorageE
 
     require(operatorAddr != address(0), Errors.SUPPORT_INVALID_ADDRESS);
 
-    CollectionSupport storage collectionSupport = _nftSupport[collection];
+    ThemeSupport storage themeSupport = _themeSupport[themeID];
     for (uint256 i = 0; i < assetsAmount.length; i++) {
-      require(collectionSupport.balance.assetMap[i] >= assetsAmount[i], Errors.SUPPORT_INVALID_WITHDRAW_BALANCE);
+      require(themeSupport.balance.assetMap[i] >= assetsAmount[i], Errors.SUPPORT_INVALID_WITHDRAW_BALANCE);
 
       //transfer
       if (assetsAmount[i] <= 0) {
@@ -552,12 +535,12 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StakingStorageE
 
       //
       if (assetTypeEnum == SupportAssetType.ETH) {
-        collectionSupport.balance.assetMap[i] -= assetsAmount[i];
+        themeSupport.balance.assetMap[i] -= assetsAmount[i];
 
         //transfer ETH
         payable(operatorAddr).transfer(assetsAmount[i]);
         emit WithdrawForIssue(
-          collection,
+          themeID,
           issueNo,
           msg.sender,
           operatorAddr,
@@ -567,13 +550,13 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StakingStorageE
         );
       } else if (assetTypeEnum < SupportAssetType.Last) {
         // transfer ERC20  to this contract
-        collectionSupport.balance.assetMap[i] -= assetsAmount[i];
+        themeSupport.balance.assetMap[i] -= assetsAmount[i];
 
         address assetAddr = _assetAddr[i];
         bool transferResult = IERC20Upgradeable(assetAddr).transfer(operatorAddr, assetsAmount[i]);
         require(transferResult, Errors.SUPPORT_TRANSFER_FAILED);
         emit WithdrawForIssue(
-          collection,
+          themeID,
           issueNo,
           msg.sender,
           operatorAddr,
