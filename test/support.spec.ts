@@ -243,7 +243,6 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     //-- updateThemeIssueSchedule
     // https://www.epochconverter.com/
     // Date and time (GMT): Tuesday, January 31, 2023 12:00:00 AM
-    // Date and time (your time zone): Tuesday, January 31, 2023 8:00:00 AM GMT+08:00
     const baseStartTime = 1675123200;
     // Two weeks
     const issueDurationTime = 1209600;

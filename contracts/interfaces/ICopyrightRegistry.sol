@@ -10,6 +10,7 @@ interface ICopyrightRegistry {
    * @param symbol Token's symbol
    * @param name Token's name
    * @param sender sender of the registry tx
+   * @param totalSupply totalSupply
    **/
   event WorkTokenDeploy(
     uint256 indexed lv2ID,
@@ -17,7 +18,8 @@ interface ICopyrightRegistry {
     address workTokenID,
     string symbol,
     string name,
-    address sender
+    address sender,
+    uint256 totalSupply
   );
 
   /**

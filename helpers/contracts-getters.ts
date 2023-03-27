@@ -37,7 +37,7 @@ export const getEmergencyAdminSigner = async () => (await getEthersSigners())[1]
 
 export const getProxyAdminSigner = async () => (await getEthersSigners())[2];
 
-export const getSupporter = async () => (await getEthersSigners())[6];
+export const getSupporter = async () => (await getEthersSigners())[5];
 
 export const getServiceSigner = async () => (await getEthersSigners())[4];
 

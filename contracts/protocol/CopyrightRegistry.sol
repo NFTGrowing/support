@@ -100,14 +100,14 @@ contract CopyrightRegistry is Ownable, ICopyrightRegistry {
       _lv2Registry[lv2ID].lv2TokenID = address(copyrightFixedSupply);
 
       //Emit event
-      emit WorkTokenDeploy(lv2ID, id, address(copyrightFixedSupply), symbol, name, msg.sender);
+      emit WorkTokenDeploy(lv2ID, id, address(copyrightFixedSupply), symbol, name, msg.sender, totalSupply);
       return address(copyrightFixedSupply);
     } else {
       require(id != 0, Errors.C_REGISTRY_INVALID_ID);
       require(_lv2Registry[0].lv1Registry[id].lv1TokenID == address(0), Errors.C_REGISTRY_LV1_REGISTERED);
 
       //deploy ERC20
-      CopyrightFixedSupply copyrightFixedSupply = new CopyrightFixedSupply(name, symbol, 8, totalSupply);
+      CopyrightFixedSupply copyrightFixedSupply = new CopyrightFixedSupply(name, symbol, 18, totalSupply);
 
       Lv1Register storage lv1Register = _lv2Registry[0].lv1Registry[id];
 
@@ -117,7 +117,7 @@ contract CopyrightRegistry is Ownable, ICopyrightRegistry {
       lv1Register.lv1TokenID = address(copyrightFixedSupply);
 
       //Emit event
-      emit WorkTokenDeploy(lv2ID, id, address(copyrightFixedSupply), symbol, name, msg.sender);
+      emit WorkTokenDeploy(lv2ID, id, address(copyrightFixedSupply), symbol, name, msg.sender, totalSupply);
       return address(copyrightFixedSupply);
     }
   }
