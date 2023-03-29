@@ -71,19 +71,6 @@
     "address": "0xb08AD9349f7e38414aDA9CeC0a4A803019cAB795",
     "deployer": "0x249D0dF00d8ca96952A9fc29ddD3199bD035A05B"
   },
-  "BendProxyAdminPool": {
-    "address": "0x8da1Cb92f02f5c441A275036Ed26BB03ad6C40Cb"
-  },
-  "BendProxyAdminFund": {
-    "address": "0x4C8FA526099383508D1AdAE511EaEc7D587DB99b"
-  },
-  "BendCollectorImpl": {
-    "address": "0xfc0b073F89bC75CDb87d19aAC451b8497E945145"
-  },
-  "BendCollector": {
-    "address": "0xBC6E81c410FF3b32cDa031267772713f93599077",
-    "deployer": "0x249D0dF00d8ca96952A9fc29ddD3199bD035A05B"
-  },
   "LendPoolAddressesProvider": {
     "address": "0xFBcd346b1EeFd2c065be476C8a77262889028977",
     "deployer": "0x249D0dF00d8ca96952A9fc29ddD3199bD035A05B"
@@ -171,10 +158,6 @@
   },
   "WalletBalanceProvider": {
     "address": "0xeC6Fe4E8580F057E72154A7D2A6996f8a024847A",
-    "deployer": "0x249D0dF00d8ca96952A9fc29ddD3199bD035A05B"
-  },
-  "BendProtocolDataProvider": {
-    "address": "0x9D24E09D260EB519512c6fD55b467FdAEe777A03",
     "deployer": "0x249D0dF00d8ca96952A9fc29ddD3199bD035A05B"
   },
   "UIPoolDataProvider": {

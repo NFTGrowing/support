@@ -4,7 +4,7 @@ import { DRE, getDb, notFalsyOrZeroAddress } from "./misc-utils";
 import {
   tEthereumAddress,
   eContractid,
-  BendPools,
+  CBPPools,
   TokenContractId,
   NftContractId,
   IReserveParams,
@@ -221,10 +221,10 @@ export const deployWETH9 = async (verify?: boolean) =>
 export const deployAllMockTokens = async (forTestCases: boolean, verify?: boolean) => {
   const tokens: { [symbol: string]: MockContract | MintableERC20 | WETH9Mocked | WETH9 } = {};
 
-  const protoConfigData = getReservesConfigByPool(BendPools.proto);
+  const protoConfigData = getReservesConfigByPool(CBPPools.proto);
 
   for (const tokenSymbol of Object.keys(TokenContractId)) {
-    const tokenName = "Bend Mock " + tokenSymbol;
+    const tokenName = "CBP Mock " + tokenSymbol;
 
     if (tokenSymbol === "WETH") {
       if (forTestCases) {

@@ -9,7 +9,7 @@ import {
   eContractid,
   tStringTokenSmallUnits,
   eEthereumNetwork,
-  BendPools,
+  CBPPools,
   iParamsPerNetwork,
   iParamsPerPool,
   eNetwork,
@@ -206,9 +206,9 @@ export const getOptionalParamAddressPerNetwork = (
   return getParamPerNetwork(param, network);
 };
 
-export const getParamPerPool = <T>({ proto }: iParamsPerPool<T>, pool: BendPools) => {
+export const getParamPerPool = <T>({ proto }: iParamsPerPool<T>, pool: CBPPools) => {
   switch (pool) {
-    case BendPools.proto:
+    case CBPPools.proto:
       return proto;
     default:
       return proto;
@@ -288,18 +288,14 @@ export const getSignatureFromTypedData = (
 };
 
 export const verifyContract = async (id: string, instance: Contract, args: (string | string[])[]) => {
-  if (id == eContractid.BendUpgradeableProxy) {
+  if (id == eContractid.CBPUpgradeableProxy) {
     await verifyEtherscanContract(
       instance.address,
       args,
-      "contracts/libraries/proxy/BendUpgradeableProxy.sol:BendUpgradeableProxy"
+      "contracts/libraries/proxy/CBPUpgradeableProxy.sol:CBPUpgradeableProxy"
     );
-  } else if (id == eContractid.BendProxyAdminFund || id == eContractid.BendProxyAdminPool) {
-    await verifyEtherscanContract(
-      instance.address,
-      args,
-      "contracts/libraries/proxy/BendProxyAdmin.sol:BendProxyAdmin"
-    );
+  } else if (id == eContractid.CBPProxyAdminFund || id == eContractid.CBPProxyAdminPool) {
+    await verifyEtherscanContract(instance.address, args, "contracts/libraries/proxy/CBPProxyAdmin.sol:CBPProxyAdmin");
   } else {
     await verifyEtherscanContract(instance.address, args);
   }

@@ -21,8 +21,8 @@ deployed-contracts.json
 !/deployments/deployed-contracts-kovan*.json
 
 /flattened
-bend-flattened.*
-bend-protocol-flattened.*
+CBP-flattened.*
+CBP-protocol-flattened.*
 
 coverage
 .coverage_artifacts

@@ -1,5 +1,5 @@
 import {
-  BendPools,
+  CBPPools,
   iMultiPoolsAssets,
   IReserveParams,
   iMultiPoolsNfts,
@@ -9,8 +9,8 @@ import {
   eNetwork,
 } from "./types";
 import { getEthersSignersAddresses, getParamPerPool } from "./contracts-helpers";
-import BendConfig from "../markets/bend";
-import { CommonsConfig } from "../markets/bend/commons";
+import CBPConfig from "../markets/cbp";
+import { CommonsConfig } from "../markets/cbp/commons";
 import { DRE, notFalsyOrZeroAddress } from "./misc-utils";
 import { tEthereumAddress } from "./types";
 import { getParamPerNetwork } from "./contracts-helpers";
@@ -19,13 +19,13 @@ import { ZERO_ADDRESS } from "./constants";
 
 export enum ConfigNames {
   Commons = "Commons",
-  Bend = "Bend",
+  CBP = "CBP",
 }
 
 export const loadPoolConfig = (configName: ConfigNames): PoolConfiguration => {
   switch (configName) {
-    case ConfigNames.Bend:
-      return BendConfig;
+    case ConfigNames.CBP:
+      return CBPConfig;
     case ConfigNames.Commons:
       return CommonsConfig;
     default:
@@ -37,21 +37,21 @@ export const loadPoolConfig = (configName: ConfigNames): PoolConfiguration => {
 // PROTOCOL PARAMS PER POOL
 // ----------------
 
-export const getReservesConfigByPool = (pool: BendPools): iMultiPoolsAssets<IReserveParams> =>
+export const getReservesConfigByPool = (pool: CBPPools): iMultiPoolsAssets<IReserveParams> =>
   getParamPerPool<iMultiPoolsAssets<IReserveParams>>(
     {
-      [BendPools.proto]: {
-        ...BendConfig.ReservesConfig,
+      [CBPPools.proto]: {
+        ...CBPConfig.ReservesConfig,
       },
     },
     pool
   );
 
-export const getNftsConfigByPool = (pool: BendPools): iMultiPoolsNfts<INftParams> =>
+export const getNftsConfigByPool = (pool: CBPPools): iMultiPoolsNfts<INftParams> =>
   getParamPerPool<iMultiPoolsNfts<INftParams>>(
     {
-      [BendPools.proto]: {
-        ...BendConfig.NftsConfig,
+      [CBPPools.proto]: {
+        ...CBPConfig.NftsConfig,
       },
     },
     pool

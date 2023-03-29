@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: agpl-3.0
 pragma solidity 0.8.4;
 
-
 import {IStaking} from "../interfaces/IStaking.sol";
 import {IStakingAddressesProvider} from "../interfaces/IStakingAddressesProvider.sol";
 
@@ -35,7 +34,7 @@ import {ContextUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/Cont
  * - To be covered by a proxy contract, owned by the StakingAddressesProvider of the specific market
  * - All admin functions are callable by the StakingConfigurator contract defined also in the
  *   StakingAddressesProvider
- * @author Bend
+ * @author CBP
  **/
 // !!! For Upgradable: DO NOT ADJUST Inheritance Order !!!
 contract Staking is
@@ -48,7 +47,6 @@ contract Staking is
 {
   using NftConfiguration for DataTypes.NftConfigurationMap;
   using NftLogic for DataTypes.NftData;
-  
 
   /**
    * @dev Prevents a contract from calling itself, directly or indirectly.
@@ -106,10 +104,7 @@ contract Staking is
    * @param nftAsset The address of the NFT to be staked
    * @param nftTokenId NFT id in nftAsset to be deposited
    **/
-  function stake(
-    address nftAsset,
-    uint256 nftTokenId
-  ) external override nonReentrant whenNotPaused {
+  function stake(address nftAsset, uint256 nftTokenId) external override nonReentrant whenNotPaused {
     StakeLogic.executeStake(
       _addressesProvider,
       _nfts,
@@ -120,7 +115,6 @@ contract Staking is
         onBehalfOf: _msgSender()
       })
     );
-
   }
 
   function onERC721Received(
@@ -219,7 +213,6 @@ contract Staking is
     return _maxNumberOfNfts;
   }
 
-
   /**
    * @dev Initializes a nft, activating it, assigning nft loan and an
    * interest rate strategy
@@ -264,7 +257,6 @@ contract Staking is
     _nfts[asset].id = uint8(nftsCount);
     _nftsList[nftsCount] = asset;
     _nftsCount = nftsCount + 1;
-
   }
 
   function _verifyCallResult(

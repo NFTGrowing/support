@@ -21,9 +21,9 @@ import BigNumber from "bignumber.js";
 import { BigNumber as BN } from "ethers";
 import { getReservesConfigByPool } from "../helpers/configuration";
 import {
-  BendPools,
+  CBPPools,
   eContractid,
-  iBendPoolAssets,
+  iCBPPoolAssets,
   IReserveParams,
   ProtocolLoanState,
   TokenContractId,
@@ -59,12 +59,6 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     });
 
     actionsConfiguration.skipIntegrityCheck = false; //set this to true to execute solidity-coverage
-
-    /*
-    calculationsConfiguration.reservesParams = <iBendPoolAssets<IReserveParams>>(
-      getReservesConfigByPool(BendPools.proto)
-    );
-    */
   });
   after("Reset", () => {
     // Reset BigNumber
@@ -243,7 +237,7 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     //-- updateThemeIssueSchedule
     // https://www.epochconverter.com/
     // Date and time (GMT): Tuesday, January 31, 2023 12:00:00 AM
-    const baseStartTime = 1675123200;
+    const baseStartTime = 1680048000;
     // Two weeks
     const issueDurationTime = 1209600;
 

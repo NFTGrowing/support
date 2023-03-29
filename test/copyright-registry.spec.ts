@@ -22,9 +22,9 @@ import BigNumber from "bignumber.js";
 import { BigNumber as BN } from "ethers";
 import { getReservesConfigByPool } from "../helpers/configuration";
 import {
-  BendPools,
+  CBPPools,
   eContractid,
-  iBendPoolAssets,
+  iCBPPoolAssets,
   IReserveParams,
   ProtocolLoanState,
   TokenContractId,
@@ -67,12 +67,6 @@ makeSuite("CopyrightRegistry: test copyright token registry and claim ", (testEn
     });
 
     actionsConfiguration.skipIntegrityCheck = false; //set this to true to execute solidity-coverage
-
-    /*
-    calculationsConfiguration.reservesParams = <iBendPoolAssets<IReserveParams>>(
-      getReservesConfigByPool(BendPools.proto)
-    );
-    */
   });
   after("Reset", () => {
     // Reset BigNumber

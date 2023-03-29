@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import { ONE_YEAR, RAY, MAX_UINT_AMOUNT, PERCENTAGE_FACTOR, ZERO_ADDRESS, oneEther } from "../../../helpers/constants";
-import { IReserveParams, iBendPoolAssets, tEthereumAddress, ProtocolLoanState } from "../../../helpers/types";
+import { IReserveParams, iCBPPoolAssets, tEthereumAddress, ProtocolLoanState } from "../../../helpers/types";
 import "./math";
 import { ReserveData, UserReserveData, LoanData } from "./interfaces";
 import { expect } from "chai";
@@ -8,7 +8,7 @@ import { expect } from "chai";
 export const strToBN = (amount: string): BigNumber => new BigNumber(amount);
 
 interface Configuration {
-  reservesParams: iBendPoolAssets<IReserveParams>;
+  reservesParams: iCBPPoolAssets<IReserveParams>;
 }
 
 export const configuration: Configuration = <Configuration>{};

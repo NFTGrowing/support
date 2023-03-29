@@ -6,7 +6,7 @@ import { getParamPerNetwork } from "../../helpers/contracts-helpers";
 import { eNetwork } from "../../helpers/types";
 import { ConfigNames, getReserveFactorCollectorAddress, loadPoolConfig } from "../../helpers/configuration";
 
-import { tEthereumAddress, BendPools, eContractid } from "../../helpers/types";
+import { tEthereumAddress, CBPPools, eContractid } from "../../helpers/types";
 import { waitForTx, filterMapBy, notFalsyOrZeroAddress } from "../../helpers/misc-utils";
 import { getAllTokenAddresses, getAllNftAddresses } from "../../helpers/mock-helpers";
 import { ZERO_ADDRESS } from "../../helpers/constants";

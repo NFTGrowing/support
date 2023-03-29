@@ -18,7 +18,7 @@ export enum eEthereumNetwork {
   main = "main",
 }
 
-export enum BendPools {
+export enum CBPPools {
   proto = "proto",
 }
 
@@ -49,16 +49,16 @@ export enum eContractid {
   MockNFTOracle = "MockNFTOracle",
   MockReserveOracle = "MockReserveOracle",
   InterestRate = "InterestRate",
-  BendUpgradeableProxy = "BendUpgradeableProxy",
-  BendProxyAdminTest = "BendProxyAdminTest",
-  BendProxyAdminPool = "BendProxyAdminPool", //LendPool Contracts, etc Oracle(Reserve, NFT)
-  BendProxyAdminFund = "BendProxyAdminFund", //Treasury Fundings, etc Collector
+  CBPUpgradeableProxy = "CBPUpgradeableProxy",
+  CBPProxyAdminTest = "CBPProxyAdminTest",
+  CBPProxyAdminPool = "CBPProxyAdminPool", //LendPool Contracts, etc Oracle(Reserve, NFT)
+  CBPProxyAdminFund = "CBPProxyAdminFund", //Treasury Fundings, etc Collector
   WalletBalanceProvider = "WalletBalanceProvider",
   BToken = "BToken",
   DebtToken = "DebtToken",
   BNFT = "BNFT",
   MockBNFT = "MockBNFT",
-  BendProtocolDataProvider = "BendProtocolDataProvider",
+  CBPProtocolDataProvider = "CBPProtocolDataProvider",
   IERC20Detailed = "IERC20Detailed",
   IERC721Detailed = "IERC721Detailed",
   FeeProvider = "FeeProvider",
@@ -83,8 +83,8 @@ export enum eContractid {
   PunkGatewayImpl = "PunkGatewayImpl",
   MockIncentivesController = "MockIncentivesController",
   UIPoolDataProvider = "UIPoolDataProvider",
-  BendCollector = "BendCollector",
-  BendCollectorImpl = "BendCollectorImpl",
+  CBPCollector = "CBPCollector",
+  CBPCollectorImpl = "CBPCollectorImpl",
   TimelockControllerFast = "TimelockControllerFast",
   TimelockControllerSlow = "TimelockControllerSlow",
 }
@@ -237,7 +237,7 @@ export type iAssetsWithoutETH<T> = Omit<iAssetBase<T>, "ETH">;
 
 export type iAssetsWithoutUSD<T> = Omit<iAssetBase<T>, "USD">;
 
-export type iBendPoolAssets<T> = Pick<
+export type iCBPPoolAssets<T> = Pick<
   iAssetsWithoutUSD<T>,
   | "WETH"
   | "DAI"
@@ -246,9 +246,9 @@ export type iBendPoolAssets<T> = Pick<
   | "USDT"
 >;
 
-export type iMultiPoolsAssets<T> = iAssetCommon<T> | iBendPoolAssets<T>;
+export type iMultiPoolsAssets<T> = iAssetCommon<T> | iCBPPoolAssets<T>;
 
-export type iBendPoolTokens<T> = Omit<iBendPoolAssets<T>, "ETH">;
+export type iCBPPoolTokens<T> = Omit<iCBPPoolAssets<T>, "ETH">;
 
 export type iAssetAggregatorBase<T> = iAssetsWithoutETH<T>;
 
@@ -276,9 +276,9 @@ export interface iNftBase<T> {
   KONGZ: T;
 }
 
-export type iMultiPoolsNfts<T> = iNftCommon<T> | iBendPoolNfts<T>;
+export type iMultiPoolsNfts<T> = iNftCommon<T> | iCBPPoolNfts<T>;
 
-export type iBendPoolNfts<T> = iNftBase<T>;
+export type iCBPPoolNfts<T> = iNftBase<T>;
 
 export type iNftAggregatorBase<T> = iNftBase<T>;
 
@@ -357,7 +357,7 @@ export interface iEthereumParamsPerNetwork<T> {
 }
 
 export interface iParamsPerPool<T> {
-  [BendPools.proto]: T;
+  [CBPPools.proto]: T;
 }
 
 export interface iBasicDistributionParams {
@@ -429,13 +429,13 @@ export interface ICommonConfiguration {
   OracleQuoteUnit: string;
 }
 
-export interface IBendConfiguration extends ICommonConfiguration {
-  ReservesConfig: iBendPoolAssets<IReserveParams>;
-  NftsConfig: iBendPoolNfts<INftParams>;
+export interface ICBPConfiguration extends ICommonConfiguration {
+  ReservesConfig: iCBPPoolAssets<IReserveParams>;
+  NftsConfig: iCBPPoolNfts<INftParams>;
 }
 
 export interface ITokenAddress {
   [token: string]: tEthereumAddress;
 }
 
-export type PoolConfiguration = ICommonConfiguration | IBendConfiguration;
+export type PoolConfiguration = ICommonConfiguration | ICBPConfiguration;

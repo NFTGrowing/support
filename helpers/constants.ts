@@ -28,7 +28,7 @@ export const APPROVAL_AMOUNT_LENDING_POOL = "1000000000000000000000000000";
 export const TOKEN_DISTRIBUTOR_PERCENTAGE_BASE = "10000";
 export const MOCK_USD_PRICE = "425107839690";
 export const USD_ADDRESS = "0x9ceb4d4c184d1786614a593a03621b7f37f8685f"; //index 19, lowercase
-export const BEND_REFERRAL = "0";
+export const CBP_REFERRAL = "0";
 
 // ----------------
 // ADDRESS IDS IN PROVIDER
@@ -42,7 +42,7 @@ export const MOCK_RESERVE_AGGREGATORS_PRICES = {
   DAI: oneEther.multipliedBy("0.000233211").toFixed(),
   //BUSD: oneEther.multipliedBy('0.0002343946').toFixed(),
   USDC: oneEther.multipliedBy("0.0002349162").toFixed(),
-  USDT: oneEther.multipliedBy('0.0002359253').toFixed(),
+  USDT: oneEther.multipliedBy("0.0002359253").toFixed(),
 };
 
 //Price source: https://nftpricefloor.com/

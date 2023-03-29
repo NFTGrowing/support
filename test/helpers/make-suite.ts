@@ -31,7 +31,7 @@ import { StakingAddressesProvider } from "../../types/StakingAddressesProvider";
 import { getEthersSigners } from "../../helpers/contracts-helpers";
 import { getParamPerNetwork } from "../../helpers/contracts-helpers";
 import { solidity } from "ethereum-waffle";
-import { BendConfig } from "../../markets/bend";
+import { CBPConfig } from "../../markets/cbp";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { BNFTRegistry } from "../../types";
 import { USD_ADDRESS } from "../../helpers/constants";

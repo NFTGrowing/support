@@ -13,12 +13,12 @@ import {
 import { tEthereumAddress } from "../../../helpers/types";
 import BigNumber from "bignumber.js";
 import { getDb, DRE } from "../../../helpers/misc-utils";
-import { BendProtocolDataProvider } from "../../../types/BendProtocolDataProvider";
+import { CBPProtocolDataProvider as CBPProtocolDataProvider } from "../../../types/CBPProtocolDataProvider";
 import { ERC20Factory } from "../../../types";
 import { SignerWithAddress } from "../make-suite";
 
 export const getReserveData = async (
-  helper: BendProtocolDataProvider,
+  helper: CBPProtocolDataProvider,
   reserve: tEthereumAddress
 ): Promise<ReserveData> => {
   const [reserveData, tokenAddresses, token] = await Promise.all([
@@ -60,7 +60,7 @@ export const getReserveData = async (
   };
 };
 
-export const getNftData = async (helper: BendProtocolDataProvider, nftAsset: tEthereumAddress): Promise<NftData> => {
+export const getNftData = async (helper: CBPProtocolDataProvider, nftAsset: tEthereumAddress): Promise<NftData> => {
   const [nftData, tokenAddresses, token] = await Promise.all([
     helper.getNftConfigurationData(nftAsset),
     helper.getNftTokenData(nftAsset),
@@ -79,7 +79,7 @@ export const getNftData = async (helper: BendProtocolDataProvider, nftAsset: tEt
 
 export const getUserData = async (
   pool: LendPool,
-  helper: BendProtocolDataProvider,
+  helper: CBPProtocolDataProvider,
   reserve: string,
   user: tEthereumAddress,
   sender?: tEthereumAddress
@@ -104,7 +104,7 @@ export const getUserData = async (
 
 export const getLoanData = async (
   pool: LendPool,
-  helper: BendProtocolDataProvider,
+  helper: CBPProtocolDataProvider,
   nftAsset: string,
   nftTokenId: string,
   loanId: string
@@ -163,7 +163,7 @@ export const getNftAddressFromSymbol = async (symbol: string) => {
   return token.address;
 };
 
-const getBTokenUserData = async (reserve: string, user: string, dataProvider: BendProtocolDataProvider) => {
+const getBTokenUserData = async (reserve: string, user: string, dataProvider: CBPProtocolDataProvider) => {
   const { bTokenAddress } = await dataProvider.getReserveTokenData(reserve);
 
   const bToken = await getBToken(bTokenAddress);

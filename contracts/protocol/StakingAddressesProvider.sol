@@ -28,16 +28,16 @@ contract StakingAddressesProvider is Ownable, IStakingAddressesProvider {
   bytes32 private constant EMERGENCY_ADMIN = "EMERGENCY_ADMIN";
   bytes32 private constant RESERVE_ORACLE = "RESERVE_ORACLE";
   bytes32 private constant NFT_ORACLE = "NFT_ORACLE";
-  bytes32 private constant BEND_ORACLE = "BEND_ORACLE";
+  bytes32 private constant CBP_ORACLE = "CBP_ORACLE";
   bytes32 private constant BNFT_REGISTRY = "BNFT_REGISTRY";
   bytes32 private constant INCENTIVES_CONTROLLER = "INCENTIVES_CONTROLLER";
-  
+
   constructor(string memory marketId) {
     _setMarketId(marketId);
   }
 
   /**
-   * @dev Returns the id of the fBend market to which this contracts points to
+   * @dev Returns the id of the fCBP market to which this contracts points to
    * @return The market id
    **/
   function getMarketId() external view override returns (string memory) {
@@ -181,7 +181,6 @@ contract StakingAddressesProvider is Ownable, IStakingAddressesProvider {
     _addresses[EMERGENCY_ADMIN] = emergencyAdmin;
     emit EmergencyAdminUpdated(emergencyAdmin);
   }
-
 
   function getBNFTRegistry() external view override returns (address) {
     return getAddress(BNFT_REGISTRY);

@@ -7,7 +7,7 @@ import { MAX_UINT_AMOUNT, oneEther, ONE_YEAR } from "../helpers/constants";
 import { getDebtToken } from "../helpers/contracts-getters";
 import { convertToCurrencyDecimals, convertToCurrencyUnits } from "../helpers/contracts-helpers";
 import { advanceBlock, advanceTimeAndBlock, sleep, waitForTx } from "../helpers/misc-utils";
-import { BendPools, iBendPoolAssets, IReserveParams, ProtocolLoanState } from "../helpers/types";
+import { CBPPools, iCBPPoolAssets, IReserveParams, ProtocolLoanState } from "../helpers/types";
 import { ERC721Factory } from "../types";
 import {
   approveERC20,
@@ -41,9 +41,7 @@ makeSuite("PunkGateway", (testEnv: TestEnv) => {
 
     actionsConfiguration.skipIntegrityCheck = false; //set this to true to execute solidity-coverage
 
-    calculationsConfiguration.reservesParams = <iBendPoolAssets<IReserveParams>>(
-      getReservesConfigByPool(BendPools.proto)
-    );
+    calculationsConfiguration.reservesParams = <iCBPPoolAssets<IReserveParams>>getReservesConfigByPool(CBPPools.proto);
   });
   after("Reset", () => {
     // Reset BigNumber

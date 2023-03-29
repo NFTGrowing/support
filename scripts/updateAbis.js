@@ -16,7 +16,7 @@ const protocolContractList = [
   "WETHGateway",
 ];
 
-const miscContractList = ["UiPoolDataProvider", "BendProtocolDataProvider", "WalletBalanceProvider"];
+const miscContractList = ["UiPoolDataProvider", "CBPProtocolDataProvider", "WalletBalanceProvider"];
 
 const interfacesContractList = ["IERC20Detailed", "IERC721Detailed", "IIncentivesController"];
 

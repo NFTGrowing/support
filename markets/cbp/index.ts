@@ -1,5 +1,5 @@
 import { oneRay, ZERO_ADDRESS } from '../../helpers/constants';
-import { IBendConfiguration, eEthereumNetwork } from '../../helpers/types';
+import { ICBPConfiguration, eEthereumNetwork } from '../../helpers/types';
 
 import { CommonsConfig } from './commons';
 import {
@@ -25,9 +25,9 @@ import {
 // POOL--SPECIFIC PARAMS
 // ----------------
 
-export const BendConfig: IBendConfiguration = {
+export const CBPConfig: ICBPConfiguration = {
   ...CommonsConfig,
-  MarketId: 'Bend genesis market',
+  MarketId: 'CBP genesis market',
   ProviderId: 1,
   ReservesConfig: {
     WETH: strategyWETH,
@@ -162,4 +162,4 @@ export const BendConfig: IBendConfiguration = {
   },
 };
 
-export default BendConfig;
+export default CBPConfig;

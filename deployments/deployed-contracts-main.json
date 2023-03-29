@@ -1,24 +1,9 @@
 {
-  "BendProxyAdminPool": {
-    "address": "0x501c991E0D31D408c25bCf00da27BdF2759A394a",
-    "deployer": "0x868964fa49a6fd6e116FE82c8f4165904406f479"
-  },
   "NFTOracleImpl": {
     "address": "0x1bFC8D3D6704D63a9901189CD6dFeFD0993A1B25"
   },
   "NFTOracle": {
     "address": "0x7C2A19e54e48718f6C60908a9Cff3396E4Ea1eBA"
-  },
-  "BendProxyAdminFund": {
-    "address": "0x2A71a0F5cef1fFc519027AD12f19453110e70666",
-    "deployer": "0x868964fa49a6fd6e116FE82c8f4165904406f479"
-  },
-  "BendCollectorImpl": {
-    "address": "0x67a05fae0B411588E4FBA0d28c6bb33588769501"
-  },
-  "BendCollector": {
-    "address": "0x43078AbfB76bd24885Fd64eFFB22049f92a8c495",
-    "deployer": "0x868964fa49a6fd6e116FE82c8f4165904406f479"
   },
   "LendPoolAddressesProvider": {
     "address": "0x24451F47CaF13B24f4b5034e1dF6c0E401ec0e46",
@@ -114,10 +99,6 @@
   },
   "WalletBalanceProvider": {
     "address": "0x22d7694d0E74978F691228a1e2d407289Ad78B4F",
-    "deployer": "0x868964fa49a6fd6e116FE82c8f4165904406f479"
-  },
-  "BendProtocolDataProvider": {
-    "address": "0x3811DA50f55CCF75376C5535562F5b4797822480",
     "deployer": "0x868964fa49a6fd6e116FE82c8f4165904406f479"
   },
   "UIPoolDataProvider": {

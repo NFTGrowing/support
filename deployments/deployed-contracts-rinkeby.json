@@ -39,12 +39,6 @@
     "address": "0x588D1a07ccdb224cB28dCd8E3dD46E16B3a72b5e",
     "deployer": "0xafF5C36642385b6c7Aaf7585eC785aB2316b5db6"
   },
-  "BendProxyAdminPool": {
-    "address": "0xC019619F15aF1f96A695aBA39478e64ABcAa474b"
-  },
-  "BendProxyAdminFund": {
-    "address": "0x64DA9D7651CA78caAB756740C6057e2b7B1E63De"
-  },
   "LendPoolAddressesProvider": {
     "address": "0xE55870eBB007a50B0dfAbAdB1a21e4bFcee5299b",
     "deployer": "0xafF5C36642385b6c7Aaf7585eC785aB2316b5db6"
@@ -159,10 +153,6 @@
     "address": "0x3fb2582769C555E363997Ddf0d1c29FD4a26FfA0",
     "deployer": "0xafF5C36642385b6c7Aaf7585eC785aB2316b5db6"
   },
-  "BendProtocolDataProvider": {
-    "address": "0xD67198CdD7E2Bb9A8Df14Fa464346d92BD239854",
-    "deployer": "0xafF5C36642385b6c7Aaf7585eC785aB2316b5db6"
-  },
   "UIPoolDataProvider": {
     "address": "0x617d30544A3D98C33608fFe9c0d628b24D45D2b0",
     "deployer": "0xafF5C36642385b6c7Aaf7585eC785aB2316b5db6"
@@ -182,12 +172,6 @@
   "MAYC": {
     "address": "0x9C235dF4053a415f028b8386ed13ae8162843a6e",
     "deployer": "0xafF5C36642385b6c7Aaf7585eC785aB2316b5db6"
-  },
-  "BendCollectorImpl": {
-    "address": "0x0c3D91bD664D20b2d3E1af5a48Dadb060EFf913A"
-  },
-  "BendCollector": {
-    "address": "0x7A02EE743Aadca63d60945971B7eD12c7f26b6d2"
   },
   "WOW": {
     "address": "0xdfC14f7A536944467834EF7ce7b05a9a79BCDFaD",

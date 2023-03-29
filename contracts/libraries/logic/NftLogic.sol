@@ -6,7 +6,7 @@ import {DataTypes} from "../types/DataTypes.sol";
 
 /**
  * @title NftLogic library
- * @author Bend
+ * @author CBP
  * @notice Implements the logic to update the nft state
  */
 library NftLogic {

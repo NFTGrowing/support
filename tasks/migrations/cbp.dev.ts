@@ -6,7 +6,7 @@ import { printContracts } from "../../helpers/misc-utils";
 task("cbp:dev", "Deploy development enviroment")
   .addFlag("verify", "Verify contracts at Etherscan")
   .setAction(async ({ verify }, localBRE) => {
-    const POOL_NAME = ConfigNames.Bend;
+    const POOL_NAME = ConfigNames.CBP;
 
     await localBRE.run("set-DRE");
 

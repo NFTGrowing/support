@@ -8,7 +8,7 @@ import {
   getBToken,
   getLendPoolLoanProxy,
   getDebtToken,
-  getBendUpgradeableProxy,
+  getCBPUpgradeableProxy,
 } from "../helpers/contracts-getters";
 import { BTokenFactory, LendPoolLoanFactory, LendPoolLoan, BToken, DebtToken, DebtTokenFactory } from "../types";
 import { BytesLike } from "@ethersproject/bytes";

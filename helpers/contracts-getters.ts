@@ -200,10 +200,10 @@ export const getStakeLogic = async (address?: tEthereumAddress) =>
     await getDeploySigner()
   );
 
-export const getBendUpgradeableProxy = async (address: tEthereumAddress) =>
+export const getCBPUpgradeableProxy = async (address: tEthereumAddress) =>
   await CBUpgradeableProxyFactory.connect(address, await getDeploySigner());
 
-export const getBendProxyAdminByAddress = async (address: tEthereumAddress) =>
+export const getCBPProxyAdminByAddress = async (address: tEthereumAddress) =>
   await CBProxyAdminFactory.connect(address, await getDeploySigner());
 
 export const getCBProxyAdminById = async (id: string) =>

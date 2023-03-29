@@ -18,7 +18,7 @@ import {
 } from "../helpers/contracts-deployments";
 
 import { Signer } from "ethers";
-import { eContractid, tEthereumAddress, BendPools } from "../helpers/types";
+import { eContractid, tEthereumAddress, CBPPools } from "../helpers/types";
 import { MintableERC20 } from "../types/MintableERC20";
 import { MintableERC721 } from "../types/MintableERC721";
 import { WETH9Mocked } from "../types/WETH9Mocked";
@@ -35,7 +35,7 @@ import {
   deployChainlinkMockAggregator,
 } from "../helpers/oracles-helpers";
 import { DRE, waitForTx } from "../helpers/misc-utils";
-import BendConfig from "../markets/bend";
+import CBPConfig from "../markets/cbp";
 import {
   getSecondSigner,
   getDeploySigner,
@@ -48,10 +48,10 @@ import {
 import { getNftAddressFromSymbol } from "./helpers/utils/helpers";
 import { ADDRESS_ID_PUNK_GATEWAY, ADDRESS_ID_WETH_GATEWAY } from "../helpers/constants";
 
-const MOCK_USD_PRICE = BendConfig.ProtocolGlobalParams.MockUsdPrice;
-const ALL_ASSETS_INITIAL_PRICES = BendConfig.Mocks.AllAssetsInitialPrices;
-const USD_ADDRESS = BendConfig.ProtocolGlobalParams.UsdAddress;
-const ALL_NFTS_INITIAL_PRICES = BendConfig.Mocks.AllNftsInitialPrices;
+const MOCK_USD_PRICE = CBPConfig.ProtocolGlobalParams.MockUsdPrice;
+const ALL_ASSETS_INITIAL_PRICES = CBPConfig.Mocks.AllAssetsInitialPrices;
+const USD_ADDRESS = CBPConfig.ProtocolGlobalParams.UsdAddress;
+const ALL_NFTS_INITIAL_PRICES = CBPConfig.Mocks.AllNftsInitialPrices;
 
 const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
   console.time("setup");
@@ -60,7 +60,7 @@ const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
   const emergencyAdmin = await (await getEmergencyAdminSigner()).getAddress();
   console.log("Admin accounts:", "poolAdmin:", poolAdmin, "emergencyAdmin:", emergencyAdmin);
 
-  const config = loadPoolConfig(ConfigNames.Bend);
+  const config = loadPoolConfig(ConfigNames.CBP);
 
   //////////////////////////////////////////////////////////////////////////////
   console.log("-> Prepare mock external ERC20 Tokens, such as WETH, DAI...");
@@ -91,8 +91,8 @@ const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
 
   //////////////////////////////////////////////////////////////////////////////
   console.log("-> Prepare proxy admin...");
-  const bendProxyAdmin = await deployCBProxyAdmin(eContractid.BendProxyAdminTest);
-  console.log("bendProxyAdmin:", bendProxyAdmin.address);
+  const cbpProxyAdmin = await deployCBProxyAdmin(eContractid.CBPProxyAdminTest);
+  console.log("cbpProxyAdmin:", cbpProxyAdmin.address);
 
   //////////////////////////////////////////////////////////////////////////////
   // !!! MUST BEFORE LendPoolConfigurator which will getBNFTRegistry from address provider when init
@@ -108,7 +108,7 @@ const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
 
   const bnftRegistryProxy = await deployCBUpgradeableProxy(
     eContractid.BNFTRegistry,
-    bendProxyAdmin.address,
+    cbpProxyAdmin.address,
     bnftRegistryImpl.address,
     initEncodedData
   );
@@ -129,15 +129,9 @@ const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
   console.log("-> Prepare address provider...");
   //const addressesProviderRegistry = await deployStakingAddressesProviderRegistry();
 
-  const addressesProvider = await deployStakingAddressesProvider(BendConfig.MarketId);
+  const addressesProvider = await deployStakingAddressesProvider(CBPConfig.MarketId);
   await waitForTx(await addressesProvider.setPoolAdmin(poolAdmin));
   await waitForTx(await addressesProvider.setEmergencyAdmin(emergencyAdmin));
-
-  /*
-  await waitForTx(
-    await addressesProviderRegistry.registerAddressesProvider(addressesProvider.address, BendConfig.ProviderId)
-  );
-  */
 
   //////////////////////////////////////////////////////////////////////////////
   // !!! MUST BEFORE LendPoolConfigurator which will getBNFTRegistry from address provider when init
@@ -169,7 +163,7 @@ const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
 
   console.timeEnd("setup");
 
-  //todo - Mon search pool admin in bend
+  //todo - Mon search pool admin in cbp
 };
 
 before(async () => {
@@ -179,7 +173,7 @@ before(async () => {
   const FORK = process.env.FORK;
 
   if (FORK) {
-    await rawBRE.run("bend:mainnet", { skipRegistry: true });
+    await rawBRE.run("cbp:mainnet", { skipRegistry: true });
   } else {
     console.log("-> Deploying test environment...");
     await buildTestEnv(deployer, secondaryWallet);

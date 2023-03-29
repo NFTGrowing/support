@@ -4,7 +4,7 @@ import { expect } from "chai";
 import { ethers } from "ethers";
 import { ProtocolErrors } from "../helpers/types";
 import { makeSuite, TestEnv } from "./helpers/make-suite";
-import { CommonsConfig } from "../markets/bend/commons";
+import { CommonsConfig } from "../markets/cbp/commons";
 import { waitForTx } from "../helpers/misc-utils";
 
 makeSuite("BToken", (testEnv: TestEnv) => {

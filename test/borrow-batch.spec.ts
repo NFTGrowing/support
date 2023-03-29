@@ -15,7 +15,7 @@ import { configuration as actionsConfiguration } from "./helpers/actions";
 import { configuration as calculationsConfiguration } from "./helpers/utils/calculations";
 import BigNumber from "bignumber.js";
 import { getReservesConfigByPool } from "../helpers/configuration";
-import { BendPools, iBendPoolAssets, IReserveParams, ProtocolLoanState } from "../helpers/types";
+import { CBPPools, iCBPPoolAssets, IReserveParams, ProtocolLoanState } from "../helpers/types";
 import { string } from "hardhat/internal/core/params/argumentTypes";
 import { waitForTx } from "../helpers/misc-utils";
 import { parseEther } from "ethers/lib/utils";
@@ -33,9 +33,7 @@ makeSuite("LendPool: Batch borrow test cases", (testEnv: TestEnv) => {
 
     actionsConfiguration.skipIntegrityCheck = false; //set this to true to execute solidity-coverage
 
-    calculationsConfiguration.reservesParams = <iBendPoolAssets<IReserveParams>>(
-      getReservesConfigByPool(BendPools.proto)
-    );
+    calculationsConfiguration.reservesParams = <iCBPPoolAssets<IReserveParams>>getReservesConfigByPool(CBPPools.proto);
   });
   after("Reset", () => {
     // Reset BigNumber
