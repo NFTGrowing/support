@@ -4,16 +4,11 @@ import "./helpers/utils/math";
 import { insertContractAddressInDb, registerContractInJsonDb } from "../helpers/contracts-helpers";
 import {
   deployAllMockTokens,
-  deployBNFTRegistry,
-  deployStaking,
   deploySupport,
   deployStakingAddressesProvider,
-  deployGenericBNFTImpl,
-  deployBNFTImplementations,
   deployCBUpgradeableProxy,
   deployAllMockNfts,
   deployCBProxyAdmin,
-  deployCBLibraries,
   deployCopyrightRegistry,
 } from "../helpers/contracts-deployments";
 
@@ -41,9 +36,7 @@ import {
   getDeploySigner,
   getPoolAdminSigner,
   getEmergencyAdminSigner,
-  getStaking,
   getSupport,
-  getBNFTRegistryProxy,
 } from "../helpers/contracts-getters";
 import { getNftAddressFromSymbol } from "./helpers/utils/helpers";
 import { ADDRESS_ID_PUNK_GATEWAY, ADDRESS_ID_WETH_GATEWAY } from "../helpers/constants";
@@ -77,78 +70,14 @@ const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
     ...(await deployAllMockNfts(false)),
   };
 
-  /*
-  const cryptoPunksMarket = await getCryptoPunksMarket();
-  await waitForTx(await cryptoPunksMarket.allInitialOwnersAssigned());
-  const wrappedPunk = await getWrappedPunk();
-*/
-
-  /*
-  console.log("-> Prepare mock external IncentivesController...");
-  const mockIncentivesController = await deployMockIncentivesController();
-  const incentivesControllerAddress = mockIncentivesController.address;
-*/
-
-  //////////////////////////////////////////////////////////////////////////////
   console.log("-> Prepare proxy admin...");
   const cbpProxyAdmin = await deployCBProxyAdmin(eContractid.CBPProxyAdminTest);
   console.log("cbpProxyAdmin:", cbpProxyAdmin.address);
 
-  //////////////////////////////////////////////////////////////////////////////
-  // !!! MUST BEFORE LendPoolConfigurator which will getBNFTRegistry from address provider when init
-  console.log("-> Prepare mock bnft registry...");
-  const bnftGenericImpl = await deployGenericBNFTImpl(false);
-
-  const bnftRegistryImpl = await deployBNFTRegistry();
-  const initEncodedData = bnftRegistryImpl.interface.encodeFunctionData("initialize", [
-    bnftGenericImpl.address,
-    config.Mocks.BNftNamePrefix,
-    config.Mocks.BNftSymbolPrefix,
-  ]);
-
-  const bnftRegistryProxy = await deployCBUpgradeableProxy(
-    eContractid.BNFTRegistry,
-    cbpProxyAdmin.address,
-    bnftRegistryImpl.address,
-    initEncodedData
-  );
-
-  const bnftRegistry = await getBNFTRegistryProxy(bnftRegistryProxy.address);
-
-  await waitForTx(await bnftRegistry.transferOwnership(poolAdmin));
-
-  //////////////////////////////////////////////////////////////////////////////
-  console.log("-> Prepare mock bnft tokens...");
-  for (const [nftSymbol, mockedNft] of Object.entries(mockNfts) as [string, MintableERC721][]) {
-    await waitForTx(await bnftRegistry.createBNFT(mockedNft.address));
-    const bnftAddresses = await bnftRegistry.getBNFTAddresses(mockedNft.address);
-    console.log("createBNFT:", nftSymbol, bnftAddresses.bNftProxy, bnftAddresses.bNftImpl);
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
   console.log("-> Prepare address provider...");
-  //const addressesProviderRegistry = await deployStakingAddressesProviderRegistry();
-
-  const addressesProvider = await deployStakingAddressesProvider(CBPConfig.MarketId);
+  const addressesProvider = await deployStakingAddressesProvider();
   await waitForTx(await addressesProvider.setPoolAdmin(poolAdmin));
   await waitForTx(await addressesProvider.setEmergencyAdmin(emergencyAdmin));
-
-  //////////////////////////////////////////////////////////////////////////////
-  // !!! MUST BEFORE LendPoolConfigurator which will getBNFTRegistry from address provider when init
-  await waitForTx(await addressesProvider.setBNFTRegistry(bnftRegistry.address));
-  // await waitForTx(await addressesProvider.setIncentivesController(incentivesControllerAddress));
-
-  //////////////////////////////////////////////////////////////////////////////
-  console.log("-> Prepare CB libraries...");
-  await deployCBLibraries();
-
-  console.log("-> Prepare Staking...");
-  const StakingImpl = await deployStaking();
-  await waitForTx(await addressesProvider.setStakingImpl(StakingImpl.address, []));
-  // configurator will create proxy for implement
-  const StakingAddress = await addressesProvider.getStaking();
-  const stakingProxy = await getStaking(StakingAddress);
-  await insertContractAddressInDb(eContractid.Staking, stakingProxy.address);
 
   console.log("-> Prepare Support...");
   const SupportImpl = await deploySupport();

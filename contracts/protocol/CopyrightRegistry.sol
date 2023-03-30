@@ -4,7 +4,6 @@ pragma solidity 0.8.4;
 // Prettier ignore to prevent buidler flatter bug
 // prettier-ignore
 import {ICopyrightRegistry} from "../interfaces/ICopyrightRegistry.sol";
-import {CBUpgradeableProxy} from "../libraries/proxy/CBUpgradeableProxy.sol";
 import {Errors} from "../libraries/helpers/Errors.sol";
 import {CopyrightFixedSupply} from "./CopyrightFixedSupply.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";

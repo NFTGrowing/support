@@ -10,8 +10,7 @@ import {NftConfiguration} from "../libraries/configuration/NftConfiguration.sol"
 import {NftLogic} from "../libraries/logic/NftLogic.sol";
 */
 
-import {DataTypes} from "../libraries/types/DataTypes.sol";
-import {StakingStorageExt} from "./StakingStorageExt.sol";
+import {StorageExt} from "./StorageExt.sol";
 import {Errors} from "../libraries/helpers/Errors.sol";
 
 import {AddressUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
@@ -36,7 +35,7 @@ import {ContextUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/Cont
 
 // !!! For Upgradable: DO NOT ADJUST Inheritance Order !!!
 // TODO - check whether to seperate the storage contract
-contract Support is Initializable, ISupport, ContextUpgradeable, StakingStorageExt {
+contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
   uint256 public constant AssetTypeLimit = 20;
   uint256 public constant SlotLowerLimit = 1;
   uint256 public constant DefaultSlotUpperLimit = 30;

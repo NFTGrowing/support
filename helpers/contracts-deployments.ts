@@ -18,8 +18,6 @@ import {
   MintableERC20Factory,
   MintableERC721,
   MintableERC721Factory,
-  BNFTFactory,
-  BNFTRegistryFactory,
   StakingFactory,
   SupportFactory,
   StakingAddressesProviderFactory,
@@ -49,16 +47,6 @@ import { eNetwork } from "./types";
 const readArtifact = async (id: string) => {
   return (DRE as HardhatRuntimeEnvironment).artifacts.readArtifact(id);
 };
-
-/*
-export const deployStakingAddressesProviderRegistry = async (verify?: boolean) =>
-  withSaveAndVerify(
-    await new StakingAddressesProviderRegistryFactory(await getDeploySigner()).deploy(),
-    eContractid.LendPoolAddressesProviderRegistry,
-    [],
-    verify
-  );
-*/
 
 export const deployCBLibraries = async (verify?: boolean) => {
   await deployStakingLibraries(verify);
@@ -117,13 +105,6 @@ const PLACEHOLDER_BORROW_LOGIC = "__$b77bd822e3d83798efedd92c87b87b691d$__";
 const PLACEHOLDER_LIQUIDATE_LOGIC = "__$ce70b23849b5cbed90e6e2f622d8887206$__";
 const PLACEHOLDER_CONFIGURATOR_LOGIC = "__$3b2ad8f1ea56cc7a60e9a93596bbfe9178$__";
 
-export const deployStaking = async (verify?: boolean) => {
-  const libraries = await getStakingLibraries(verify);
-  const stakingImpl = await new StakingFactory(libraries, await getDeploySigner()).deploy();
-  await insertContractAddressInDb(eContractid.StakingImpl, stakingImpl.address);
-  return withSaveAndVerify(stakingImpl, eContractid.Staking, [], verify);
-};
-
 export const deploySupport = async (verify?: boolean) => {
   const supportImpl = await new SupportFactory(await getDeploySigner()).deploy();
   await insertContractAddressInDb(eContractid.SupportImpl, supportImpl.address);
@@ -136,73 +117,13 @@ export const deployCopyrightRegistry = async (verify?: boolean) => {
   return withSaveAndVerify(copyrightRegistryImpl, eContractid.CopyrightRegistryImpl, [], verify);
 };
 
-export const deployStakingAddressesProvider = async (marketId: string, verify?: boolean) =>
+export const deployStakingAddressesProvider = async (verify?: boolean) =>
   withSaveAndVerify(
-    await new StakingAddressesProviderFactory(await getDeploySigner()).deploy(marketId),
+    await new StakingAddressesProviderFactory(await getDeploySigner()).deploy(),
     eContractid.StakingAddressesProvider,
-    [marketId],
-    verify
-  );
-
-/*
-export const deployStakingConfigurator = async (verify?: boolean) => {
-  const cfgLogicAddress = await getContractAddressInDb(eContractid.ConfiguratorLogic);
-
-  const libraries = {
-    [PLACEHOLDER_CONFIGURATOR_LOGIC]: cfgLogicAddress,
-  };
-
-  const lendPoolConfiguratorImpl = await new StakingConfiguratorFactory(libraries, await getDeploySigner()).deploy();
-  await insertContractAddressInDb(eContractid.LendPoolConfiguratorImpl, lendPoolConfiguratorImpl.address);
-  return withSaveAndVerify(lendPoolConfiguratorImpl, eContractid.LendPoolConfigurator, [], verify);
-};
-*/
-
-/*
-export const deployLendPoolLoan = async (verify?: boolean) => {
-  const lendPoolLoanImpl = await new LendPoolLoanFactory(await getDeploySigner()).deploy();
-  await insertContractAddressInDb(eContractid.LendPoolLoanImpl, lendPoolLoanImpl.address);
-  return withSaveAndVerify(lendPoolLoanImpl, eContractid.LendPoolLoan, [], verify);
-};
-*/
-
-export const deployBNFTRegistry = async (verify?: boolean) => {
-  const bnftRegistryImpl = await new BNFTRegistryFactory(await getDeploySigner()).deploy();
-  await insertContractAddressInDb(eContractid.BNFTRegistryImpl, bnftRegistryImpl.address);
-  return withSaveAndVerify(bnftRegistryImpl, eContractid.BNFTRegistry, [], verify);
-};
-
-export const deployNftLogicLibrary = async (verify?: boolean) => {
-  const nftLogicArtifact = await readArtifact(eContractid.NftLogic);
-  const linkedNftLogicByteCode = linkBytecode(nftLogicArtifact, {
-    //[eContractid.ReserveLogic]: reserveLogic.address,
-  });
-
-  const nftLogicFactory = await DRE.ethers.getContractFactory(nftLogicArtifact.abi, linkedNftLogicByteCode);
-
-  const nftLogic = await (await nftLogicFactory.connect(await getDeploySigner()).deploy()).deployed();
-
-  return withSaveAndVerify(nftLogic, eContractid.NftLogic, [], verify);
-};
-
-export const deployStakeLogicLibrary = async (verify?: boolean) => {
-  /*
-  const validateLogicAddress = await getContractAddressInDb(eContractid.ValidationLogic);
-  const libraries = {
-    [PLACEHOLDER_VALIDATION_LOGIC]: validateLogicAddress,
-  };
-  */
-
-  return withSaveAndVerify(
-    await new StakeLogicFactory(await getDeploySigner()).deploy(),
-    eContractid.StakeLogic,
     [],
     verify
   );
-};
-
-export const deployGenericBNFTImpl = async (verify: boolean) =>
-  withSaveAndVerify(await new BNFTFactory(await getDeploySigner()).deploy(), eContractid.BNFT, [], verify);
 
 export const deployMintableERC20 = async (args: [string, string, string], verify?: boolean): Promise<MintableERC20> =>
   withSaveAndVerify(
@@ -261,7 +182,7 @@ export const deployAllMockNfts = async (verify?: boolean) => {
   const tokens: { [symbol: string]: MockContract | MintableERC721 } = {};
 
   for (const tokenSymbol of Object.keys(NftContractId)) {
-    const tokenName = "Bend Mock " + tokenSymbol;
+    const tokenName = "CBP Mock " + tokenSymbol;
 
     /*
     if (tokenSymbol === "WPUNKS") {
@@ -277,43 +198,6 @@ export const deployAllMockNfts = async (verify?: boolean) => {
     await registerContractInJsonDb(tokenSymbol.toUpperCase(), tokens[tokenSymbol]);
   }
   return tokens;
-};
-
-export const chooseBNFTDeployment = (id: eContractid) => {
-  switch (id) {
-    case eContractid.BNFT:
-      return deployGenericBNFTImpl;
-    //case eContractid.DelegationAwareBNFT:
-    //  return deployDelegationAwareBNFTImpl;
-    default:
-      throw Error(`Missing bNFT implementation deployment script for: ${id}`);
-  }
-};
-
-export const deployBNFTImplementations = async (
-  pool: ConfigNames,
-  NftsConfig: { [key: string]: INftParams },
-  verify = false
-) => {
-  const poolConfig = loadPoolConfig(pool);
-  const network = <eNetwork>DRE.network.name;
-
-  // Obtain the different BNFT implementations of all nfts inside the Market config
-  const bNftImplementations = [
-    ...Object.entries(NftsConfig).reduce<Set<eContractid>>((acc, [, entry]) => {
-      acc.add(entry.bNftImpl);
-      return acc;
-    }, new Set<eContractid>()),
-  ];
-
-  for (let x = 0; x < bNftImplementations.length; x++) {
-    const bNftAddress = getOptionalParamAddressPerNetwork(poolConfig[bNftImplementations[x].toString()], network);
-    if (!notFalsyOrZeroAddress(bNftAddress)) {
-      const deployImplementationMethod = chooseBNFTDeployment(bNftImplementations[x]);
-      console.log(`Deploying BNFT implementation`, bNftImplementations[x]);
-      await deployImplementationMethod(verify);
-    }
-  }
 };
 
 export const deployCBUpgradeableProxy = async (

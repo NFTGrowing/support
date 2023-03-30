@@ -1,19 +1,15 @@
 import { evmRevert, evmSnapshot, DRE, getNowTimeInSeconds } from "../../helpers/misc-utils";
 import { Signer } from "ethers";
 import {
-  getStaking,
   getStakingAddressesProvider,
-  getBNFT,
   getMintableERC20,
   getMintableERC721,
-  getBNFTRegistryProxy,
   getSupport,
   getAllMockedTokens,
   getWETHMocked,
   getCopyrightRegistry,
 } from "../../helpers/contracts-getters";
 import { eEthereumNetwork, eNetwork, tEthereumAddress, TokenContractId } from "../../helpers/types";
-import { Staking } from "../../types/Staking";
 import { Support } from "../../types/Support";
 import { CopyrightRegistry } from "../../types/CopyrightRegistry";
 
@@ -33,7 +29,6 @@ import { getParamPerNetwork } from "../../helpers/contracts-helpers";
 import { solidity } from "ethereum-waffle";
 import { CBPConfig } from "../../markets/cbp";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { BNFTRegistry } from "../../types";
 import { USD_ADDRESS } from "../../helpers/constants";
 import { SupportInfo } from "prettier";
 
@@ -48,8 +43,6 @@ export interface SignerWithAddress {
 export interface TestEnv {
   deployer: SignerWithAddress;
   users: SignerWithAddress[];
-  bnftRegistry: BNFTRegistry;
-  pool: Staking;
   support: Support;
   copyrightRegistry: CopyrightRegistry;
 
@@ -78,8 +71,6 @@ const setBuidlerevmSnapshotId = (id: string) => {
 const testEnv: TestEnv = {
   deployer: {} as SignerWithAddress,
   users: [] as SignerWithAddress[],
-  bnftRegistry: {} as BNFTRegistry,
-  pool: {} as Staking,
   support: {} as Support,
   copyrightRegistry: {} as CopyrightRegistry,
 
@@ -113,8 +104,6 @@ export async function initializeMakeSuite() {
   }
 
   testEnv.deployer = deployer;
-  testEnv.bnftRegistry = await getBNFTRegistryProxy();
-  testEnv.pool = await getStaking();
   testEnv.support = await getSupport();
   testEnv.copyrightRegistry = await getCopyrightRegistry();
   testEnv.addressesProvider = await getStakingAddressesProvider();

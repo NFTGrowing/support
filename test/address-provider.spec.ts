@@ -5,7 +5,7 @@ import { ProtocolErrors } from "../helpers/types";
 import { ethers } from "ethers";
 import { ZERO_ADDRESS } from "../helpers/constants";
 import { waitForTx } from "../helpers/misc-utils";
-import { deployStaking } from "../helpers/contracts-deployments";
+import { deploySupport } from "../helpers/contracts-deployments";
 
 const { utils } = ethers;
 
@@ -23,7 +23,6 @@ makeSuite("LendPoolAddressesProvider", (testEnv: TestEnv) => {
       addressesProvider.setPoolAdmin,
       addressesProvider.setEmergencyAdmin,
       addressesProvider.setEmergencyAdmin,
-      
     ]) {
       await expect(contractFunction(mockAddress)).to.be.revertedWith(INVALID_OWNER_REVERT_MSG);
     }
@@ -37,9 +36,7 @@ makeSuite("LendPoolAddressesProvider", (testEnv: TestEnv) => {
     ).to.be.revertedWith(INVALID_OWNER_REVERT_MSG);
 
     await expect(addressesProvider.setStakingImpl(mockAddress, [])).to.be.revertedWith(INVALID_OWNER_REVERT_MSG);
-
   });
-
 
   it("Tests adding a proxied address with `setAddressAsProxy()`", async () => {
     const { addressesProvider, users } = testEnv;
@@ -47,13 +44,13 @@ makeSuite("LendPoolAddressesProvider", (testEnv: TestEnv) => {
 
     const currentAddressesProviderOwner = users[1];
 
-    const mockLendPool = await deployStaking();
+    const mockSupportContract = await deploySupport();
     const proxiedAddressId = utils.keccak256(utils.toUtf8Bytes("RANDOM_PROXIED"));
 
     const proxiedAddressSetReceipt = await waitForTx(
       await addressesProvider
         .connect(currentAddressesProviderOwner.signer)
-        .setAddressAsProxy(proxiedAddressId, mockLendPool.address, [])
+        .setAddressAsProxy(proxiedAddressId, mockSupportContract.address, [])
     );
 
     if (!proxiedAddressSetReceipt.events || proxiedAddressSetReceipt.events?.length < 1) {
@@ -66,11 +63,11 @@ makeSuite("LendPoolAddressesProvider", (testEnv: TestEnv) => {
     expect(proxiedAddressSetReceipt.events[2].event).to.be.equal("ProxyCreated");
     expect(proxiedAddressSetReceipt.events[3].event).to.be.equal("AddressSet");
     expect(proxiedAddressSetReceipt.events[3].args?.id).to.be.equal(proxiedAddressId);
-    expect(proxiedAddressSetReceipt.events[3].args?.newAddress).to.be.equal(mockLendPool.address);
+    expect(proxiedAddressSetReceipt.events[3].args?.newAddress).to.be.equal(mockSupportContract.address);
     expect(proxiedAddressSetReceipt.events[3].args?.hasProxy).to.be.equal(true);
   });
 
-    /*
+  /*
   it("Tests adding a non proxied address with `setAddress()`", async () => {
     const { addressesProvider, users } = testEnv;
     const { INVALID_OWNER_REVERT_MSG } = ProtocolErrors;

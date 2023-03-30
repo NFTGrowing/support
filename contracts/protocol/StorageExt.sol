@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: agpl-3.0
 pragma solidity 0.8.4;
 
-contract StakingStorageExt {
+contract StorageExt {
   // !!! Add new variable MUST append it only, do not insert, update type & name, or change order !!!
   // https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#potentially-unsafe-operations
 

@@ -18,39 +18,13 @@ import {Address} from "@openzeppelin/contracts/utils/Address.sol";
  * @author CBP
  **/
 contract StakingAddressesProvider is Ownable, IStakingAddressesProvider {
-  string private _marketId;
   mapping(bytes32 => address) private _addresses;
 
-  bytes32 private constant STAKING = "STAKING";
   bytes32 private constant SUPPORT = "SUPPORT";
-  bytes32 private constant STAKING_CONFIGURATOR = "STAKING_CONFIGURATOR";
   bytes32 private constant POOL_ADMIN = "POOL_ADMIN";
   bytes32 private constant EMERGENCY_ADMIN = "EMERGENCY_ADMIN";
-  bytes32 private constant RESERVE_ORACLE = "RESERVE_ORACLE";
-  bytes32 private constant NFT_ORACLE = "NFT_ORACLE";
-  bytes32 private constant CBP_ORACLE = "CBP_ORACLE";
-  bytes32 private constant BNFT_REGISTRY = "BNFT_REGISTRY";
-  bytes32 private constant INCENTIVES_CONTROLLER = "INCENTIVES_CONTROLLER";
 
-  constructor(string memory marketId) {
-    _setMarketId(marketId);
-  }
-
-  /**
-   * @dev Returns the id of the fCBP market to which this contracts points to
-   * @return The market id
-   **/
-  function getMarketId() external view override returns (string memory) {
-    return _marketId;
-  }
-
-  /**
-   * @dev Allows to set the market which this StakingAddressesProvider represents
-   * @param marketId The market id
-   */
-  function setMarketId(string memory marketId) external override onlyOwner {
-    _setMarketId(marketId);
-  }
+  constructor() {}
 
   /**
    * @dev General function to update the implementation of a proxy registered with
@@ -94,28 +68,6 @@ contract StakingAddressesProvider is Ownable, IStakingAddressesProvider {
   }
 
   /**
-   * @dev Returns the address of the Staking proxy
-   * @return The Staking proxy address
-   **/
-  function getStaking() external view override returns (address) {
-    return getAddress(STAKING);
-  }
-
-  /**
-   * @dev Updates the implementation of the Staking, or creates the proxy
-   * setting the new `staking` implementation on the first time calling it
-   * @param staking The new Staking implementation
-   **/
-  function setStakingImpl(address staking, bytes memory encodedCallData) external override onlyOwner {
-    _updateImpl(STAKING, staking);
-    emit StakingUpdated(staking, encodedCallData);
-
-    if (encodedCallData.length > 0) {
-      Address.functionCall(_addresses[STAKING], encodedCallData);
-    }
-  }
-
-  /**
    * @dev Returns the address of the Support proxy
    * @return The Support proxy address
    **/
@@ -134,28 +86,6 @@ contract StakingAddressesProvider is Ownable, IStakingAddressesProvider {
 
     if (encodedCallData.length > 0) {
       Address.functionCall(_addresses[SUPPORT], encodedCallData);
-    }
-  }
-
-  /**
-   * @dev Returns the address of the StakingConfigurator proxy
-   * @return The StakingConfigurator proxy address
-   **/
-  function getStakingConfigurator() external view override returns (address) {
-    return getAddress(STAKING_CONFIGURATOR);
-  }
-
-  /**
-   * @dev Updates the implementation of the StakingConfigurator, or creates the proxy
-   * setting the new `configurator` implementation on the first time calling it
-   * @param configurator The new StakingConfigurator implementation
-   **/
-  function setStakingConfiguratorImpl(address configurator, bytes memory encodedCallData) external override onlyOwner {
-    _updateImpl(STAKING_CONFIGURATOR, configurator);
-    emit StakingConfiguratorUpdated(configurator, encodedCallData);
-
-    if (encodedCallData.length > 0) {
-      Address.functionCall(_addresses[STAKING_CONFIGURATOR], encodedCallData);
     }
   }
 
@@ -180,15 +110,6 @@ contract StakingAddressesProvider is Ownable, IStakingAddressesProvider {
   function setEmergencyAdmin(address emergencyAdmin) external override onlyOwner {
     _addresses[EMERGENCY_ADMIN] = emergencyAdmin;
     emit EmergencyAdminUpdated(emergencyAdmin);
-  }
-
-  function getBNFTRegistry() external view override returns (address) {
-    return getAddress(BNFT_REGISTRY);
-  }
-
-  function setBNFTRegistry(address factory) external override onlyOwner {
-    _addresses[BNFT_REGISTRY] = factory;
-    emit BNFTRegistryUpdated(factory);
   }
 
   function getImplementation(address proxyAddress) external view onlyOwner returns (address) {
@@ -222,10 +143,5 @@ contract StakingAddressesProvider is Ownable, IStakingAddressesProvider {
 
       proxy.upgradeTo(newAddress);
     }
-  }
-
-  function _setMarketId(string memory marketId) internal {
-    _marketId = marketId;
-    emit MarketIdSet(marketId);
   }
 }

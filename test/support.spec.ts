@@ -37,7 +37,6 @@ import {
   getPoolAdminSigner,
   getMintableERC721,
   getStakeLogic,
-  getStaking,
   getSupport,
   getAllMockedTokens,
   getCopyrightRegistry,

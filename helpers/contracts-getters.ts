@@ -1,8 +1,6 @@
 import { Signer, ethers } from "ethers";
 import {
   StakeLogicFactory,
-  BNFTFactory,
-  BNFTRegistryFactory,
   StakingAddressesProviderFactory,
   StakingFactory,
   SupportFactory,
@@ -48,19 +46,6 @@ export const getStakingAddressesProvider = async (address?: tEthereumAddress) =>
   );
 };
 
-export const getBNFTRegistryProxy = async (address?: tEthereumAddress) => {
-  return await BNFTRegistryFactory.connect(
-    address || (await getDb(DRE.network.name).get(`${eContractid.BNFTRegistry}`).value()).address,
-    await getDeploySigner()
-  );
-};
-
-export const getStaking = async (address?: tEthereumAddress) =>
-  await StakingFactory.connect(
-    address || (await getDb(DRE.network.name).get(`${eContractid.Staking}`).value()).address,
-    await getDeploySigner()
-  );
-
 export const getSupport = async (address?: tEthereumAddress) =>
   await SupportFactory.connect(
     address || (await getDb(DRE.network.name).get(`${eContractid.Support}`).value()).address,
@@ -75,12 +60,6 @@ export const getCopyrightRegistry = async (address?: tEthereumAddress) =>
 
 export const getCopyrightFixedSupply = async (address: tEthereumAddress) =>
   await CopyrightFixedSupplyFactory.connect(address, await getDeploySigner());
-
-export const getBNFT = async (address?: tEthereumAddress) =>
-  await BNFTFactory.connect(
-    address || (await getDb(DRE.network.name).get(`${eContractid.BNFT}`).value()).address,
-    await getDeploySigner()
-  );
 
 export const getMintableERC20 = async (address: tEthereumAddress) =>
   await MintableERC20Factory.connect(
@@ -219,13 +198,6 @@ export const getLendPoolImpl = async (address?: tEthereumAddress) =>
     address || (await getDb(DRE.network.name).get(`${eContractid.StakingImpl}`).value()).address,
     await getDeploySigner()
   );
-
-export const getBNFTRegistryImpl = async (address?: tEthereumAddress) => {
-  return await BNFTRegistryFactory.connect(
-    address || (await getDb(DRE.network.name).get(`${eContractid.BNFTRegistryImpl}`).value()).address,
-    await getDeploySigner()
-  );
-};
 
 export const getAddressById = async (id: string): Promise<tEthereumAddress | undefined> =>
   (await getDb(DRE.network.name).get(`${id}`).value())?.address || undefined;
