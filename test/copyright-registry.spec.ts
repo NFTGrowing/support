@@ -113,10 +113,9 @@ makeSuite("CopyrightRegistry: test copyright token registry and claim ", (testEn
     // console.log("copyrightRegistry is", copyrightRegistry.address);
 
     console.log("paras: ", lv2ID, id, symbol, name_1, totalSupply);
-    console.log("test invite");
-    const testInviteReturn = await copyrightRegistry.testInvite();
-
-    console.log("test invite result", testInviteReturn);
+    // console.log("test invite");
+    // const testInviteReturn = await copyrightRegistry.testInvite();
+    //console.log("test invite result", testInviteReturn);
 
     // Approach 1
     const encodeRWT_result = await copyrightRegistry.encodeRWT(lv2ID, id, symbol, name_1, totalSupply);

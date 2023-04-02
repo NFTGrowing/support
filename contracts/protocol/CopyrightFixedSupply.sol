@@ -70,4 +70,8 @@ contract CopyrightFixedSupply is ERC20 {
     emit TurnoffIncreaseSupplySwitch();
     return true;
   }
+
+  function burn(uint256 amount) public {
+    _burn(msg.sender, amount);
+  }
 }

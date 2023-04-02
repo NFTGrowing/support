@@ -148,4 +148,5 @@ library Errors {
   string public constant C_REGISTRY_CLAIMED_ALREADY = "909";
   string public constant C_REGISTRY_AMOUNT_ERROR = "910";
   string public constant C_REGISTRY_WRONG_LV1_TOKENID = "911";
+  string public constant C_REGISTRY_WRONG_TOKENID = "912";
 }

@@ -269,7 +269,7 @@ contract CopyrightRegistry is Initializable, ICopyrightRegistry, ContextUpgradea
     uint256 id,
     address workTokenID
   ) public onlyConfigurator returns (bool) {
-    require(workTokenID != address(0), Errors.C_REGISTRY_WRONG_LV2_TOKENID);
+    require(workTokenID != address(0), Errors.C_REGISTRY_WRONG_TOKENID);
     if (lv2ID != 0) {
       require(workTokenID == _lv2Registry[lv2ID].lv2TokenID, Errors.C_REGISTRY_WRONG_LV2_TOKENID);
       CopyrightFixedSupply(_lv2Registry[lv2ID].lv2TokenID).turnoffIncreaseSupplySwitch();
@@ -280,6 +280,58 @@ contract CopyrightRegistry is Initializable, ICopyrightRegistry, ContextUpgradea
     }
     emit TurnoffIncreaseSupplySwitch(lv2ID, id, workTokenID);
     return true;
+  }
+
+  /**
+   * @dev increase supply if the token contract is avaiblable for increasing
+   * @param lv2ID aggregation ID of the work, 0 means no lv2ID
+   * @param id single chapter work id
+   * @param workTokenID addr of the work token
+   * @param tokenAmount token amount
+   */
+  function increaseTokenSupply(
+    uint256 lv2ID,
+    uint256 id,
+    address workTokenID,
+    uint256 tokenAmount
+  ) public nonReentrant onlyConfigurator returns (bool) {
+    require(workTokenID != address(0), Errors.C_REGISTRY_WRONG_TOKENID);
+    bool result = false;
+    if (lv2ID != 0) {
+      require(workTokenID == _lv2Registry[lv2ID].lv2TokenID, Errors.C_REGISTRY_WRONG_LV2_TOKENID);
+      result = CopyrightFixedSupply(_lv2Registry[lv2ID].lv2TokenID).increaseSupply(tokenAmount);
+    } else {
+      address lv1TokenID = _lv2Registry[lv2ID].lv1Registry[id].lv1TokenID;
+      require(workTokenID == lv1TokenID, Errors.C_REGISTRY_WRONG_LV1_TOKENID);
+      result = CopyrightFixedSupply(lv1TokenID).increaseSupply(tokenAmount);
+    }
+    emit IncreaseSupplyForWork(lv2ID, id, workTokenID, tokenAmount);
+    return result;
+  }
+
+  /**
+   * @dev burn supply
+   * @param lv2ID aggregation ID of the work, 0 means no lv2ID
+   * @param id single chapter work id
+   * @param workTokenID addr of the work token
+   * @param tokenAmount token amount
+   */
+  function burnTokenSupply(
+    uint256 lv2ID,
+    uint256 id,
+    address workTokenID,
+    uint256 tokenAmount
+  ) public nonReentrant onlyConfigurator {
+    require(workTokenID != address(0), Errors.C_REGISTRY_WRONG_TOKENID);
+    if (lv2ID != 0) {
+      require(workTokenID == _lv2Registry[lv2ID].lv2TokenID, Errors.C_REGISTRY_WRONG_LV2_TOKENID);
+      CopyrightFixedSupply(_lv2Registry[lv2ID].lv2TokenID).burn(tokenAmount);
+    } else {
+      address lv1TokenID = _lv2Registry[lv2ID].lv1Registry[id].lv1TokenID;
+      require(workTokenID == lv1TokenID, Errors.C_REGISTRY_WRONG_LV1_TOKENID);
+      CopyrightFixedSupply(lv1TokenID).burn(tokenAmount);
+    }
+    emit BurnSupplyForWork(lv2ID, id, workTokenID, tokenAmount);
   }
 
   /**
@@ -300,9 +352,11 @@ contract CopyrightRegistry is Initializable, ICopyrightRegistry, ContextUpgradea
     return abi.encodePacked(lv2ID, id, symbol, name, totalSupply);
   }
 
+  /*
   function testInvite() public pure returns (string memory) {
     return "hello";
   }
+*/
 
   /**
    * @dev encode to get the message for claimWorkToken interface

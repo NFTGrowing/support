@@ -53,6 +53,24 @@ interface ICopyrightRegistry {
   event TurnoffIncreaseSupplySwitch(uint256 indexed lv2ID, uint256 indexed id, address workTokenID);
 
   /**
+   * @dev Emitted on increaseSupplyForWork
+   * @param lv2ID aggregation ID of the work, 0 means no lv2ID
+   * @param id ID of the work
+   * @param workTokenID ID of the work
+   * @param tokenAmount token amount
+   **/
+  event IncreaseSupplyForWork(uint256 indexed lv2ID, uint256 indexed id, address workTokenID, uint256 tokenAmount);
+
+  /**
+   * @dev Emitted on burnSupply
+   * @param lv2ID aggregation ID of the work, 0 means no lv2ID
+   * @param id ID of the work
+   * @param workTokenID ID of the work
+   * @param tokenAmount token amount
+   **/
+  event BurnSupplyForWork(uint256 indexed lv2ID, uint256 indexed id, address workTokenID, uint256 tokenAmount);
+
+  /**
    * @dev Emitted in receive funciton for ether depositing
    * @param depositor depositor
    * @param amount amount
