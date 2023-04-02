@@ -3,10 +3,16 @@ pragma solidity 0.8.4;
 
 // Prettier ignore to prevent buidler flatter bug
 // prettier-ignore
+
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import {ContextUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
+import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+
 import {ICopyrightRegistry} from "../interfaces/ICopyrightRegistry.sol";
+import {ICBPAddressesProvider} from "../interfaces/ICBPAddressesProvider.sol";
+import {StorageExt} from "./StorageExt.sol";
 import {Errors} from "../libraries/helpers/Errors.sol";
 import {CopyrightFixedSupply} from "./CopyrightFixedSupply.sol";
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
@@ -18,11 +24,11 @@ import {Address} from "@openzeppelin/contracts/utils/Address.sol";
  * - Owned by the CBP Governance
  * @author CBP
  **/
-contract CopyrightRegistry is Ownable, ICopyrightRegistry {
+contract CopyrightRegistry is Initializable, ICopyrightRegistry, ContextUpgradeable, StorageExt {
   using ECDSA for bytes32;
 
   //TODO: add iterate code?
-
+  ICBPAddressesProvider public _addressesProvider;
   address public _serviceSignAddr;
 
   struct Lv1Register {
@@ -47,13 +53,66 @@ contract CopyrightRegistry is Ownable, ICopyrightRegistry {
   // lv2ID => lv2 registry info
   mapping(uint256 => Lv2Register) _lv2Registry;
 
-  constructor() {}
+  receive() external payable {
+    emit Received(msg.sender, msg.value);
+  }
+
+  fallback() external payable {}
+
+  function _onlyConfigurator() internal view {
+    //TODO - check to see whether create one new configurator
+    require(_addressesProvider.getPoolAdmin() == _msgSender(), Errors.LP_CALLER_NOT_SUPPORT_CONFIGURATOR);
+  }
+
+  modifier onlyConfigurator() {
+    _onlyConfigurator();
+    _;
+  }
+
+  function _whenNotPaused() internal view {
+    require(!_paused, Errors.FUNCTION_IS_PAUSED);
+  }
+
+  function setPauseStatus(bool newPauseStatus) external nonReentrant onlyConfigurator {
+    _paused = newPauseStatus;
+  }
+
+  modifier whenNotPaused() {
+    _whenNotPaused();
+    _;
+  }
+
+  /**
+   * @dev Function is invoked by the proxy contract when the Support contract is added to the
+   * AddressesProvider
+   * - Caching the address of the AddressesProvider in order to reduce gas consumption
+   *   on subsequent operations
+   * @param provider The address of the AddressesProvider
+   **/
+  function initialize(ICBPAddressesProvider provider) public initializer {
+    _addressesProvider = provider;
+  }
+
+  modifier nonReentrant() {
+    // On the first call to nonReentrant, _notEntered will be true
+    require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+
+    // Any calls to nonReentrant after this point will fail
+    _status = _ENTERED;
+
+    _;
+
+    // TODO - check this
+    // By storing the original value once again, a refund is triggered (see
+    // https://eips.ethereum.org/EIPS/eip-2200)
+    _status = _NOT_ENTERED;
+  }
 
   /**
    * @dev Allows to set the addr which sign the register or claim msg
    * @param addr new _serviceSignAddr
    */
-  function setServiceSignAddr(address addr) external onlyOwner {
+  function setServiceSignAddr(address addr) external onlyConfigurator {
     _serviceSignAddr = addr;
     //TODO: emit event
     emit SetServiceSignAddr(addr);
@@ -75,7 +134,7 @@ contract CopyrightRegistry is Ownable, ICopyrightRegistry {
     string memory symbol,
     string memory name,
     uint256 totalSupply
-  ) external override returns (address) {
+  ) external override whenNotPaused returns (address) {
     require(
       signature.length != 0 && bytes(symbol).length != 0 && bytes(name).length != 0,
       Errors.VL_INVALID_STRING_PARA
@@ -150,7 +209,7 @@ contract CopyrightRegistry is Ownable, ICopyrightRegistry {
     address workTokenID,
     uint256[] memory amountArray,
     address beneficiary
-  ) external override {
+  ) external override whenNotPaused {
     require(signature.length != 0, Errors.VL_INVALID_STRING_PARA);
     require(beneficiary != address(0), Errors.C_REGISTRY_INVALID_BENEFICIARY);
     require(msg.sender == beneficiary, Errors.C_REGISTRY_BENEFICIARY_NE_SENDER);
@@ -209,7 +268,7 @@ contract CopyrightRegistry is Ownable, ICopyrightRegistry {
     uint256 lv2ID,
     uint256 id,
     address workTokenID
-  ) public onlyOwner returns (bool) {
+  ) public onlyConfigurator returns (bool) {
     require(workTokenID != address(0), Errors.C_REGISTRY_WRONG_LV2_TOKENID);
     if (lv2ID != 0) {
       require(workTokenID == _lv2Registry[lv2ID].lv2TokenID, Errors.C_REGISTRY_WRONG_LV2_TOKENID);

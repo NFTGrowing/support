@@ -3,7 +3,7 @@ pragma solidity 0.8.4;
 
 // Prettier ignore to prevent buidler flatter bug
 // prettier-ignore
-import {IStakingAddressesProvider} from "../interfaces/IStakingAddressesProvider.sol";
+import {ICBPAddressesProvider} from "../interfaces/ICBPAddressesProvider.sol";
 import {CBUpgradeableProxy} from "../libraries/proxy/CBUpgradeableProxy.sol";
 import {Errors} from "../libraries/helpers/Errors.sol";
 
@@ -11,16 +11,18 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
 /**
- * @title StakingAddressesProvider contract
+ * @title CBPAddressesProvider contract
  * @dev Main registry of addresses part of or connected to the protocol, including permissioned roles
  * - Acting also as factory of proxies and admin of those, so with right to change its implementations
  * - Owned by the CBP Governance
  * @author CBP
  **/
-contract StakingAddressesProvider is Ownable, IStakingAddressesProvider {
+contract CBPAddressesProvider is Ownable, ICBPAddressesProvider {
   mapping(bytes32 => address) private _addresses;
 
   bytes32 private constant SUPPORT = "SUPPORT";
+  bytes32 private constant COPYRIGHT_REGISTRY = "COPYRIGHT_REGISTRY";
+
   bytes32 private constant POOL_ADMIN = "POOL_ADMIN";
   bytes32 private constant EMERGENCY_ADMIN = "EMERGENCY_ADMIN";
 
@@ -86,6 +88,32 @@ contract StakingAddressesProvider is Ownable, IStakingAddressesProvider {
 
     if (encodedCallData.length > 0) {
       Address.functionCall(_addresses[SUPPORT], encodedCallData);
+    }
+  }
+
+  /**
+   * @dev Returns the address of the CopyrightRegistry proxy
+   * @return The CopyrightRegistry proxy address
+   **/
+  function getCopyrightRegistry() external view override returns (address) {
+    return getAddress(COPYRIGHT_REGISTRY);
+  }
+
+  /**
+   * @dev Updates the implementation of the CopyrightRegistry, or creates the proxy
+   * setting the new `copyrightRegistry` implementation on the first time calling it
+   * @param copyrightRegistry The new CopyrightRegistry implementation
+   **/
+  function setCopyrightRegistryImpl(address copyrightRegistry, bytes memory encodedCallData)
+    external
+    override
+    onlyOwner
+  {
+    _updateImpl(COPYRIGHT_REGISTRY, copyrightRegistry);
+    emit CopyrightRegistryUpdated(copyrightRegistry, encodedCallData);
+
+    if (encodedCallData.length > 0) {
+      Address.functionCall(_addresses[COPYRIGHT_REGISTRY], encodedCallData);
     }
   }
 

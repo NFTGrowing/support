@@ -9,6 +9,7 @@ contract StorageExt {
   uint256 internal constant _ENTERED = 1;
   uint256 internal _status;
 
+  bool public _paused;
   uint256 internal _pauseStartTime;
   uint256 internal _pauseDurationTime;
 

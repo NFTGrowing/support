@@ -53,6 +53,13 @@ interface ICopyrightRegistry {
   event TurnoffIncreaseSupplySwitch(uint256 indexed lv2ID, uint256 indexed id, address workTokenID);
 
   /**
+   * @dev Emitted in receive funciton for ether depositing
+   * @param depositor depositor
+   * @param amount amount
+   **/
+  event Received(address depositor, uint256 amount);
+
+  /**
    * @dev register copyright token for work
    * @param signature signature to the parameters by protocol service
    * @param lv2ID aggregation ID of the work, 0 means no lv2ID

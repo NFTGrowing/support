@@ -13,7 +13,7 @@ import { ZERO_ADDRESS } from "../../helpers/constants";
 import {
   getAllMockedTokens,
   getAllMockedNfts,
-  getStakingAddressesProvider,
+  getCBPAddressesProvider,
   getSupport,
   getWETHMocked,
   getPoolAdminSigner,
@@ -31,7 +31,7 @@ task("dev:initialize-support", "Initialize support.")
     await localBRE.run("set-DRE");
     const network = <eNetwork>localBRE.network.name;
 
-    const addressesProvider = await getStakingAddressesProvider();
+    const addressesProvider = await getCBPAddressesProvider();
     // const admin = await addressesProvider.getPoolAdmin();
     const poolAdminSigner = await getPoolAdminSigner();
 
@@ -90,7 +90,7 @@ task("dev:setup-themeschedule", "setup theme schedulesupport")
     await localBRE.run("set-DRE");
     const network = <eNetwork>localBRE.network.name;
 
-    const addressesProvider = await getStakingAddressesProvider();
+    const addressesProvider = await getCBPAddressesProvider();
     // const admin = await addressesProvider.getPoolAdmin();
     const poolAdminSigner = await getPoolAdminSigner();
 

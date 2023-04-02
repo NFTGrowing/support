@@ -416,5 +416,21 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
       recordAfterWithdrawUSDT,
       actualOperatorUSDT
     );
+
+    /*
+    console.log("Test paused function")
+    await waitForTx(
+      await support
+        .connect(poolAdminSigner)
+        .setPauseStatus(true)
+    );
+
+    //Support ETH
+    await waitForTx(
+      await support
+        .connect(themeSupporter.signer)
+        .caseByCaseSupport(themeIDActive, 0, 0, 1, 1, { value: depositSizeCase })
+    );
+    */
   });
 });

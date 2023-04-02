@@ -20,7 +20,7 @@ import {
   MintableERC721Factory,
   StakingFactory,
   SupportFactory,
-  StakingAddressesProviderFactory,
+  CBPAddressesProviderFactory,
   CBUpgradeableProxyFactory,
   CBProxyAdminFactory,
   StakeLogicFactory,
@@ -46,22 +46,6 @@ import { eNetwork } from "./types";
 
 const readArtifact = async (id: string) => {
   return (DRE as HardhatRuntimeEnvironment).artifacts.readArtifact(id);
-};
-
-export const deployCBLibraries = async (verify?: boolean) => {
-  await deployStakingLibraries(verify);
-  // await deployConfiguratorLibraries(verify);
-};
-
-export const deployStakingLibraries = async (verify?: boolean) => {
-  // const genericLogic = await deployGenericLogic(verify);
-  // const reserveLogic = await deployReserveLogicLibrary(verify);
-  const nftLogic = await deployNftLogicLibrary(verify);
-  // const validationLogic = await deployValidationLogic(reserveLogic, genericLogic, verify);
-
-  // const supplyLogic = await deploySupplyLogicLibrary(verify);
-  const borrowLogic = await deployStakeLogicLibrary(verify);
-  // const liquidateLogic = await deployLiquidateLogicLibrary(verify);
 };
 
 export const getStakingLibraries = async (verify?: boolean): Promise<StakingLibraryAddresses> => {
@@ -117,10 +101,10 @@ export const deployCopyrightRegistry = async (verify?: boolean) => {
   return withSaveAndVerify(copyrightRegistryImpl, eContractid.CopyrightRegistryImpl, [], verify);
 };
 
-export const deployStakingAddressesProvider = async (verify?: boolean) =>
+export const deployCBPAddressesProvider = async (verify?: boolean) =>
   withSaveAndVerify(
-    await new StakingAddressesProviderFactory(await getDeploySigner()).deploy(),
-    eContractid.StakingAddressesProvider,
+    await new CBPAddressesProviderFactory(await getDeploySigner()).deploy(),
+    eContractid.CBPAddressesProvider,
     [],
     verify
   );

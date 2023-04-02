@@ -1,7 +1,7 @@
 import { Signer, ethers } from "ethers";
 import {
   StakeLogicFactory,
-  StakingAddressesProviderFactory,
+  CBPAddressesProviderFactory,
   StakingFactory,
   SupportFactory,
   MintableERC20Factory,
@@ -39,9 +39,9 @@ export const getSupporter = async () => (await getEthersSigners())[5];
 
 export const getServiceSigner = async () => (await getEthersSigners())[4];
 
-export const getStakingAddressesProvider = async (address?: tEthereumAddress) => {
-  return await StakingAddressesProviderFactory.connect(
-    address || (await getDb(DRE.network.name).get(`${eContractid.StakingAddressesProvider}`).value()).address,
+export const getCBPAddressesProvider = async (address?: tEthereumAddress) => {
+  return await CBPAddressesProviderFactory.connect(
+    address || (await getDb(DRE.network.name).get(`${eContractid.CBPAddressesProvider}`).value()).address,
     await getDeploySigner()
   );
 };
@@ -54,7 +54,7 @@ export const getSupport = async (address?: tEthereumAddress) =>
 
 export const getCopyrightRegistry = async (address?: tEthereumAddress) =>
   await CopyrightRegistryFactory.connect(
-    address || (await getDb(DRE.network.name).get(`${eContractid.CopyrightRegistryImpl}`).value()).address,
+    address || (await getDb(DRE.network.name).get(`${eContractid.CopyrightRegistryProxy}`).value()).address,
     await getDeploySigner()
   );
 

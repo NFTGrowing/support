@@ -39,7 +39,6 @@ import {
   getDeploySigner,
   getMintableERC721,
   getStakeLogic,
-  getStaking,
   getSupport,
   getAllMockedTokens,
   getCopyrightRegistry,
@@ -89,13 +88,14 @@ makeSuite("CopyrightRegistry: test copyright token registry and claim ", (testEn
     const copyrightRegistry = await getCopyrightRegistry();
 
     //setup serviceSignAddr to registry
-    const ownerAddr = await copyrightRegistry.owner();
-    console.log("ownerAddr", ownerAddr);
-    console.log("depositor", depositor.getAddress());
-    expect(ownerAddr, "currentServiceSignAddr check").to.be.equal(await depositor.getAddress());
+    // const ownerAddr = await copyrightRegistry.owner();
+    const poolAdmin = await getPoolAdminSigner();
+    // console.log("poolAdmin", poolAdmin);
+
+    // expect(ownerAddr, "currentServiceSignAddr check").to.be.equal(await depositor.getAddress());
 
     console.log("setup serviceSignAddr to registry", serviceSignAddr.address);
-    await waitForTx(await copyrightRegistry.connect(depositor).setServiceSignAddr(serviceSignAddr.address));
+    await waitForTx(await copyrightRegistry.connect(poolAdmin).setServiceSignAddr(serviceSignAddr.address));
     const currentServiceSignAddr = await copyrightRegistry._serviceSignAddr();
     console.log("current serviceSignAddr", currentServiceSignAddr);
     expect(currentServiceSignAddr, "currentServiceSignAddr check").to.be.equal(serviceSignAddr.address);

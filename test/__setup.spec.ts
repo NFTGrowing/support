@@ -5,7 +5,7 @@ import { insertContractAddressInDb, registerContractInJsonDb } from "../helpers/
 import {
   deployAllMockTokens,
   deploySupport,
-  deployStakingAddressesProvider,
+  deployCBPAddressesProvider,
   deployCBUpgradeableProxy,
   deployAllMockNfts,
   deployCBProxyAdmin,
@@ -37,6 +37,7 @@ import {
   getPoolAdminSigner,
   getEmergencyAdminSigner,
   getSupport,
+  getCopyrightRegistry,
 } from "../helpers/contracts-getters";
 import { getNftAddressFromSymbol } from "./helpers/utils/helpers";
 import { ADDRESS_ID_PUNK_GATEWAY, ADDRESS_ID_WETH_GATEWAY } from "../helpers/constants";
@@ -75,7 +76,7 @@ const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
   console.log("cbpProxyAdmin:", cbpProxyAdmin.address);
 
   console.log("-> Prepare address provider...");
-  const addressesProvider = await deployStakingAddressesProvider();
+  const addressesProvider = await deployCBPAddressesProvider();
   await waitForTx(await addressesProvider.setPoolAdmin(poolAdmin));
   await waitForTx(await addressesProvider.setEmergencyAdmin(emergencyAdmin));
 
@@ -88,7 +89,12 @@ const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
   await insertContractAddressInDb(eContractid.Support, supportProxy.address);
 
   console.log("-> Prepare CopyrightRegistry...");
-  const copyrightRegistry = await deployCopyrightRegistry();
+  const copyrightRegistryImpl = await deployCopyrightRegistry();
+  await waitForTx(await addressesProvider.setCopyrightRegistryImpl(copyrightRegistryImpl.address, []));
+  // configurator will create proxy for implement
+  const copyrightRegistry = await addressesProvider.getCopyrightRegistry();
+  const copyrightRegistryProxy = await getCopyrightRegistry(copyrightRegistry);
+  await insertContractAddressInDb(eContractid.CopyrightRegistryProxy, copyrightRegistryProxy.address);
 
   console.timeEnd("setup");
 

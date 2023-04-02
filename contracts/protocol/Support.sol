@@ -3,7 +3,7 @@ pragma solidity 0.8.4;
 
 import {ISupport} from "../interfaces/ISupport.sol";
 
-import {IStakingAddressesProvider} from "../interfaces/IStakingAddressesProvider.sol";
+import {ICBPAddressesProvider} from "../interfaces/ICBPAddressesProvider.sol";
 
 /*
 import {NftConfiguration} from "../libraries/configuration/NftConfiguration.sol";
@@ -28,8 +28,8 @@ import {ContextUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/Cont
  * - Users can:
  *   # support
  *   # get support list
- * - To be covered by a proxy contract, owned by the StakingAddressesProvider? of the specific market
- * - ?All admin functions are callable by the admin defined also in the StakingAddressesProvider
+ * - To be covered by a proxy contract, owned by the CBPAddressesProvider? of the specific market
+ * - ?All admin functions are callable by the admin defined also in the CBPAddressesProvider
  * @author CBP
  **/
 
@@ -134,8 +134,7 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
     BalanceView balances;
   }
 
-  bool public _paused;
-  IStakingAddressesProvider public _addressesProvider;
+  ICBPAddressesProvider public _addressesProvider;
 
   //TODO - Does flexiable length overlap the memory when SupportAssetType extend on upgrading
   address[AssetTypeLimit] public _assetAddr;
@@ -171,8 +170,8 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
     _;
   }
 
-  modifier onlySupportConfigurator() {
-    _onlySupportConfigurator();
+  modifier onlyConfigurator() {
+    _onlyConfigurator();
     _;
   }
 
@@ -183,10 +182,14 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
   fallback() external payable {}
 
   function _whenNotPaused() internal view {
-    require(!_paused, Errors.LP_IS_PAUSED);
+    require(!_paused, Errors.FUNCTION_IS_PAUSED);
   }
 
-  function _onlySupportConfigurator() internal view {
+  function setPauseStatus(bool newPauseStatus) external nonReentrant onlyConfigurator {
+    _paused = newPauseStatus;
+  }
+
+  function _onlyConfigurator() internal view {
     //TODO - check to see whether create one new configurator
     require(_addressesProvider.getPoolAdmin() == _msgSender(), Errors.LP_CALLER_NOT_SUPPORT_CONFIGURATOR);
   }
@@ -198,7 +201,7 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
    *   on subsequent operations
    * @param provider The address of the AddressesProvider
    **/
-  function initialize(IStakingAddressesProvider provider) public initializer {
+  function initialize(ICBPAddressesProvider provider) public initializer {
     _addressesProvider = provider;
     _slotUpperLimit = DefaultSlotUpperLimit;
   }
@@ -233,7 +236,7 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
    * @dev set asset address
    * @param addrList New addrList to cover the existing arr
    */
-  function setAssetsAddr(address[] calldata addrList) external override nonReentrant onlySupportConfigurator {
+  function setAssetsAddr(address[] calldata addrList) external override nonReentrant onlyConfigurator {
     require(addrList.length <= _assetAddr.length, Errors.VL_INVALID_AMOUNT);
 
     for (uint256 i = 0; i < _assetAddr.length; i++) {
@@ -249,7 +252,7 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
    * @dev set _slotUpperLimit
    * @param slotUpperLimit New slotUpperLimit to cover the existing
    */
-  function setSlotUpperLimit(uint256 slotUpperLimit) external override nonReentrant onlySupportConfigurator {
+  function setSlotUpperLimit(uint256 slotUpperLimit) external override nonReentrant onlyConfigurator {
     _slotUpperLimit = slotUpperLimit;
   }
 
@@ -315,12 +318,7 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
    * @param themeIDs The ids of the theme to be updated
    * @param newStatus set the themes to this status
    **/
-  function updateStatus(uint32[] calldata themeIDs, bool newStatus)
-    external
-    override
-    nonReentrant
-    onlySupportConfigurator
-  {
+  function updateStatus(uint32[] calldata themeIDs, bool newStatus) external override nonReentrant onlyConfigurator {
     require(themeIDs.length > 0, Errors.VL_INVALID_AMOUNT);
 
     for (uint256 i = 0; i < themeIDs.length; i++) {
@@ -345,7 +343,7 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
     uint256 baseIssueNo,
     uint256 baseStartTime,
     uint256 issueDurationTime
-  ) external override nonReentrant onlySupportConfigurator {
+  ) external override nonReentrant onlyConfigurator {
     require(issueDurationTime > 0, Errors.VL_INVALID_AMOUNT);
     _themeSupport[themeID].issueSchedule.baseIssueNo = baseIssueNo;
     _themeSupport[themeID].issueSchedule.baseStartTime = baseStartTime;
@@ -511,7 +509,7 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
     uint32 issueNo,
     address operatorAddr,
     uint256[] memory assetsAmount
-  ) external override nonReentrant onlySupportConfigurator {
+  ) external override nonReentrant onlyConfigurator {
     require(
       assetsAmount.length > 0 && assetsAmount.length <= uint32(SupportAssetType.Last),
       Errors.VL_INVALID_ASSETARRAY_LENGTH

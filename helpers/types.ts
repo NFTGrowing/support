@@ -25,7 +25,7 @@ export enum CBPPools {
 export enum eContractid {
   MintableERC20 = "MintableERC20",
   MintableERC721 = "MintableERC721",
-  StakingAddressesProvider = "StakingAddressesProvider",
+  CBPAddressesProvider = "CBPAddressesProvider",
   LendPoolAddressesProviderRegistry = "LendPoolAddressesProviderRegistry",
   LendPoolParametersProvider = "LendPoolParametersProvider",
   LendPoolConfigurator = "LendPoolConfigurator",
@@ -73,6 +73,7 @@ export enum eContractid {
   StakingImpl = "StakingImpl",
   SupportImpl = "SupportImpl",
   CopyrightRegistryImpl = "CopyrightRegistryImpl",
+  CopyrightRegistryProxy = "CopyrightRegistryProxy",
   LendPoolConfiguratorImpl = "LendPoolConfiguratorImpl",
   LendPoolLoanImpl = "LendPoolLoanImpl",
   BNFTRegistry = "BNFTRegistry",
@@ -111,6 +112,7 @@ export enum ProtocolErrors {
   INVALID_FROM_BALANCE_AFTER_TRANSFER = "102",
   INVALID_TO_BALANCE_AFTER_TRANSFER = "103",
   CALLER_NOT_ONBEHALFOF_OR_IN_WHITELIST = "104",
+  FUNCTION_IS_PAUSED = "105",
 
   //math library erros
   MATH_MULTIPLICATION_OVERFLOW = "200",

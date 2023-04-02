@@ -1,7 +1,7 @@
 import { evmRevert, evmSnapshot, DRE, getNowTimeInSeconds } from "../../helpers/misc-utils";
 import { Signer } from "ethers";
 import {
-  getStakingAddressesProvider,
+  getCBPAddressesProvider,
   getMintableERC20,
   getMintableERC721,
   getSupport,
@@ -23,7 +23,7 @@ import chai from "chai";
 // @ts-ignore
 import bignumberChai from "chai-bignumber";
 import { almostEqual } from "./almost-equal";
-import { StakingAddressesProvider } from "../../types/StakingAddressesProvider";
+import { CBPAddressesProvider } from "../../types/CBPAddressesProvider";
 import { getEthersSigners } from "../../helpers/contracts-helpers";
 import { getParamPerNetwork } from "../../helpers/contracts-helpers";
 import { solidity } from "ethereum-waffle";
@@ -55,7 +55,7 @@ export interface TestEnv {
   bPUNK: BNFT;
   bayc: MintableERC721;
   bBAYC: BNFT;
-  addressesProvider: StakingAddressesProvider;
+  addressesProvider: CBPAddressesProvider;
 
   tokenIdTracker: number;
 
@@ -82,7 +82,7 @@ const testEnv: TestEnv = {
   bPUNK: {} as BNFT,
   bayc: {} as MintableERC721,
   bBAYC: {} as BNFT,
-  addressesProvider: {} as StakingAddressesProvider,
+  addressesProvider: {} as CBPAddressesProvider,
 
   tokenIdTracker: {} as number,
   roundIdTracker: {} as number,
@@ -106,7 +106,7 @@ export async function initializeMakeSuite() {
   testEnv.deployer = deployer;
   testEnv.support = await getSupport();
   testEnv.copyrightRegistry = await getCopyrightRegistry();
-  testEnv.addressesProvider = await getStakingAddressesProvider();
+  testEnv.addressesProvider = await getCBPAddressesProvider();
 
   // Tokens
   const allTokens = await getAllMockedTokens();

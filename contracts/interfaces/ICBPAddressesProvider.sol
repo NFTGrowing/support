@@ -2,14 +2,15 @@
 pragma solidity 0.8.4;
 
 /**
- * @title StakingAddressesProvider contract
+ * @title CBPAddressesProvider contract
  * @dev Main registry of addresses part of or connected to the protocol, including permissioned roles
  * - Acting also as factory of proxies and admin of those, so with right to change its implementations
  * - Owned by the  Governance
- * @author
+ * @author CBP
  **/
-interface IStakingAddressesProvider {
+interface ICBPAddressesProvider {
   event SupportUpdated(address indexed newAddress, bytes encodedCallData);
+  event CopyrightRegistryUpdated(address indexed newAddress, bytes encodedCallData);
   event ConfigurationAdminUpdated(address indexed newAddress);
   event EmergencyAdminUpdated(address indexed newAddress);
   event ProxyCreated(bytes32 id, address indexed newAddress);
@@ -28,6 +29,10 @@ interface IStakingAddressesProvider {
   function getSupport() external view returns (address);
 
   function setSupportImpl(address support, bytes memory encodedCallData) external;
+
+  function getCopyrightRegistry() external view returns (address);
+
+  function setCopyrightRegistryImpl(address support, bytes memory encodedCallData) external;
 
   function getPoolAdmin() external view returns (address);
 
