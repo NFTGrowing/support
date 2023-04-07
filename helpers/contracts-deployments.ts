@@ -101,10 +101,10 @@ export const deployCopyrightRegistry = async (verify?: boolean) => {
   return withSaveAndVerify(copyrightRegistryImpl, eContractid.CopyrightRegistryImpl, [], verify);
 };
 
-export const deployCBPAddressesProvider = async (verify?: boolean) =>
+export const deployCBPAddressesProviderImpl = async (verify?: boolean) =>
   withSaveAndVerify(
     await new CBPAddressesProviderFactory(await getDeploySigner()).deploy(),
-    eContractid.CBPAddressesProvider,
+    eContractid.CBPAddressesProviderImpl,
     [],
     verify
   );

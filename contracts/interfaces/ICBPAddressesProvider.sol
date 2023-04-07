@@ -9,6 +9,7 @@ pragma solidity 0.8.4;
  * @author CBP
  **/
 interface ICBPAddressesProvider {
+  event Initialized();
   event SupportUpdated(address indexed newAddress, bytes encodedCallData);
   event CopyrightRegistryUpdated(address indexed newAddress, bytes encodedCallData);
   event ConfigurationAdminUpdated(address indexed newAddress);

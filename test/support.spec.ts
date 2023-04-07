@@ -248,6 +248,16 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
         .updateThemeIssueSchedule(themeIDActive, 1, baseStartTime, issueDurationTime)
     );
 
+    /*
+    //test updateThemeIssueSchedule with non admin account
+    console.log("updateThemeIssueSchedule");
+    await waitForTx(
+      await support
+        .connect(themeSupporter.signer)
+        .updateThemeIssueSchedule(themeIDActive, 1, baseStartTime, issueDurationTime)
+    );
+    */
+
     //Get and print the issue schedule
     const themesIssueSchedule = await support.getThemesIssueSchedule([themeIDActive]);
     console.log(themesIssueSchedule);

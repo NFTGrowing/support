@@ -6,7 +6,7 @@ import {
   getCopyrightRegistry,
   getServiceSigner,
   getDeploySigner,
-  getCBPAddressesProvider,
+  getCBPAddressesProviderProxy,
 } from "../../helpers/contracts-getters";
 import { insertContractAddressInDb } from "../../helpers/contracts-helpers";
 import { ConfigNames, loadPoolConfig } from "../../helpers/configuration";
@@ -16,7 +16,7 @@ task("dev:deploy-copyrightregistry", "Deploy CopyrightRegistry contract")
   .setAction(async ({ verify }, localBRE) => {
     await localBRE.run("set-DRE");
 
-    const addressesProvider = await getCBPAddressesProvider();
+    const addressesProvider = await getCBPAddressesProviderProxy();
     // const poolConfig = loadPoolConfig(pool);
 
     const copyrightRegistryImpl = await deployCopyrightRegistry();
@@ -24,7 +24,7 @@ task("dev:deploy-copyrightregistry", "Deploy CopyrightRegistry contract")
     await waitForTx(await addressesProvider.setCopyrightRegistryImpl(copyrightRegistryImpl.address, []));
     // configurator will create proxy for implement
     const copyrightRegistry = await addressesProvider.getCopyrightRegistry();
-    const copyrightRegistryProxy = await getCopyrightRegistry(copyrightRegistry);
+    const copyrightRpegistryProxy = await getCopyrightRegistry(copyrightRegistry);
     await insertContractAddressInDb(eContractid.CopyrightRegistryProxy, copyrightRegistryProxy.address);
   });
 

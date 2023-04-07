@@ -35,13 +35,15 @@ export const getEmergencyAdminSigner = async () => (await getEthersSigners())[1]
 
 export const getProxyAdminSigner = async () => (await getEthersSigners())[2];
 
+export const getAddressProviderProxyAdmin = async () => (await getEthersSigners())[3];
+
 export const getSupporter = async () => (await getEthersSigners())[5];
 
 export const getServiceSigner = async () => (await getEthersSigners())[4];
 
-export const getCBPAddressesProvider = async (address?: tEthereumAddress) => {
+export const getCBPAddressesProviderProxy = async (address?: tEthereumAddress) => {
   return await CBPAddressesProviderFactory.connect(
-    address || (await getDb(DRE.network.name).get(`${eContractid.CBPAddressesProvider}`).value()).address,
+    address || (await getDb(DRE.network.name).get(`${eContractid.CBPAddressesProviderProxy}`).value()).address,
     await getDeploySigner()
   );
 };

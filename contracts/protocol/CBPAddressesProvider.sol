@@ -8,6 +8,8 @@ import {CBUpgradeableProxy} from "../libraries/proxy/CBUpgradeableProxy.sol";
 import {Errors} from "../libraries/helpers/Errors.sol";
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
 /**
@@ -17,16 +19,20 @@ import {Address} from "@openzeppelin/contracts/utils/Address.sol";
  * - Owned by the CBP Governance
  * @author CBP
  **/
-contract CBPAddressesProvider is Ownable, ICBPAddressesProvider {
+contract CBPAddressesProvider is ICBPAddressesProvider, Initializable, OwnableUpgradeable {
   mapping(bytes32 => address) private _addresses;
 
   bytes32 private constant SUPPORT = "SUPPORT";
   bytes32 private constant COPYRIGHT_REGISTRY = "COPYRIGHT_REGISTRY";
 
-  bytes32 private constant POOL_ADMIN = "POOL_ADMIN";
+  bytes32 private constant POOL_ADMIN = "";
   bytes32 private constant EMERGENCY_ADMIN = "EMERGENCY_ADMIN";
 
-  constructor() {}
+  // constructor() {}
+  function initialize() external initializer {
+    __Ownable_init();
+    emit Initialized();
+  }
 
   /**
    * @dev General function to update the implementation of a proxy registered with

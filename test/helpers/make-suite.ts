@@ -1,7 +1,7 @@
 import { evmRevert, evmSnapshot, DRE, getNowTimeInSeconds } from "../../helpers/misc-utils";
 import { Signer } from "ethers";
 import {
-  getCBPAddressesProvider,
+  getCBPAddressesProviderProxy,
   getMintableERC20,
   getMintableERC721,
   getSupport,
@@ -106,7 +106,7 @@ export async function initializeMakeSuite() {
   testEnv.deployer = deployer;
   testEnv.support = await getSupport();
   testEnv.copyrightRegistry = await getCopyrightRegistry();
-  testEnv.addressesProvider = await getCBPAddressesProvider();
+  testEnv.addressesProvider = await getCBPAddressesProviderProxy();
 
   // Tokens
   const allTokens = await getAllMockedTokens();

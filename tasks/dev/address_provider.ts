@@ -1,8 +1,9 @@
 import { task } from "hardhat/config";
 import { ConfigNames, loadPoolConfig } from "../../helpers/configuration";
-import { deployCBPAddressesProvider } from "../../helpers/contracts-deployments";
-import { getDeploySigner } from "../../helpers/contracts-getters";
+import { deployCBPAddressesProviderImpl, deployCBUpgradeableProxy } from "../../helpers/contracts-deployments";
+import { getDeploySigner, getAddressProviderProxyAdmin } from "../../helpers/contracts-getters";
 import { waitForTx } from "../../helpers/misc-utils";
+import { eContractid } from "../../helpers/types";
 
 task("dev:deploy-address-provider", "Deploy address provider for dev enviroment")
   .addFlag("verify", "Verify contracts at Etherscan")
@@ -13,7 +14,16 @@ task("dev:deploy-address-provider", "Deploy address provider for dev enviroment"
     const signer = await getDeploySigner();
     const admin = await signer.getAddress();
 
-    const addressesProvider = await deployCBPAddressesProvider(verify);
-    await waitForTx(await addressesProvider.setPoolAdmin(admin));
-    await waitForTx(await addressesProvider.setEmergencyAdmin(admin));
+    const addressesProviderImpl = await deployCBPAddressesProviderImpl(verify);
+    const initEncodedData = addressesProviderImpl.interface.encodeFunctionData("initialize", []);
+
+    const addressesProviderProxy = await deployCBUpgradeableProxy(
+      eContractid.CBPAddressesProviderProxy,
+      await (await getAddressProviderProxyAdmin()).getAddress(), //TODO: should change this address
+      addressesProviderImpl.address,
+      initEncodedData
+    );
+
+    await waitForTx(await addressesProviderProxy.setPoolAdmin(admin));
+    await waitForTx(await addressesProviderProxy.setEmergencyAdmin(admin));
   });

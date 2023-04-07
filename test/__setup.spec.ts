@@ -5,7 +5,7 @@ import { insertContractAddressInDb, registerContractInJsonDb } from "../helpers/
 import {
   deployAllMockTokens,
   deploySupport,
-  deployCBPAddressesProvider,
+  deployCBPAddressesProviderImpl,
   deployCBUpgradeableProxy,
   deployAllMockNfts,
   deployCBProxyAdmin,
@@ -34,10 +34,12 @@ import CBPConfig from "../markets/cbp";
 import {
   getSecondSigner,
   getDeploySigner,
+  getAddressProviderProxyAdmin,
   getPoolAdminSigner,
   getEmergencyAdminSigner,
   getSupport,
   getCopyrightRegistry,
+  getCBPAddressesProviderProxy,
 } from "../helpers/contracts-getters";
 import { getNftAddressFromSymbol } from "./helpers/utils/helpers";
 import { ADDRESS_ID_PUNK_GATEWAY, ADDRESS_ID_WETH_GATEWAY } from "../helpers/constants";
@@ -76,23 +78,35 @@ const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
   console.log("cbpProxyAdmin:", cbpProxyAdmin.address);
 
   console.log("-> Prepare address provider...");
-  const addressesProvider = await deployCBPAddressesProvider();
-  await waitForTx(await addressesProvider.setPoolAdmin(poolAdmin));
-  await waitForTx(await addressesProvider.setEmergencyAdmin(emergencyAdmin));
+  const addressesProviderImpl = await deployCBPAddressesProviderImpl();
+  const initEncodedData = addressesProviderImpl.interface.encodeFunctionData("initialize", []);
+
+  const cbUpgradeableProxy = await deployCBUpgradeableProxy(
+    eContractid.CBPAddressesProviderProxy,
+    await (await getAddressProviderProxyAdmin()).getAddress(),
+    addressesProviderImpl.address,
+    initEncodedData
+  );
+
+  const addressesProviderProxy = await getCBPAddressesProviderProxy(cbUpgradeableProxy.address);
+
+  await waitForTx(await addressesProviderProxy.setPoolAdmin(poolAdmin));
+  await waitForTx(await addressesProviderProxy.setEmergencyAdmin(emergencyAdmin));
 
   console.log("-> Prepare Support...");
   const SupportImpl = await deploySupport();
-  await waitForTx(await addressesProvider.setSupportImpl(SupportImpl.address, []));
+  // TODO: should report issue here
+  await waitForTx(await addressesProviderProxy.setSupportImpl(SupportImpl.address, []));
   // configurator will create proxy for implement
-  const SupportAddress = await addressesProvider.getSupport();
+  const SupportAddress = await addressesProviderProxy.getSupport();
   const supportProxy = await getSupport(SupportAddress);
   await insertContractAddressInDb(eContractid.Support, supportProxy.address);
 
   console.log("-> Prepare CopyrightRegistry...");
   const copyrightRegistryImpl = await deployCopyrightRegistry();
-  await waitForTx(await addressesProvider.setCopyrightRegistryImpl(copyrightRegistryImpl.address, []));
+  await waitForTx(await addressesProviderProxy.setCopyrightRegistryImpl(copyrightRegistryImpl.address, []));
   // configurator will create proxy for implement
-  const copyrightRegistry = await addressesProvider.getCopyrightRegistry();
+  const copyrightRegistry = await addressesProviderProxy.getCopyrightRegistry();
   const copyrightRegistryProxy = await getCopyrightRegistry(copyrightRegistry);
   await insertContractAddressInDb(eContractid.CopyrightRegistryProxy, copyrightRegistryProxy.address);
 

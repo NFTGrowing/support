@@ -224,5 +224,15 @@ makeSuite("CopyrightRegistry: test copyright token registry and claim ", (testEn
     const claimWorkTokenBalance_2 = await workToken_2.balanceOf(claimAccount.address);
     console.log("claimWorkTokenBalance_2", claimWorkTokenBalance_2);
     expect(claimWorkTokenBalance_2, "Check work token 1 Balance").to.be.eq(50000);
+
+    //spam claim
+    /*
+    console.log("spam claim");
+    const claimWorkTokenAddr_2_spm = await waitForTx(
+      await copyrightRegistry
+        .connect(claimAccount.signer)
+        .claimWorkToken(claim_signature_2, lv2ID_2, [id_2], workTokenID_2, [50000], claimAccount.address)
+    );
+    */
   });
 });

@@ -25,7 +25,8 @@ export enum CBPPools {
 export enum eContractid {
   MintableERC20 = "MintableERC20",
   MintableERC721 = "MintableERC721",
-  CBPAddressesProvider = "CBPAddressesProvider",
+  CBPAddressesProviderImpl = "CBPAddressesProviderImpl",
+  CBPAddressesProviderProxy = "CBPAddressesProviderProxy",
   LendPoolAddressesProviderRegistry = "LendPoolAddressesProviderRegistry",
   LendPoolParametersProvider = "LendPoolParametersProvider",
   LendPoolConfigurator = "LendPoolConfigurator",

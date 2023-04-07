@@ -16,7 +16,7 @@ import { ZERO_ADDRESS } from "../../helpers/constants";
 import {
   getAllMockedTokens,
   getAllMockedNfts,
-  getCBPAddressesProvider,
+  getCBPAddressesProviderProxy,
   getSupport,
   getWETHMocked,
   getPoolAdminSigner,
@@ -42,7 +42,7 @@ task("verify:mintApproveAsset", "mint and approve token for support").setAction(
   await localBRE.run("set-DRE");
   const network = <eNetwork>localBRE.network.name;
 
-  const addressesProvider = await getCBPAddressesProvider();
+  const addressesProvider = await getCBPAddressesProviderProxy();
   // const admin = await addressesProvider.getPoolAdmin();
   const poolAdminSigner = await getPoolAdminSigner();
   const simulateSupporter = await getSupporter();
@@ -88,7 +88,7 @@ task("verify:listNewTheme", "Initialize support.").setAction(async ({}, localBRE
   await localBRE.run("set-DRE");
   const network = <eNetwork>localBRE.network.name;
 
-  const addressesProvider = await getCBPAddressesProvider();
+  const addressesProvider = await getCBPAddressesProviderProxy();
   // const admin = await addressesProvider.getPoolAdmin();
   const poolAdminSigner = await getPoolAdminSigner();
   const simulateSupporter = await getSupporter();
@@ -133,7 +133,7 @@ task("verify:longTermSupport", "longTermSupport").setAction(async ({}, localBRE)
   await localBRE.run("set-DRE");
   const network = <eNetwork>localBRE.network.name;
 
-  const addressesProvider = await getCBPAddressesProvider();
+  const addressesProvider = await getCBPAddressesProviderProxy();
   // const admin = await addressesProvider.getPoolAdmin();
   const poolAdminSigner = await getPoolAdminSigner();
   const simulateSupporter = await getSupporter();
@@ -198,7 +198,7 @@ task("verify:caseByCaseSupport", "caseByCaseSupport").setAction(async ({}, local
   await localBRE.run("set-DRE");
   const network = <eNetwork>localBRE.network.name;
 
-  const addressesProvider = await getCBPAddressesProvider();
+  const addressesProvider = await getCBPAddressesProviderProxy();
   // const admin = await addressesProvider.getPoolAdmin();
   const poolAdminSigner = await getPoolAdminSigner();
   const simulateSupporter = await getSupporter();
