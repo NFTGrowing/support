@@ -61,7 +61,7 @@ contract CopyrightRegistry is Initializable, ICopyrightRegistry, ContextUpgradea
 
   function _onlyConfigurator() internal view {
     //TODO - check to see whether create one new configurator
-    require(_addressesProvider.getPoolAdmin() == _msgSender(), Errors.LP_CALLER_NOT_SUPPORT_CONFIGURATOR);
+    require(_addressesProvider.getConfigurator() == _msgSender(), Errors.LP_CALLER_NOT_SUPPORT_CONFIGURATOR);
   }
 
   modifier onlyConfigurator() {

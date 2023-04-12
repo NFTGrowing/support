@@ -35,7 +35,7 @@ import { waitForTx } from "../helpers/misc-utils";
 
 import { getNftAddressFromSymbol } from "./helpers/utils/helpers";
 import {
-  getPoolAdminSigner,
+  getConfiguratorSigner,
   getDeploySigner,
   getMintableERC721,
   getStakeLogic,
@@ -78,7 +78,7 @@ makeSuite("CopyrightRegistry: test copyright token registry and claim ", (testEn
   it("test copyright token registry and claim ", async () => {
     const { users, bayc, weth, usdc, usdt } = testEnv;
 
-    const poolAdminSigner = await getPoolAdminSigner();
+    const poolAdminSigner = await getConfiguratorSigner();
     const depositor = await getDeploySigner();
 
     const serviceSignAddr = users[2];
@@ -89,7 +89,7 @@ makeSuite("CopyrightRegistry: test copyright token registry and claim ", (testEn
 
     //setup serviceSignAddr to registry
     // const ownerAddr = await copyrightRegistry.owner();
-    const poolAdmin = await getPoolAdminSigner();
+    const poolAdmin = await getConfiguratorSigner();
     // console.log("poolAdmin", poolAdmin);
 
     // expect(ownerAddr, "currentServiceSignAddr check").to.be.equal(await depositor.getAddress());

@@ -22,11 +22,13 @@ import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 contract CBPAddressesProvider is ICBPAddressesProvider, Initializable, OwnableUpgradeable {
   mapping(bytes32 => address) private _addresses;
 
+  //Feature Contract proxy
   bytes32 private constant SUPPORT = "SUPPORT";
   bytes32 private constant COPYRIGHT_REGISTRY = "COPYRIGHT_REGISTRY";
 
-  bytes32 private constant POOL_ADMIN = "";
-  bytes32 private constant EMERGENCY_ADMIN = "EMERGENCY_ADMIN";
+  //Configurator
+  bytes32 private constant CONFIGURATOR = "CONFIGURATOR";
+  bytes32 private constant OPERATOR = "OPERATOR";
 
   // constructor() {}
   function initialize() external initializer {
@@ -128,22 +130,22 @@ contract CBPAddressesProvider is ICBPAddressesProvider, Initializable, OwnableUp
    * of the protocol hence the upgradable proxy pattern is not used
    **/
 
-  function getPoolAdmin() external view override returns (address) {
-    return getAddress(POOL_ADMIN);
+  function getConfigurator() external view override returns (address) {
+    return getAddress(CONFIGURATOR);
   }
 
-  function setPoolAdmin(address admin) external override onlyOwner {
-    _addresses[POOL_ADMIN] = admin;
-    emit ConfigurationAdminUpdated(admin);
+  function setConfigurator(address configurator) external override onlyOwner {
+    _addresses[CONFIGURATOR] = configurator;
+    emit ConfigurationAdminUpdated(configurator);
   }
 
-  function getEmergencyAdmin() external view override returns (address) {
-    return getAddress(EMERGENCY_ADMIN);
+  function getOperator() external view override returns (address) {
+    return getAddress(OPERATOR);
   }
 
-  function setEmergencyAdmin(address emergencyAdmin) external override onlyOwner {
-    _addresses[EMERGENCY_ADMIN] = emergencyAdmin;
-    emit EmergencyAdminUpdated(emergencyAdmin);
+  function setOperator(address operator) external override onlyOwner {
+    _addresses[OPERATOR] = operator;
+    emit OperatorUpdated(operator);
   }
 
   function getImplementation(address proxyAddress) external view onlyOwner returns (address) {

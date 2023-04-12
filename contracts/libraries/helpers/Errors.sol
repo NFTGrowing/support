@@ -54,8 +54,8 @@ library Errors {
   string public constant VL_INVALID_ASSETARRAY_LENGTH = "323";
   string public constant VL_INVALID_STRING_PARA = "324";
 
-  //lend pool errors
-  string public constant LP_CALLER_NOT_SUPPORT_CONFIGURATOR = "400"; // 'The caller of the function is not the lending pool configurator'
+  //support errors
+  string public constant LP_CALLER_NOT_SUPPORT_CONFIGURATOR = "400";
   string public constant LP_IS_PAUSED = "401"; // 'Pool is paused'
   string public constant LP_NO_MORE_RESERVES_ALLOWED = "402";
   string public constant LP_NOT_CONTRACT = "403";
@@ -74,6 +74,7 @@ library Errors {
   string public constant LP_AMOUNT_GREATER_THAN_MAX_REPAY = "416";
   string public constant LP_NFT_TOKEN_ID_EXCEED_MAX_LIMIT = "417";
   string public constant LP_NFT_SUPPLY_NUM_EXCEED_MAX_LIMIT = "418";
+  string public constant LP_CALLER_NOT_SUPPORT_OPERATOR = "419";
 
   //lend pool loan errors
   string public constant LPL_INVALID_LOAN_STATE = "480";

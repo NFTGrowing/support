@@ -16,7 +16,7 @@ import {
   getCBPAddressesProviderProxy,
   getSupport,
   getWETHMocked,
-  getPoolAdminSigner,
+  getConfiguratorSigner,
 } from "../../helpers/contracts-getters";
 import { insertContractAddressInDb } from "../../helpers/contracts-helpers";
 import { Support } from "../../types/Support";
@@ -32,8 +32,8 @@ task("dev:initialize-support", "Initialize support.")
     const network = <eNetwork>localBRE.network.name;
 
     const addressesProvider = await getCBPAddressesProviderProxy();
-    // const admin = await addressesProvider.getPoolAdmin();
-    const poolAdminSigner = await getPoolAdminSigner();
+    // const admin = await addressesProvider.getConfigurator();
+    const poolAdminSigner = await getConfiguratorSigner();
 
     //   testEnv.support = await getSupport();
     const support = await getSupport();
@@ -91,8 +91,8 @@ task("dev:setup-themeschedule", "setup theme schedulesupport")
     const network = <eNetwork>localBRE.network.name;
 
     const addressesProvider = await getCBPAddressesProviderProxy();
-    // const admin = await addressesProvider.getPoolAdmin();
-    const poolAdminSigner = await getPoolAdminSigner();
+    // const admin = await addressesProvider.getConfigurator();
+    const poolAdminSigner = await getConfiguratorSigner();
 
     //   testEnv.support = await getSupport();
     const support = await getSupport();

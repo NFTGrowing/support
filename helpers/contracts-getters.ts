@@ -27,11 +27,11 @@ export const getThirdSigner = async () => (await getEthersSigners())[2];
 
 export const getDeploySigner = async () => (await getEthersSigners())[0];
 
-export const getPoolAdminSigner = async () => (await getEthersSigners())[0];
+export const getConfiguratorSigner = async () => (await getEthersSigners())[0];
+
+export const getOperatorSigner = async () => (await getEthersSigners())[1];
 
 export const getPoolOwnerSigner = async () => (await getEthersSigners())[0];
-
-export const getEmergencyAdminSigner = async () => (await getEthersSigners())[1];
 
 export const getProxyAdminSigner = async () => (await getEthersSigners())[2];
 

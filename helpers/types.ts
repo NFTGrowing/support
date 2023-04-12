@@ -410,8 +410,6 @@ export interface ICommonConfiguration {
 
   PoolAdmin: iParamsPerNetwork<tEthereumAddress | undefined>;
   PoolAdminIndex: number;
-  EmergencyAdmin: iParamsPerNetwork<tEthereumAddress | undefined>;
-  EmergencyAdminIndex: number;
 
   ReserveAggregators: iParamsPerNetwork<ITokenAddress>;
   ReserveAssets: iParamsPerNetwork<SymbolMap<tEthereumAddress>>;

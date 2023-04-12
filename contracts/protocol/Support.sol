@@ -175,6 +175,11 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
     _;
   }
 
+  modifier onlyOperator() {
+    _onlyOperator();
+    _;
+  }
+
   receive() external payable {
     emit Received(msg.sender, msg.value);
   }
@@ -190,8 +195,11 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
   }
 
   function _onlyConfigurator() internal view {
-    //TODO - check to see whether create one new configurator
-    require(_addressesProvider.getPoolAdmin() == _msgSender(), Errors.LP_CALLER_NOT_SUPPORT_CONFIGURATOR);
+    require(_addressesProvider.getConfigurator() == _msgSender(), Errors.LP_CALLER_NOT_SUPPORT_CONFIGURATOR);
+  }
+
+  function _onlyOperator() internal view {
+    require(_addressesProvider.getOperator() == _msgSender(), Errors.LP_CALLER_NOT_SUPPORT_OPERATOR);
   }
 
   /**
@@ -509,7 +517,7 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
     uint32 issueNo,
     address operatorAddr,
     uint256[] memory assetsAmount
-  ) external override nonReentrant onlyConfigurator {
+  ) external override nonReentrant onlyOperator {
     require(
       assetsAmount.length > 0 && assetsAmount.length <= uint32(SupportAssetType.Last),
       Errors.VL_INVALID_ASSETARRAY_LENGTH

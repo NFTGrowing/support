@@ -34,7 +34,8 @@ import { waitForTx } from "../helpers/misc-utils";
 
 import { getNftAddressFromSymbol } from "./helpers/utils/helpers";
 import {
-  getPoolAdminSigner,
+  getConfiguratorSigner,
+  getOperatorSigner,
   getMintableERC721,
   getStakeLogic,
   getSupport,
@@ -70,7 +71,9 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
   it("Support the theme", async () => {
     const { users, bayc, support, weth, usdc, usdt } = testEnv;
 
-    const poolAdminSigner = await getPoolAdminSigner();
+    const poolAdminSigner = await getConfiguratorSigner();
+    const operatorSigner = await getOperatorSigner();
+
     const depositor = users[0];
     const themeSupporter = users[2];
 
@@ -351,7 +354,7 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
 
     await waitForTx(
       await support
-        .connect(poolAdminSigner)
+        .connect(operatorSigner)
         .withdrawForOneIssue(themeIDActive, 1, settleOperator.address, [
           withdrawSize,
           withdrawWETHSize,

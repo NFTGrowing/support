@@ -17,13 +17,7 @@ makeSuite("LendPoolAddressesProvider", (testEnv: TestEnv) => {
 
     await addressesProvider.transferOwnership(users[1].address);
 
-    for (const contractFunction of [
-      addressesProvider.setMarketId,
-      addressesProvider.setBNFTRegistry,
-      addressesProvider.setPoolAdmin,
-      addressesProvider.setEmergencyAdmin,
-      addressesProvider.setEmergencyAdmin,
-    ]) {
+    for (const contractFunction of [addressesProvider.setConfigurator]) {
       await expect(contractFunction(mockAddress)).to.be.revertedWith(INVALID_OWNER_REVERT_MSG);
     }
 

@@ -1,7 +1,7 @@
 import { task } from "hardhat/config";
 import { ConfigNames, loadPoolConfig } from "../../helpers/configuration";
 import { deployCBPAddressesProviderImpl, deployCBUpgradeableProxy } from "../../helpers/contracts-deployments";
-import { getDeploySigner, getAddressProviderProxyAdmin } from "../../helpers/contracts-getters";
+import { getDeploySigner, getAddressProviderProxyAdmin, getOperatorSigner } from "../../helpers/contracts-getters";
 import { waitForTx } from "../../helpers/misc-utils";
 import { eContractid } from "../../helpers/types";
 
@@ -12,7 +12,10 @@ task("dev:deploy-address-provider", "Deploy address provider for dev enviroment"
     await localBRE.run("set-DRE");
     const poolConfig = loadPoolConfig(pool);
     const signer = await getDeploySigner();
+    const operatorSigner = await getOperatorSigner();
+
     const admin = await signer.getAddress();
+    const operatorAddr = await operatorSigner.getAddress();
 
     const addressesProviderImpl = await deployCBPAddressesProviderImpl(verify);
     const initEncodedData = addressesProviderImpl.interface.encodeFunctionData("initialize", []);
@@ -24,6 +27,6 @@ task("dev:deploy-address-provider", "Deploy address provider for dev enviroment"
       initEncodedData
     );
 
-    await waitForTx(await addressesProviderProxy.setPoolAdmin(admin));
-    await waitForTx(await addressesProviderProxy.setEmergencyAdmin(admin));
+    await waitForTx(await addressesProviderProxy.setConfigurator(admin));
+    await waitForTx(await addressesProviderProxy.setOperator(operatorAddr));
   });

@@ -35,8 +35,8 @@ import {
   getSecondSigner,
   getDeploySigner,
   getAddressProviderProxyAdmin,
-  getPoolAdminSigner,
-  getEmergencyAdminSigner,
+  getConfiguratorSigner,
+  getOperatorSigner,
   getSupport,
   getCopyrightRegistry,
   getCBPAddressesProviderProxy,
@@ -52,9 +52,9 @@ const ALL_NFTS_INITIAL_PRICES = CBPConfig.Mocks.AllNftsInitialPrices;
 const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
   console.time("setup");
 
-  const poolAdmin = await (await getPoolAdminSigner()).getAddress();
-  const emergencyAdmin = await (await getEmergencyAdminSigner()).getAddress();
-  console.log("Admin accounts:", "poolAdmin:", poolAdmin, "emergencyAdmin:", emergencyAdmin);
+  const poolAdmin = await (await getConfiguratorSigner()).getAddress();
+  const operator = await (await getOperatorSigner()).getAddress();
+  console.log("Admin accounts:", "poolAdmin:", poolAdmin, "operator", operator);
 
   const config = loadPoolConfig(ConfigNames.CBP);
 
@@ -90,8 +90,8 @@ const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
 
   const addressesProviderProxy = await getCBPAddressesProviderProxy(cbUpgradeableProxy.address);
 
-  await waitForTx(await addressesProviderProxy.setPoolAdmin(poolAdmin));
-  await waitForTx(await addressesProviderProxy.setEmergencyAdmin(emergencyAdmin));
+  await waitForTx(await addressesProviderProxy.setConfigurator(poolAdmin));
+  await waitForTx(await addressesProviderProxy.setOperator(operator));
 
   console.log("-> Prepare Support...");
   const SupportImpl = await deploySupport();

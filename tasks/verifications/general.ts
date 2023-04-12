@@ -19,7 +19,7 @@ import {
   getCBPAddressesProviderProxy,
   getSupport,
   getWETHMocked,
-  getPoolAdminSigner,
+  getConfiguratorSigner,
   getSupporter,
 } from "../../helpers/contracts-getters";
 import { insertContractAddressInDb } from "../../helpers/contracts-helpers";
@@ -43,8 +43,8 @@ task("verify:mintApproveAsset", "mint and approve token for support").setAction(
   const network = <eNetwork>localBRE.network.name;
 
   const addressesProvider = await getCBPAddressesProviderProxy();
-  // const admin = await addressesProvider.getPoolAdmin();
-  const poolAdminSigner = await getPoolAdminSigner();
+  // const admin = await addressesProvider.getConfigurator();
+  const poolAdminSigner = await getConfiguratorSigner();
   const simulateSupporter = await getSupporter();
 
   //   testEnv.support = await getSupport();
@@ -89,8 +89,8 @@ task("verify:listNewTheme", "Initialize support.").setAction(async ({}, localBRE
   const network = <eNetwork>localBRE.network.name;
 
   const addressesProvider = await getCBPAddressesProviderProxy();
-  // const admin = await addressesProvider.getPoolAdmin();
-  const poolAdminSigner = await getPoolAdminSigner();
+  // const admin = await addressesProvider.getConfigurator();
+  const poolAdminSigner = await getConfiguratorSigner();
   const simulateSupporter = await getSupporter();
 
   //   testEnv.support = await getSupport();
@@ -134,8 +134,8 @@ task("verify:longTermSupport", "longTermSupport").setAction(async ({}, localBRE)
   const network = <eNetwork>localBRE.network.name;
 
   const addressesProvider = await getCBPAddressesProviderProxy();
-  // const admin = await addressesProvider.getPoolAdmin();
-  const poolAdminSigner = await getPoolAdminSigner();
+  // const admin = await addressesProvider.getConfigurator();
+  const poolAdminSigner = await getConfiguratorSigner();
   const simulateSupporter = await getSupporter();
 
   //   testEnv.support = await getSupport();
@@ -199,8 +199,8 @@ task("verify:caseByCaseSupport", "caseByCaseSupport").setAction(async ({}, local
   const network = <eNetwork>localBRE.network.name;
 
   const addressesProvider = await getCBPAddressesProviderProxy();
-  // const admin = await addressesProvider.getPoolAdmin();
-  const poolAdminSigner = await getPoolAdminSigner();
+  // const admin = await addressesProvider.getConfigurator();
+  const poolAdminSigner = await getConfiguratorSigner();
   const simulateSupporter = await getSupporter();
 
   //   testEnv.support = await getSupport();

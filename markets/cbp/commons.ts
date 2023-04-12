@@ -72,7 +72,7 @@ export const CommonsConfig: ICommonConfiguration = {
     [eEthereumNetwork.main]: '0x2A71a0F5cef1fFc519027AD12f19453110e70666',
   },
 
-  // If PoolAdmin/emergencyAdmin is set, will take priority over PoolAdminIndex/emergencyAdminIndex
+  // If PoolAdmin is set, will take priority over PoolAdminIndex
   PoolAdmin: {
     [eEthereumNetwork.coverage]: undefined,
     [eEthereumNetwork.hardhat]: undefined,
@@ -85,18 +85,6 @@ export const CommonsConfig: ICommonConfiguration = {
     [eEthereumNetwork.main]: '0x868964fa49a6fd6e116FE82c8f4165904406f479',
   },
   PoolAdminIndex: 1,
-  EmergencyAdmin: {
-    [eEthereumNetwork.hardhat]: undefined,
-    [eEthereumNetwork.coverage]: undefined,
-    [eEthereumNetwork.localhost]: undefined,
-    [eEthereumNetwork.develop]: '0x14048d069A5E821eB82E01a275fdfC915C5BcfC4',
-    [eEthereumNetwork.kovan]: '0x8956D65982Edc6397540d9f2C2be249E98DAFE8b',
-    [eEthereumNetwork.rinkeby]: '0xFc6a5b329340719b2693C2c74a5D056cf4f93FB0',
-    [eEthereumNetwork.sepolia]: '0xC019619F15aF1f96A695aBA39478e64ABcAa474b',
-    [eEthereumNetwork.mumbai]: '0xC019619F15aF1f96A695aBA39478e64ABcAa474b',
-    [eEthereumNetwork.main]: '0x2CFa21b4dEc4409670899d05b8644e9C432250de',
-  },
-  EmergencyAdminIndex: 2,
 
   BNFTRegistry: {
     [eEthereumNetwork.coverage]: '',

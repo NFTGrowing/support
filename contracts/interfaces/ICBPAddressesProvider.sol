@@ -13,7 +13,7 @@ interface ICBPAddressesProvider {
   event SupportUpdated(address indexed newAddress, bytes encodedCallData);
   event CopyrightRegistryUpdated(address indexed newAddress, bytes encodedCallData);
   event ConfigurationAdminUpdated(address indexed newAddress);
-  event EmergencyAdminUpdated(address indexed newAddress);
+  event OperatorUpdated(address indexed newAddress);
   event ProxyCreated(bytes32 id, address indexed newAddress);
   event AddressSet(bytes32 id, address indexed newAddress, bool hasProxy, bytes encodedCallData);
 
@@ -35,11 +35,11 @@ interface ICBPAddressesProvider {
 
   function setCopyrightRegistryImpl(address support, bytes memory encodedCallData) external;
 
-  function getPoolAdmin() external view returns (address);
+  function getConfigurator() external view returns (address);
 
-  function setPoolAdmin(address admin) external;
+  function setConfigurator(address configurator) external;
 
-  function getEmergencyAdmin() external view returns (address);
+  function getOperator() external view returns (address);
 
-  function setEmergencyAdmin(address admin) external;
+  function setOperator(address operator) external;
 }
