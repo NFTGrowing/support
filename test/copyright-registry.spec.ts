@@ -84,6 +84,7 @@ makeSuite("CopyrightRegistry: test copyright token registry and claim ", (testEn
     const serviceSignAddr = users[2];
     const regitsterAccount = users[6];
     const claimAccount = users[7];
+    const claimAccount_2 = users[8];
 
     const copyrightRegistry = await getCopyrightRegistry();
 
@@ -205,9 +206,10 @@ makeSuite("CopyrightRegistry: test copyright token registry and claim ", (testEn
     expect(claimWorkTokenBalance_1, "Check work token 1 Balance").to.be.eq(30000);
 
     // work token 2 claim
+    const workToken_claim_amount = 50000;
     const claimMsgHash_2 = ethers.utils.solidityKeccak256(
       ["uint256", "uint256[]", "address", "uint256[]", "address"],
-      [lv2ID_2, [id_2], workTokenID_2, [50000], claimAccount.address]
+      [lv2ID_2, [id_2], workTokenID_2, [workToken_claim_amount], claimAccount.address]
     );
     // console.log("claimMsgHash_1: ", claimMsgHash_1);
     const claimMessageBytes_2 = ethers.utils.arrayify(claimMsgHash_2);
@@ -218,12 +220,69 @@ makeSuite("CopyrightRegistry: test copyright token registry and claim ", (testEn
     const claimWorkTokenAddr_2 = await waitForTx(
       await copyrightRegistry
         .connect(claimAccount.signer)
-        .claimWorkToken(claim_signature_2, lv2ID_2, [id_2], workTokenID_2, [50000], claimAccount.address)
+        .claimWorkToken(
+          claim_signature_2,
+          lv2ID_2,
+          [id_2],
+          workTokenID_2,
+          [workToken_claim_amount],
+          claimAccount.address
+        )
     );
     const workToken_2 = await getCopyrightFixedSupply(workTokenID_2);
     const claimWorkTokenBalance_2 = await workToken_2.balanceOf(claimAccount.address);
     console.log("claimWorkTokenBalance_2", claimWorkTokenBalance_2);
-    expect(claimWorkTokenBalance_2, "Check work token 1 Balance").to.be.eq(50000);
+    expect(claimWorkTokenBalance_2, "Check work token 1 Balance").to.be.eq(workToken_claim_amount);
+
+    await waitForTx(
+      await copyrightRegistry.connect(poolAdmin).increaseTokenSupply(lv2ID_2, id_2, workTokenID_2, 50001)
+    );
+
+    const totalSupply_2_2 = await workToken_2.totalSupply();
+    expect(totalSupply_2_2, "check total supply after increasing").to.be.eq(50001 + totalSupply_2);
+
+    //burn some token
+    await waitForTx(await copyrightRegistry.connect(poolAdmin).burnTokenSupply(lv2ID_2, id_2, workTokenID_2, 50000001));
+
+    const totalSupply_2_2_burn = await workToken_2.totalSupply();
+    expect(totalSupply_2_2_burn, "check total supply after burn").to.be.eq(totalSupply_2_2.sub(50000001));
+
+    const workToken_claim_amount_2_2 = 50000000;
+    const claimMsgHash_2_2 = ethers.utils.solidityKeccak256(
+      ["uint256", "uint256[]", "address", "uint256[]", "address"],
+      [lv2ID_2, [id_2], workTokenID_2, [workToken_claim_amount_2_2], claimAccount_2.address]
+    );
+    // console.log("claimMsgHash_1: ", claimMsgHash_1);
+    const claimMessageBytes_2_2 = ethers.utils.arrayify(claimMsgHash_2_2);
+    // console.log("messageBytes 2: ", claimMessageBytes_2)
+    const claim_signature_2_2 = await serviceSignAddr.signer.signMessage(claimMessageBytes_2_2);
+    console.log("claimWorkToken");
+    const claimWorkTokenAddr_2_2 = await waitForTx(
+      await copyrightRegistry
+        .connect(claimAccount_2.signer)
+        .claimWorkToken(
+          claim_signature_2_2,
+          lv2ID_2,
+          [id_2],
+          workTokenID_2,
+          [workToken_claim_amount_2_2],
+          claimAccount_2.address
+        )
+    );
+
+    console.log("Turnoff the increase supply switch");
+    await waitForTx(
+      await copyrightRegistry.connect(poolAdmin).turnoffIncreaseSupplySwitch(lv2ID_2, id_2, workTokenID_2)
+    );
+
+    /*
+    console.log("try increasing after turnoff");
+    await waitForTx(
+      await copyrightRegistry
+        .connect(poolAdmin)
+        .increaseTokenSupply(lv2ID_2, id_2, workTokenID_2, 50001)
+    );
+    */
 
     //spam claim
     /*

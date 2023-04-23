@@ -50,7 +50,7 @@ import { Address } from "ethereumjs-util";
 
 const { expect } = require("chai");
 
-makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
+makeSuite("Support: test support", (testEnv: TestEnv) => {
   before("Initializing configuration", async () => {
     // Sets BigNumber for this suite, instead of globally
     BigNumber.config({
@@ -148,6 +148,8 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
 
     //Enable the mockedAddressActive
     console.log("Enable the mockedAddressActive");
+    const depositSize = parseEther("1.05");
+
     await waitForTx(await support.connect(poolAdminSigner).updateStatus([themeIDActive], true));
 
     const SupportActive = await support.getThemeSupport(themeIDActive);
@@ -158,7 +160,7 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     //console.log("themeSupportNotActive", SupportNotActive.supporting);
 
     //-- support the active theme
-    const depositSize = parseEther("1.05");
+
     const depositUSDCSize = await convertToCurrencyDecimals(usdc.address, "2.05");
     const depositUSDTSize = await convertToCurrencyDecimals(usdt.address, "3.05");
     const depositWETHSize = await convertToCurrencyDecimals(weth.address, "4.05");
@@ -168,6 +170,14 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     await waitForTx(
       await support.connect(themeSupporter.signer).longTermSupport(themeIDActive, 0, 0, { value: depositSize })
     );
+
+    /*
+    //Long Support before init 
+    console.log("Long Support before open");
+    await waitForTx(
+      await support.connect(themeSupporter.signer).longTermSupport(themeIDNotActive, 0, 0, { value: depositSize })
+    );
+    */
 
     const supportWithETH = await support.getThemeSupport(themeIDActive);
     console.log("ETH:", supportWithETH.balances.assetsArray[0]);
@@ -270,6 +280,20 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     const depositUSDCCase = await convertToCurrencyDecimals(usdc.address, "2.05");
     const depositUSDTCase = await convertToCurrencyDecimals(usdt.address, "3.05");
     const depositWETHCase = await convertToCurrencyDecimals(weth.address, "4.05");
+
+    /*
+    console.log("Case by case support before open");
+    //Support ETH
+    await waitForTx(
+      await support
+        .connect(themeSupporter.signer)
+        .caseByCaseSupport(themeIDNotActive, 0, 0, 1, 1, { value: depositSizeCase })
+    );
+    */
+
+    /*
+    await waitForTx(await support.connect(poolAdminSigner).updateStatus([themeIDActive], false));
+    */
 
     console.log("support the active one");
     //Support ETH
@@ -446,4 +470,35 @@ makeSuite("Support: test long-term support", (testEnv: TestEnv) => {
     );
     */
   });
+
+  /*
+  it("Theme Status", async () => {
+    const { users, bayc, support, weth, usdc, usdt } = testEnv;
+
+    const poolAdminSigner = await getConfiguratorSigner();
+    const operatorSigner = await getOperatorSigner();
+
+    const depositor = users[0];
+    const themeSupporter = users[2];
+
+    const settleOperator = users[6];
+
+    const themeIDActive = 1;
+    const depositSize = 1;
+    
+    //init
+    console.log("support while init");
+    //Support ETH
+    await waitForTx(
+      await support.connect(themeSupporter.signer).longTermSupport(themeIDActive, 0, 0, { value: depositSize })
+    );
+    
+    console.log("support while open")
+    await waitForTx(await support.connect(poolAdminSigner).updateStatus([themeIDActive], true));
+
+
+    
+    //pause
+  });
+  */
 });

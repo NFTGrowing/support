@@ -51,8 +51,8 @@ library Errors {
   string public constant VL_INVALID_ISSUE_NO = "321";
   string public constant VL_INVALID_CURRENT_ISSUE_NO = "322";
   string public constant VL_INVALID_SLOTID = "323";
-  string public constant VL_INVALID_ASSETARRAY_LENGTH = "323";
-  string public constant VL_INVALID_STRING_PARA = "324";
+  string public constant VL_INVALID_ASSETARRAY_LENGTH = "324";
+  string public constant VL_INVALID_STRING_PARA = "325";
 
   //support errors
   string public constant LP_CALLER_NOT_SUPPORT_CONFIGURATOR = "400";
