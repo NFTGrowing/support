@@ -18,7 +18,7 @@ task("dev:deploy-address-provider", "Deploy address provider for dev enviroment"
     const operatorAddr = await operatorSigner.getAddress();
 
     const addressesProviderImpl = await deployCBPAddressesProviderImpl(verify);
-    const initEncodedData = addressesProviderImpl.interface.encodeFunctionData("initialize", []);
+    const initEncodedData = addressesProviderImpl.interface.encodeFunctionData("initialize");
 
     const addressesProviderProxy = await deployCBUpgradeableProxy(
       eContractid.CBPAddressesProviderProxy,

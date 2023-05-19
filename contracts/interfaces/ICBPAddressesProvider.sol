@@ -17,6 +17,8 @@ interface ICBPAddressesProvider {
   event ProxyCreated(bytes32 id, address indexed newAddress);
   event AddressSet(bytes32 id, address indexed newAddress, bool hasProxy, bytes encodedCallData);
 
+  function initialize() external;
+
   function setAddress(bytes32 id, address newAddress) external;
 
   function setAddressAsProxy(

@@ -2,23 +2,12 @@ const fs = require("fs")
 const path = require("path");
 
 const protocolContractList = [
-  "LendPoolAddressesProviderRegistry",
-  "LendPoolAddressesProvider",
-  "LendPoolConfigurator",
-  "LendPool",
-  "LendPoolLoan",
-  "InterestRate",
-  "ReserveOracle",
-  "NFTOracle",
-  "BToken",
-  "DebtToken",
-  "PunkGateway",
-  "WETHGateway",
+  "Support",
+  "CopyrightRegistry",
+  "CBPAddressesProvider",
 ];
 
-const miscContractList = ["UiPoolDataProvider", "CBPProtocolDataProvider", "WalletBalanceProvider"];
-
-const interfacesContractList = ["IERC20Detailed", "IERC721Detailed", "IIncentivesController"];
+const interfacesContractList = ["ISupport", "ICopyrightRegistry", "ICBPAddressesProvider"];
 
 const updateAbis = async (subDir, contractList) => {
   contractList.forEach((contract) => {
@@ -41,7 +30,4 @@ function deleteFolderRecursive(directoryPath) {
 deleteFolderRecursive("../abis");
 
 updateAbis("protocol", protocolContractList).then().catch();
-
-updateAbis("misc", miscContractList).then().catch();
-
 updateAbis("interfaces", interfacesContractList).then().catch();

@@ -77,17 +77,6 @@ export const getGenesisPoolAdmin = async (config: ICommonConfiguration): Promise
   return addressList[addressIndex];
 };
 
-export const getEmergencyAdmin = async (config: ICommonConfiguration): Promise<tEthereumAddress> => {
-  const currentNetwork = process.env.FORK ? process.env.FORK : DRE.network.name;
-  const targetAddress = getParamPerNetwork(config.EmergencyAdmin, <eNetwork>currentNetwork);
-  if (targetAddress) {
-    return targetAddress;
-  }
-  const addressList = await getEthersSignersAddresses();
-  const addressIndex = config.EmergencyAdminIndex;
-  return addressList[addressIndex];
-};
-
 export const getReserveFactorCollectorAddress = async (config: ICommonConfiguration): Promise<tEthereumAddress> => {
   const currentNetwork = process.env.FORK ? process.env.FORK : DRE.network.name;
   return getParamPerNetwork(config.ReserveFactorCollectorAddress, <eNetwork>currentNetwork);

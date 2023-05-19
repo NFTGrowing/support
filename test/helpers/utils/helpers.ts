@@ -1,14 +1,9 @@
-import { LendPool } from "../../../types/LendPool";
 import { ReserveData, UserReserveData, LoanData, NftData } from "./interfaces";
 import {
   getIErc20Detailed,
   getMintableERC20,
   getMintableERC721,
-  getBToken,
-  getLendPoolLoanProxy,
   getDeploySigner,
-  getDebtToken,
-  getIErc721Detailed,
 } from "../../../helpers/contracts-getters";
 import { tEthereumAddress } from "../../../helpers/types";
 import BigNumber from "bignumber.js";

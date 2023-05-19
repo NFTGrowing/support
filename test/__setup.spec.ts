@@ -59,19 +59,21 @@ const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
   const config = loadPoolConfig(ConfigNames.CBP);
 
   //////////////////////////////////////////////////////////////////////////////
-  console.log("-> Prepare mock external ERC20 Tokens, such as WETH, DAI...");
+  console.log("-> Prepare mock external ERC20 Tokens");
   const mockTokens: {
     [symbol: string]: MockContract | MintableERC20 | WETH9Mocked | WETH9;
   } = {
     ...(await deployAllMockTokens(true)),
   };
 
-  console.log("-> Prepare mock external ERC721 NFTs, such as WPUNKS, BAYC...");
+  /*
+  console.log("-> Prepare mock external ERC721 NFTs");
   const mockNfts: {
     [symbol: string]: MockContract | MintableERC721;
   } = {
     ...(await deployAllMockNfts(false)),
   };
+  */
 
   console.log("-> Prepare proxy admin...");
   const cbpProxyAdmin = await deployCBProxyAdmin(eContractid.CBPProxyAdminTest);

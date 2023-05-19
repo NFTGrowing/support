@@ -1,8 +1,6 @@
 import { Signer, ethers } from "ethers";
 import {
-  StakeLogicFactory,
   CBPAddressesProviderFactory,
-  StakingFactory,
   SupportFactory,
   MintableERC20Factory,
   MintableERC721Factory,
@@ -175,12 +173,6 @@ export const getNftLogic = async (address?: tEthereumAddress) =>
   );
 */
 
-export const getStakeLogic = async (address?: tEthereumAddress) =>
-  await StakeLogicFactory.connect(
-    address || (await getDb(DRE.network.name).get(`${eContractid.StakeLogic}`).value()).address,
-    await getDeploySigner()
-  );
-
 export const getCBPUpgradeableProxy = async (address: tEthereumAddress) =>
   await CBUpgradeableProxyFactory.connect(address, await getDeploySigner());
 
@@ -192,12 +184,6 @@ export const getCBProxyAdminById = async (id: string) =>
     (
       await getDb(DRE.network.name).get(`${id}`).value()
     ).address,
-    await getDeploySigner()
-  );
-
-export const getLendPoolImpl = async (address?: tEthereumAddress) =>
-  await StakingFactory.connect(
-    address || (await getDb(DRE.network.name).get(`${eContractid.StakingImpl}`).value()).address,
     await getDeploySigner()
   );
 

@@ -18,12 +18,10 @@ import {
   MintableERC20Factory,
   MintableERC721,
   MintableERC721Factory,
-  StakingFactory,
   SupportFactory,
   CBPAddressesProviderFactory,
   CBUpgradeableProxyFactory,
   CBProxyAdminFactory,
-  StakeLogicFactory,
   WETH9MockedFactory,
   WETH9Factory,
   CopyrightRegistryFactory,
@@ -41,42 +39,10 @@ import {
 } from "./contracts-helpers";
 
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { StakingLibraryAddresses } from "../types/StakingFactory";
 import { eNetwork } from "./types";
 
 const readArtifact = async (id: string) => {
   return (DRE as HardhatRuntimeEnvironment).artifacts.readArtifact(id);
-};
-
-export const getStakingLibraries = async (verify?: boolean): Promise<StakingLibraryAddresses> => {
-  // const reserveLogicAddress = await getContractAddressInDb(eContractid.ReserveLogic);
-  const nftLogicAddress = await getContractAddressInDb(eContractid.NftLogic);
-  // const validationLogicAddress = await getContractAddressInDb(eContractid.ValidationLogic);
-  // const genericLogicAddress = await getContractAddressInDb(eContractid.GenericLogic);
-  // const supplyLogicAddress = await getContractAddressInDb(eContractid.SupplyLogic);
-  const stakeLogicAddress = await getContractAddressInDb(eContractid.StakeLogic);
-  // const liquidateLogicAddress = await getContractAddressInDb(eContractid.LiquidateLogic);
-
-  // Hardcoded solidity placeholders, if any library changes path this will fail.
-  // The '__$PLACEHOLDER$__ can be calculated via solidity keccak, but the LendPoolLibraryAddresses Type seems to
-  // require a hardcoded string.
-  //
-  //  how-to:
-  //  1. PLACEHOLDER = solidity Keccak256(['string'], `${libPath}:${libName}`).slice(2, 36)
-  //  2. LIB_PLACEHOLDER = `__$${PLACEHOLDER}$__`
-  // or grab placeholdes from LendPoolLibraryAddresses at Typechain generation.
-  //
-  // libPath example: contracts/libraries/logic/GenericLogic.sol
-  // libName example: GenericLogic
-  return {
-    //[PLACEHOLDER_GENERIC_LOGIC]: genericLogic.address,
-    //[PLACEHOLDER_VALIDATION_LOGIC]: validationLogicAddress,
-    // [PLACEHOLDER_RESERVE_LOGIC]: reserveLogicAddress,
-    [PLACEHOLDER_NFT_LOGIC]: nftLogicAddress,
-    // [PLACEHOLDER_SUPPLY_LOGIC]: supplyLogicAddress,
-    [PLACEHOLDER_BORROW_LOGIC]: stakeLogicAddress,
-    // [PLACEHOLDER_LIQUIDATE_LOGIC]: liquidateLogicAddress,
-  };
 };
 
 const PLACEHOLDER_GENERIC_LOGIC = "__$4c26be947d349222af871a3168b3fe584b$__";

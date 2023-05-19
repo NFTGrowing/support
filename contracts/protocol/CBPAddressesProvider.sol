@@ -31,7 +31,7 @@ contract CBPAddressesProvider is ICBPAddressesProvider, Initializable, OwnableUp
   bytes32 private constant OPERATOR = "OPERATOR";
 
   // constructor() {}
-  function initialize() external initializer {
+  function initialize() external override initializer {
     __Ownable_init();
     emit Initialized();
   }

@@ -21,13 +21,7 @@ import {
   calcExpectedLoanDataAfterRedeem,
   calcExpectedLoanDataAfterLiquidate,
 } from "./utils/calculations";
-import {
-  getReserveAddressFromSymbol,
-  getNftAddressFromSymbol,
-  getReserveData,
-  getUserData,
-  getLoanData,
-} from "./utils/helpers";
+import { getReserveAddressFromSymbol, getNftAddressFromSymbol, getUserData, getLoanData } from "./utils/helpers";
 
 import { convertToCurrencyDecimals, getEthersSignerByAddress } from "../../helpers/contracts-helpers";
 import {
@@ -433,8 +427,6 @@ export const delegateBorrowAllowance = async (
   const reserveAddress: tEthereumAddress = await getReserveAddressFromSymbol(reserve);
 
   const amountToDelegate: string = await (await convertToCurrencyDecimals(reserveAddress, amount)).toString();
-
-  const reserveData = await pool.getReserveData(reserveAddress);
 
   const debtToken = await getDebtToken(reserveData.debtTokenAddress);
 
@@ -961,14 +953,12 @@ export const getTxCostAndTimestamp = async (tx: ContractReceipt) => {
 export const getContractsData = async (reserve: string, user: string, testEnv: TestEnv, sender?: string) => {
   const { pool, dataProvider } = testEnv;
 
-  const [userData, reserveData, timestamp] = await Promise.all([
+  const [userData, timestamp] = await Promise.all([
     getUserData(pool, dataProvider, reserve, user, sender || user),
-    getReserveData(dataProvider, reserve),
     timeLatest(),
   ]);
 
   return {
-    reserveData,
     userData,
     timestamp: new BigNumber(timestamp),
   };
@@ -985,9 +975,8 @@ export const getContractsDataWithLoan = async (
 ) => {
   const { pool, dataProvider } = testEnv;
 
-  const [userData, reserveData, loanData, timestamp] = await Promise.all([
+  const [userData, loanData, timestamp] = await Promise.all([
     getUserData(pool, dataProvider, reserve, user, sender || user),
-    getReserveData(dataProvider, reserve),
     getLoanData(pool, dataProvider, nftAsset, nftTokenId, loanId),
     timeLatest(),
   ]);

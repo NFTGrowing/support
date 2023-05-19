@@ -24,7 +24,7 @@ task("dev:deploy-copyrightregistry", "Deploy CopyrightRegistry contract")
     await waitForTx(await addressesProvider.setCopyrightRegistryImpl(copyrightRegistryImpl.address, []));
     // configurator will create proxy for implement
     const copyrightRegistry = await addressesProvider.getCopyrightRegistry();
-    const copyrightRpegistryProxy = await getCopyrightRegistry(copyrightRegistry);
+    const copyrightRegistryProxy = await getCopyrightRegistry(copyrightRegistry);
     await insertContractAddressInDb(eContractid.CopyrightRegistryProxy, copyrightRegistryProxy.address);
   });
 
