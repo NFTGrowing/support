@@ -1,34 +1,25 @@
 import rawBRE from "hardhat";
 import { MockContract } from "ethereum-waffle";
 import "./helpers/utils/math";
-import { insertContractAddressInDb, registerContractInJsonDb } from "../helpers/contracts-helpers";
+import { insertContractAddressInDb } from "../helpers/contracts-helpers";
 import {
   deployAllMockTokens,
   deploySupport,
   deployCBPAddressesProviderImpl,
   deployCBUpgradeableProxy,
-  deployAllMockNfts,
   deployCBProxyAdmin,
   deployCopyrightRegistry,
 } from "../helpers/contracts-deployments";
 
 import { Signer } from "ethers";
-import { eContractid, tEthereumAddress, CBPPools } from "../helpers/types";
+import { eContractid } from "../helpers/types";
 import { MintableERC20 } from "../types/MintableERC20";
-import { MintableERC721 } from "../types/MintableERC721";
 import { WETH9Mocked } from "../types/WETH9Mocked";
 import { WETH9 } from "../types/WETH9";
 
-import { ConfigNames, getReserveFactorCollectorAddress, loadPoolConfig } from "../helpers/configuration";
+import { ConfigNames, loadPoolConfig } from "../helpers/configuration";
 import { initializeMakeSuite } from "./helpers/make-suite";
 
-import {
-  setAggregatorsInReserveOracle,
-  addAssetsInNFTOracle,
-  setPricesInNFTOracle,
-  deployAllChainlinkMockAggregators,
-  deployChainlinkMockAggregator,
-} from "../helpers/oracles-helpers";
 import { DRE, waitForTx } from "../helpers/misc-utils";
 import CBPConfig from "../markets/cbp";
 import {
@@ -41,8 +32,6 @@ import {
   getCopyrightRegistry,
   getCBPAddressesProviderProxy,
 } from "../helpers/contracts-getters";
-import { getNftAddressFromSymbol } from "./helpers/utils/helpers";
-import { ADDRESS_ID_PUNK_GATEWAY, ADDRESS_ID_WETH_GATEWAY } from "../helpers/constants";
 
 const MOCK_USD_PRICE = CBPConfig.ProtocolGlobalParams.MockUsdPrice;
 const ALL_ASSETS_INITIAL_PRICES = CBPConfig.Mocks.AllAssetsInitialPrices;
@@ -81,7 +70,7 @@ const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
 
   console.log("-> Prepare address provider...");
   const addressesProviderImpl = await deployCBPAddressesProviderImpl();
-  const initEncodedData = addressesProviderImpl.interface.encodeFunctionData("initialize", []);
+  const initEncodedData = addressesProviderImpl.interface.encodeFunctionData("initialize");
 
   const cbUpgradeableProxy = await deployCBUpgradeableProxy(
     eContractid.CBPAddressesProviderProxy,

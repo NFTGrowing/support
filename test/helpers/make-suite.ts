@@ -2,14 +2,12 @@ import { evmRevert, evmSnapshot, DRE, getNowTimeInSeconds } from "../../helpers/
 import { Signer } from "ethers";
 import {
   getCBPAddressesProviderProxy,
-  getMintableERC20,
-  getMintableERC721,
   getSupport,
   getAllMockedTokens,
   getWETHMocked,
   getCopyrightRegistry,
 } from "../../helpers/contracts-getters";
-import { eEthereumNetwork, eNetwork, tEthereumAddress, TokenContractId } from "../../helpers/types";
+import { tEthereumAddress, TokenContractId } from "../../helpers/types";
 import { Support } from "../../types/Support";
 import { CopyrightRegistry } from "../../types/CopyrightRegistry";
 
@@ -17,20 +15,14 @@ import { MintableERC20 } from "../../types/MintableERC20";
 import { MintableERC721 } from "../../types/MintableERC721";
 import { WETH9Mocked } from "../../types/WETH9Mocked";
 
-import { BNFT } from "../../types/BNFT";
-
 import chai from "chai";
 // @ts-ignore
 import bignumberChai from "chai-bignumber";
 import { almostEqual } from "./almost-equal";
 import { CBPAddressesProvider } from "../../types/CBPAddressesProvider";
 import { getEthersSigners } from "../../helpers/contracts-helpers";
-import { getParamPerNetwork } from "../../helpers/contracts-helpers";
 import { solidity } from "ethereum-waffle";
-import { CBPConfig } from "../../markets/cbp";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { USD_ADDRESS } from "../../helpers/constants";
-import { SupportInfo } from "prettier";
 
 chai.use(bignumberChai());
 chai.use(almostEqual());
@@ -52,9 +44,8 @@ export interface TestEnv {
   usdt: MintableERC20;
 
   //wpunks: WPUNKSMocked;
-  bPUNK: BNFT;
   bayc: MintableERC721;
-  bBAYC: BNFT;
+
   addressesProvider: CBPAddressesProvider;
 
   tokenIdTracker: number;
@@ -79,9 +70,8 @@ const testEnv: TestEnv = {
   usdc: {} as MintableERC20,
   usdt: {} as MintableERC20,
 
-  bPUNK: {} as BNFT,
   bayc: {} as MintableERC721,
-  bBAYC: {} as BNFT,
+
   addressesProvider: {} as CBPAddressesProvider,
 
   tokenIdTracker: {} as number,

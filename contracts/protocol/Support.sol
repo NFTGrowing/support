@@ -506,7 +506,7 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
   // Withdraw asset for theme issue supporting
 
   /**
-   * @dev get the theme's issues info
+   * @dev withdrawForOneIssue
    * @param themeID The id of the theme to withdraw
    * @param issueNo withdraw for this issue
    * @param operatorAddr withdraw to this operator for handling

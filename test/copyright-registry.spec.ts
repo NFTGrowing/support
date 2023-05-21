@@ -1,26 +1,10 @@
 import { ethers, waffle } from "hardhat";
 // import "@nomiclabs/hardhat-web3";
-import { createRandomAddress } from "../helpers/misc-utils";
-import { TestEnv, makeSuite } from "./helpers/make-suite";
-import {
-  mintERC20,
-  mintERC721,
-  approveERC20,
-  approveERC721,
-  setApprovalForAll,
-  deposit,
-  borrow,
-  withdraw,
-  repay,
-  delegateBorrowAllowance,
-} from "./helpers/actions";
 
-import { configuration as actionsConfiguration } from "./helpers/actions";
-import { configuration as calculationsConfiguration } from "./helpers/utils/calculations";
+import { TestEnv, makeSuite } from "./helpers/make-suite";
 import { convertToCurrencyDecimals } from "../helpers/contracts-helpers";
 import BigNumber from "bignumber.js";
 import { BigNumber as BN } from "ethers";
-import { getReservesConfigByPool } from "../helpers/configuration";
 import {
   CBPPools,
   eContractid,
@@ -33,24 +17,15 @@ import { MintableERC20 } from "../types/MintableERC20";
 import { string } from "hardhat/internal/core/params/argumentTypes";
 import { waitForTx } from "../helpers/misc-utils";
 
-import { getNftAddressFromSymbol } from "./helpers/utils/helpers";
+// import { getNftAddressFromSymbol } from "./helpers/utils/helpers";
 import {
   getConfiguratorSigner,
   getDeploySigner,
-  getMintableERC721,
-  getStakeLogic,
-  getSupport,
-  getAllMockedTokens,
   getCopyrightRegistry,
   getCopyrightFixedSupply,
 } from "../helpers/contracts-getters";
 
-import { arrayify, parseEther } from "ethers/lib/utils";
-import { MAX_UINT_AMOUNT } from "../helpers/constants";
-import { Console } from "console";
-import { Address, keccak256, keccakFromHexString } from "ethereumjs-util";
-import { hrtime } from "process";
-import { CopyrightFixedSupply } from "../types";
+import { keccakFromHexString } from "ethereumjs-util";
 
 const { expect } = require("chai");
 
@@ -65,7 +40,7 @@ makeSuite("CopyrightRegistry: test copyright token registry and claim ", (testEn
       ROUNDING_MODE: BigNumber.ROUND_DOWN,
     });
 
-    actionsConfiguration.skipIntegrityCheck = false; //set this to true to execute solidity-coverage
+    // actionsConfiguration.skipIntegrityCheck = false; //set this to true to execute solidity-coverage
   });
   after("Reset", () => {
     // Reset BigNumber
