@@ -27,7 +27,6 @@ import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 contract CopyrightRegistry is Initializable, ICopyrightRegistry, ContextUpgradeable, StorageExt {
   using ECDSA for bytes32;
 
-  //TODO: add iterate code?
   ICBPAddressesProvider public _addressesProvider;
   address public _serviceSignAddr;
 
@@ -60,7 +59,6 @@ contract CopyrightRegistry is Initializable, ICopyrightRegistry, ContextUpgradea
   fallback() external payable {}
 
   function _onlyConfigurator() internal view {
-    //TODO - check to see whether create one new configurator
     require(_addressesProvider.getConfigurator() == _msgSender(), Errors.LP_CALLER_NOT_SUPPORT_CONFIGURATOR);
   }
 
@@ -102,7 +100,6 @@ contract CopyrightRegistry is Initializable, ICopyrightRegistry, ContextUpgradea
 
     _;
 
-    // TODO - check this
     // By storing the original value once again, a refund is triggered (see
     // https://eips.ethereum.org/EIPS/eip-2200)
     _status = _NOT_ENTERED;
@@ -114,7 +111,6 @@ contract CopyrightRegistry is Initializable, ICopyrightRegistry, ContextUpgradea
    */
   function setServiceSignAddr(address addr) external onlyConfigurator {
     _serviceSignAddr = addr;
-    //TODO: emit event
     emit SetServiceSignAddr(addr);
   }
 
@@ -257,9 +253,8 @@ contract CopyrightRegistry is Initializable, ICopyrightRegistry, ContextUpgradea
   }
 
   //shutdown increaseSupplySwitch
-  // TODO: change to other admin account
   /**
-   * @dev Emitted on turnoffIncreaseSupplySwitch
+   * @dev turnoff IncreaseSupplySwitch
    * @param lv2ID aggregation ID of the work, 0 means no lv2ID
    * @param id ID of the work
    * @param workTokenID ID of the work

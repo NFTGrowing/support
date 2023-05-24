@@ -24,7 +24,6 @@ import {ContextUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/Cont
 /**
  * @title Support contract
  * @dev Main point of interaction with the support protocol -
- *      TODO - determine whether to deploy one contract instance for each theme.
  * - Users can:
  *   # support
  *   # get support list
@@ -34,7 +33,6 @@ import {ContextUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/Cont
  **/
 
 // !!! For Upgradable: DO NOT ADJUST Inheritance Order !!!
-// TODO - check whether to seperate the storage contract
 contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
   uint256 public constant AssetTypeLimit = 20;
   uint256 public constant SlotLowerLimit = 1;
@@ -62,7 +60,6 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
   }
 
   struct IssueSupport {
-    // TODO - check whether this would cause problems while upgrading based on proxy
     mapping(uint256 => SupportSlot) slots;
   }
 
@@ -76,25 +73,16 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
   }
 
   struct ThemeSupport {
-    //TODO - initial , update
     bool supporting;
     uint256 startedTimeStamp;
     IssueSchedule issueSchedule;
-    //TODO - check to determine whether this is necessary
-    // while there is indexed event
-    // https://ethereum.stackexchange.com/questions/8658/what-does-the-indexed-keyword-do
-
-    //TODO - stack may overflow if array keep increasing?
-    // LongTermSupportTx[] supportedList;
-
     //include long-term & case-by-case part
     Balance balance;
-    // TODO - check whether to record this accumulate number
     Balance accumulateBalance;
     //case by case support; key - issue id; value - issue support info
     mapping(uint32 => IssueSupport) issues;
-
-    // TODO - whether add some gap here?
+    // For upgradable, add one new variable above, minus 1 at here
+    uint256[20] __gap;
   }
 
   // for return
@@ -121,6 +109,7 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
     SlotView[DefaultSlotUpperLimit] slotsView;
   }
 
+  // for return
   struct BalanceView {
     uint256[AssetTypeLimit] assetsArray;
   }
@@ -136,7 +125,6 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
 
   ICBPAddressesProvider public _addressesProvider;
 
-  //TODO - Does flexiable length overlap the memory when SupportAssetType extend on upgrading
   address[AssetTypeLimit] public _assetAddr;
 
   // mapping(uint256 => address) internal _assetAddr;
@@ -159,7 +147,6 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
 
     _;
 
-    // TODO - check this
     // By storing the original value once again, a refund is triggered (see
     // https://eips.ethereum.org/EIPS/eip-2200)
     _status = _NOT_ENTERED;
@@ -334,10 +321,6 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
     }
   }
 
-  //TODO - add address provide code
-
-  //TODO - Add multiple operating account to do clearing in addressProvider
-
   //setup issue data
   /**
    * @dev Update the supporting issue info of theme
@@ -360,7 +343,7 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
 
   /**
    * @dev  get issue no of themes
-   * @param themes The ids of the theme to be updated
+   * @param themes The ids of the theme to query
    **/
   function getThemesIssueNo(uint32[] calldata themes) public view returns (ThemeIssueNo[] memory) {
     require(themes.length > 0, Errors.VL_INVALID_AMOUNT);
@@ -501,7 +484,15 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
     return issuesView;
   }
 
-  // TODO - settle the Theme Issue - Delayed
+  // TODO - Add batch settle the Theme Issue func  - Delayed
+  /* func draft 
+    function withdrawForOneIssue(
+    uint32[] themeID,
+    uint32[] issueNo,
+    address operatorAddr,
+    uint256[] memory ETHAmount
+  ) external override nonReentrant onlyOperator {
+  */
 
   // Withdraw asset for theme issue supporting
 

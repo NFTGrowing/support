@@ -86,7 +86,6 @@ const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
 
   console.log("-> Prepare Support...");
   const SupportImpl = await deploySupport();
-  // TODO: should report issue here
   await waitForTx(await addressesProviderProxy.setSupportImpl(SupportImpl.address, []));
   // configurator will create proxy for implement
   const SupportAddress = await addressesProviderProxy.getSupport();
@@ -102,8 +101,6 @@ const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
   await insertContractAddressInDb(eContractid.CopyrightRegistryProxy, copyrightRegistryProxy.address);
 
   console.timeEnd("setup");
-
-  //todo - Mon search pool admin in cbp
 };
 
 before(async () => {

@@ -18,7 +18,8 @@ interface ISupport {
    * @param issueNo current issue no
    * @param assetType asset using to support;
    * @param supportAmount The amount of the above asset
-   * @param supportedTimeStamp //TODO - is his duplicated with the system's log?
+   * @param supportedTimeStamp time stamp for convenience
+   * https://ethereum.stackexchange.com/questions/102411/is-it-worth-logging-block-timestamp-in-events-from-smart-contracts
    **/
   event LongTermSupport(
     address indexed supporter,
@@ -43,7 +44,7 @@ interface ISupport {
    * @param issueNo current issue no
    * @param assetType asset using to support;
    * @param supportAmount The amount of the above asset
-   * @param supportedTimeStamp //TODO - is his duplicated with the system's log?
+   * @param supportedTimeStamp time stamp while support
    **/
   event CaseByCaseSupport(
     address indexed supporter,

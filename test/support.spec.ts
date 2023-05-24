@@ -199,8 +199,7 @@ makeSuite("Support: test support", (testEnv: TestEnv) => {
 
     /*
    
-    //TODO - support the not active one
-    //support the active one
+    //support the not active one
     console.log("support the not active one");
     await waitForTx(
       await support
