@@ -78,8 +78,10 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
     IssueSchedule issueSchedule;
     //include long-term & case-by-case part
     Balance balance;
+    // gas refine - all operation of accumulateBalance has been commented
     Balance accumulateBalance;
     //case by case support; key - issue id; value - issue support info
+    //gas refine - all operation of IssueSupport has been commented
     mapping(uint32 => IssueSupport) issues;
     // For upgradable, add one new variable above, minus 1 at here
     uint256[20] __gap;
@@ -287,7 +289,7 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
 
       //add balance, accumulate Balance
       _themeSupport[themeID].balance.assetMap[assetType] += msg.value;
-      _themeSupport[themeID].accumulateBalance.assetMap[assetType] += msg.value;
+      // _themeSupport[themeID].accumulateBalance.assetMap[assetType] += msg.value;
       actualSupportAmount = msg.value;
     } else if (assetTypeEnum < SupportAssetType.Last) {
       require(supportAmount > 0, Errors.VL_INVALID_AMOUNT);
@@ -298,7 +300,7 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
 
       //add balance, accumulate Balance
       _themeSupport[themeID].balance.assetMap[assetType] += supportAmount;
-      _themeSupport[themeID].accumulateBalance.assetMap[assetType] += supportAmount;
+      // _themeSupport[themeID].accumulateBalance.assetMap[assetType] += supportAmount;
     } else {
       // revert
       revert("The assetType is not supported");
@@ -426,9 +428,9 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
       require(msg.value > 0, Errors.VL_INVALID_AMOUNT);
 
       //add balance, accumulate Balance
-      _themeSupport[themeID].issues[issueNo].slots[slotId].balance.assetMap[assetType] += msg.value;
+      // _themeSupport[themeID].issues[issueNo].slots[slotId].balance.assetMap[assetType] += msg.value;
       _themeSupport[themeID].balance.assetMap[assetType] += msg.value;
-      _themeSupport[themeID].accumulateBalance.assetMap[assetType] += msg.value;
+      // _themeSupport[themeID].accumulateBalance.assetMap[assetType] += msg.value;
       actualSupportAmount = msg.value;
     } else if (assetTypeEnum < SupportAssetType.Last) {
       require(supportAmount > 0, Errors.VL_INVALID_AMOUNT);
@@ -438,9 +440,9 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
       IERC20Upgradeable(assetAddr).transferFrom(msg.sender, address(this), supportAmount);
 
       //add balance, accumulate Balance
-      _themeSupport[themeID].issues[issueNo].slots[slotId].balance.assetMap[assetType] += supportAmount;
+      // _themeSupport[themeID].issues[issueNo].slots[slotId].balance.assetMap[assetType] += supportAmount;
       _themeSupport[themeID].balance.assetMap[assetType] += supportAmount;
-      _themeSupport[themeID].accumulateBalance.assetMap[assetType] += supportAmount;
+      // _themeSupport[themeID].accumulateBalance.assetMap[assetType] += supportAmount;
     } else {
       // revert
       revert("The assetType is not supported");
