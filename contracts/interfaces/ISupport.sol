@@ -77,6 +77,44 @@ interface ISupport {
   );
 
   /**
+   * @dev Emitted on settlement withdrawral for one issue
+   * @param themeID withdraw from this theme
+   * @param issueNo being handled issue no, 0 means multi issue
+   * @param msgSender sender of this withdrawral
+   * @param operatorAddr operator Address to handle the withdrawed asset
+   * @param assetType asset type is withdrawed
+   * @param assetAddress asset address is withdrawed
+   * @param assetsAmount The amount of the above asset
+   **/
+  event WithdrawFromTheme(
+    uint32 indexed themeID,
+    uint256 indexed issueNo,
+    address msgSender,
+    address operatorAddr,
+    uint8 assetType,
+    address assetAddress,
+    uint256 assetsAmount
+  );
+
+  /**
+   * @dev Emitted on settlement withdrawral for one issue
+   * @param msgSender sender of this withdrawral
+   * @param operatorAddr operator Address to handle the withdrawed asset
+   * @param assetType asset type is withdrawed
+   * @param assetAddress asset address is withdrawed
+   * @param assetsAmount The amount of the above asset
+   * @param comment Comment to record
+   **/
+  event RawWithdraw(
+    address msgSender,
+    address operatorAddr,
+    uint8 assetType,
+    address assetAddress,
+    uint256 assetsAmount,
+    string comment
+  );
+
+  /**
    * @dev set asset address
    * @param addrList New addrList to cover the existing arr
    */
@@ -142,6 +180,32 @@ interface ISupport {
     uint32 issueNo,
     uint32 slotId
   ) external payable;
+
+  /**
+   * @dev batchWithdrawETH
+   * @param themeIDs The id array of the theme to withdraw
+   * @param issues The issue array of the themeIDs to withdraw
+   * @param operatorAddr withdraw to this operator for handling
+   * @param ethAmounts amount of ETH to withdraw
+   **/
+  function batchWithdrawETH(
+    uint32[] memory themeIDs,
+    uint32[] memory issues,
+    address operatorAddr,
+    uint256[] memory ethAmounts
+  ) external;
+
+  /**
+   * @dev raw Withdraw with comment
+   * @param assetsAmount assets amount to withdraw; see SupportAssetType
+   * @param operatorAddr operatorAddr
+   * @param comment comments
+   */
+  function rawWithdraw(
+    uint256[] memory assetsAmount,
+    address operatorAddr,
+    string memory comment
+  ) external;
 
   /**
    * @dev get the theme's issues info

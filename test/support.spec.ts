@@ -112,6 +112,7 @@ makeSuite("Support: test support", (testEnv: TestEnv) => {
     //-- Mock two addresses, active the first one
     const themeIDActive = 1;
     const themeIDNotActive = 2;
+    const themeIDActiveSec = 3;
     // expect(themeIDActive, "Two mocked addr is different").to.not.be.eq(themeIDNotActive);
 
     //Enable the mockedAddressActive
@@ -242,7 +243,7 @@ makeSuite("Support: test support", (testEnv: TestEnv) => {
     console.log(themesIssueSchedule);
 
     // //-- case by case support
-    const depositSizeCase = parseEther("1.05");
+    const depositSizeCase = parseEther("3.05");
     const depositUSDCCase = await convertToCurrencyDecimals(usdc.address, "2.05");
     const depositUSDTCase = await convertToCurrencyDecimals(usdt.address, "3.05");
     const depositWETHCase = await convertToCurrencyDecimals(weth.address, "4.05");
@@ -465,6 +466,81 @@ makeSuite("Support: test support", (testEnv: TestEnv) => {
     //   await waitForTx(await support.connect(poolAdminSigner).updateStatus([themeIDActive], true));
 
     //pause
+
+    //batchWithdrawETH
+    //active another theme
+    await waitForTx(await support.connect(poolAdminSigner).updateStatus([themeIDActiveSec], true));
+
+    //updateThemeIssueSchedule
+    console.log("updateThemeIssueSchedule");
+    await waitForTx(
+      await support
+        .connect(poolAdminSigner)
+        .updateThemeIssueSchedule(themeIDActiveSec, 1, baseStartTime, issueDurationTime)
+    );
+
+    //Support ETH
+    await waitForTx(
+      await support
+        .connect(themeSupporter.signer)
+        .caseByCaseSupport(themeIDActiveSec, 0, 0, 1, 1, { value: depositSizeCase })
+    );
+
+    const batchWithdrawSize = parseEther("0.8");
+
+    await waitForTx(
+      await support
+        .connect(operatorSigner)
+        .batchWithdrawETH([themeIDActive, themeIDActiveSec], [1, 1], settleOperator.address, [
+          batchWithdrawSize,
+          batchWithdrawSize,
+        ])
+    );
+
+    const batchFirstExpec = ethWithdrawResultExpec.sub(batchWithdrawSize);
+    const batchSecExpec = depositSizeCase.sub(batchWithdrawSize);
+
+    const batchFirstResult = await support.getThemeSupport(themeIDActive);
+    const batchSecResult = await support.getThemeSupport(themeIDActiveSec);
+    const actualAfterBatchWithdraw = await ethers.provider.getBalance(support.address);
+    const actualOpETHAfterBatchWithdraw = await ethers.provider.getBalance(settleOperator.address);
+
+    console.log("batchFirstResult ETH", batchFirstResult.balances.assetsArray[0]);
+    console.log("batchSecResult ETH", batchSecResult.balances.assetsArray[0]);
+    console.log("actualOpETHAfterBatchWithdraw", actualOpETHAfterBatchWithdraw);
+    console.log("actualAfterBatchWithdraw", actualAfterBatchWithdraw);
+
+    expect(batchFirstResult.balances.assetsArray[0]).to.be.eq(batchFirstExpec);
+    expect(batchSecResult.balances.assetsArray[0]).to.be.eq(batchSecExpec);
+    expect(actualOpETHAfterBatchWithdraw).to.be.eq(actualOperatorETH.add(batchWithdrawSize.add(batchWithdrawSize)));
+    expect(actualAfterBatchWithdraw).to.be.eq(
+      actualAfterWithdrawETH.add(depositSizeCase).sub(batchWithdrawSize.add(batchWithdrawSize))
+    );
+
+    const rawWithdrawSize = parseEther("0.9");
+    await waitForTx(
+      await support
+        .connect(poolAdminSigner)
+        .rawWithdraw([rawWithdrawSize], settleOperator.address, "RawWithdraw 4 June No1 Theme 1,3 Issue 1,1 ")
+    );
+
+    const rawFirstExpec = ethWithdrawResultExpec.sub(rawWithdrawSize);
+    const rawSecExpec = depositSizeCase.sub(rawWithdrawSize);
+
+    const rawFirstResult = await support.getThemeSupport(themeIDActive);
+    const rawSecResult = await support.getThemeSupport(themeIDActiveSec);
+    const actualAfterRawWithdraw = await ethers.provider.getBalance(support.address);
+    const actualOpETHAfterRawWithdraw = await ethers.provider.getBalance(settleOperator.address);
+
+    console.log("rawFirstResult ETH", rawFirstResult.balances.assetsArray[0]);
+    console.log("rawSecResult ETH", rawSecResult.balances.assetsArray[0]);
+    console.log("actualOpETHAfterRawWithdraw", actualOpETHAfterRawWithdraw);
+    console.log("actualAfterRawWithdraw", actualAfterRawWithdraw);
+
+    // expect(rawFirstResult.balances.assetsArray[0]).to.be.eq(rawFirstExpec);
+    // expect(rawSecResult.balances.assetsArray[0]).to.be.eq(rawSecExpec);
+    expect(actualOpETHAfterRawWithdraw).to.be.eq(actualOpETHAfterBatchWithdraw.add(rawWithdrawSize));
+    expect(actualAfterRawWithdraw).to.be.eq(actualAfterBatchWithdraw.sub(rawWithdrawSize));
   });
   //*/
 });

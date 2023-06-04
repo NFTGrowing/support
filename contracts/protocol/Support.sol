@@ -568,4 +568,94 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
       }
     }
   }
+
+  /**
+   * @dev batchWithdrawETH
+   * @param themeIDs The id array of the theme to withdraw
+   * @param issues The issue array of the themeIDs to withdraw
+   * @param operatorAddr withdraw to this operator for handling
+   * @param ethAmounts amount of ETH to withdraw
+   **/
+  function batchWithdrawETH(
+    uint32[] memory themeIDs,
+    uint32[] memory issues,
+    address operatorAddr,
+    uint256[] memory ethAmounts
+  ) external override nonReentrant onlyOperator {
+    //check balance
+    require(
+      themeIDs.length > 0 && issues.length == themeIDs.length && themeIDs.length == ethAmounts.length,
+      Errors.VL_INVALID_THEMEIDS_LENGTH
+    );
+
+    uint256 ethWithdrawTotal = 0;
+    for (uint256 i = 0; i < themeIDs.length; i++) {
+      ThemeSupport storage themeSupport = _themeSupport[themeIDs[i]];
+      require(
+        themeSupport.balance.assetMap[uint256(SupportAssetType.ETH)] >= ethAmounts[i],
+        Errors.SUPPORT_INVALID_WITHDRAW_BALANCE
+      );
+      themeSupport.balance.assetMap[uint256(SupportAssetType.ETH)] -= ethAmounts[i];
+      ethWithdrawTotal += ethAmounts[i];
+      emit WithdrawFromTheme(
+        themeIDs[i],
+        issues[i],
+        msg.sender,
+        operatorAddr,
+        uint8(SupportAssetType.ETH),
+        address(0),
+        ethAmounts[i]
+      );
+    }
+
+    //withdraw
+    payable(operatorAddr).transfer(ethWithdrawTotal);
+  }
+
+  /**
+   * @dev raw Withdraw with comment
+   * @param assetsAmount assets amount to withdraw; see SupportAssetType
+   * @param operatorAddr operatorAddr
+   * @param comment comments
+   */
+  function rawWithdraw(
+    uint256[] memory assetsAmount,
+    address operatorAddr,
+    string memory comment
+  ) external override nonReentrant onlyConfigurator {
+    require(
+      assetsAmount.length > 0 && assetsAmount.length <= uint32(SupportAssetType.Last),
+      Errors.VL_INVALID_ASSETARRAY_LENGTH
+    );
+
+    require(operatorAddr != address(0), Errors.SUPPORT_INVALID_ADDRESS);
+
+    for (uint256 i = 0; i < assetsAmount.length; i++) {
+      //transfer
+      if (assetsAmount[i] <= 0) {
+        continue;
+      }
+
+      //assetType(uint8) to SupportAssetType(Enum) check
+      SupportAssetType assetTypeEnum = SupportAssetType(i);
+      // uint256 actualTransferAmount = assetsAmount;
+
+      //
+      if (assetTypeEnum == SupportAssetType.ETH) {
+        //transfer ETH
+        payable(operatorAddr).transfer(assetsAmount[i]);
+        emit RawWithdraw(msg.sender, operatorAddr, uint8(assetTypeEnum), address(0), assetsAmount[i], comment);
+      } else if (assetTypeEnum < SupportAssetType.Last) {
+        // transfer ERC20  to this operator addr
+        address assetAddr = _assetAddr[i];
+        bool transferResult = IERC20Upgradeable(assetAddr).transfer(operatorAddr, assetsAmount[i]);
+        require(transferResult, Errors.SUPPORT_TRANSFER_FAILED);
+
+        emit RawWithdraw(msg.sender, operatorAddr, uint8(assetTypeEnum), assetAddr, assetsAmount[i], comment);
+      } else {
+        // revert
+        revert("The assetType is not supported");
+      }
+    }
+  }
 }

@@ -53,6 +53,7 @@ library Errors {
   string public constant VL_INVALID_SLOTID = "323";
   string public constant VL_INVALID_ASSETARRAY_LENGTH = "324";
   string public constant VL_INVALID_STRING_PARA = "325";
+  string public constant VL_INVALID_THEMEIDS_LENGTH = "326";
 
   //support errors
   string public constant LP_CALLER_NOT_SUPPORT_CONFIGURATOR = "400";
