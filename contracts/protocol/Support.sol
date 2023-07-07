@@ -74,6 +74,8 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
 
   struct ThemeSupport {
     bool supporting;
+    string themeName;
+    address themeAddress;
     uint256 startedTimeStamp;
     IssueSchedule issueSchedule;
     //include long-term & case-by-case part
