@@ -33,7 +33,7 @@ contract CBPAddressesProvider is ICBPAddressesProvider, Initializable, OwnableUp
   // constructor() {}
   function initialize() external override initializer {
     __Ownable_init();
-    emit Initialized();
+    emit AddressesProviderInitialized();
   }
 
   /**

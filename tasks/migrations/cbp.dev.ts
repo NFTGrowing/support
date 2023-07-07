@@ -25,11 +25,11 @@ task("cbp:dev", "Deploy development enviroment")
     await localBRE.run("dev:deploy-address-provider", { verify, pool: POOL_NAME });
 
     //////////////////////////////////////////////////////////////////////////
-    console.log("\n\nDeploy lend pool");
+    console.log("\n\nDeploy support");
     await localBRE.run("dev:deploy-support", { verify, pool: POOL_NAME });
 
     //////////////////////////////////////////////////////////////////////////
-    console.log("\n\nInitialize lend pool");
+    console.log("\n\nInitialize support");
     await localBRE.run("dev:initialize-support", { verify, pool: POOL_NAME });
 
     console.log("\n\nFinished migration");

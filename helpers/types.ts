@@ -52,6 +52,8 @@ export enum eContractid {
   InterestRate = "InterestRate",
   CBPUpgradeableProxy = "CBPUpgradeableProxy",
   CBPProxyAdminTest = "CBPProxyAdminTest",
+  CBPProxyAdmin = "CBPProxyAdmin",
+
   CBPProxyAdminPool = "CBPProxyAdminPool", //LendPool Contracts, etc Oracle(Reserve, NFT)
   CBPProxyAdminFund = "CBPProxyAdminFund", //Treasury Fundings, etc Collector
   WalletBalanceProvider = "WalletBalanceProvider",

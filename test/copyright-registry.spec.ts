@@ -268,5 +268,13 @@ makeSuite("CopyrightRegistry: test copyright token registry and claim ", (testEn
         .claimWorkToken(claim_signature_2, lv2ID_2, [id_2], workTokenID_2, [50000], claimAccount.address)
     );
     */
+
+    //set the work url of the code
+    const TEST_URL = "https://google.com/test";
+    //burn some token
+    await waitForTx(await copyrightRegistry.connect(poolAdmin).setWorkURL(lv2ID_2, id_2, workTokenID_2, TEST_URL));
+    const workURL = await workToken_2.workURL();
+    console.log("work url is:", workURL);
+    expect(workURL, "check workurl setting").to.be.eq(TEST_URL);
   });
 });

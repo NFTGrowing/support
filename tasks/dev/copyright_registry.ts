@@ -7,6 +7,7 @@ import {
   getServiceSigner,
   getDeploySigner,
   getCBPAddressesProviderProxy,
+  getConfiguratorSigner,
 } from "../../helpers/contracts-getters";
 import { insertContractAddressInDb } from "../../helpers/contracts-helpers";
 import { ConfigNames, loadPoolConfig } from "../../helpers/configuration";
@@ -17,6 +18,7 @@ task("dev:deploy-copyrightregistry", "Deploy CopyrightRegistry contract")
     await localBRE.run("set-DRE");
 
     const addressesProvider = await getCBPAddressesProviderProxy();
+    console.log("addressesProvider is:", addressesProvider.address);
     // const poolConfig = loadPoolConfig(pool);
 
     const copyrightRegistryImpl = await deployCopyrightRegistry();
@@ -33,11 +35,13 @@ task("dev:set-serviceSignAddr", "set-serviceSignAddr")
   .setAction(async ({ verify }, localBRE) => {
     await localBRE.run("set-DRE");
     const copyrightRegistry = await getCopyrightRegistry();
+    console.log("copyrightRegistry is", copyrightRegistry.address);
 
     console.log("Setup the service sign address");
     const serviceSigner = await getServiceSigner();
-    const registryAdmin = await getDeploySigner();
+    // const registryAdmin = await getDeploySigner();
+    const configuratorSigner = await getConfiguratorSigner();
     await waitForTx(
-      await copyrightRegistry.connect(registryAdmin).setServiceSignAddr(await serviceSigner.getAddress())
+      await copyrightRegistry.connect(configuratorSigner).setServiceSignAddr(await serviceSigner.getAddress())
     );
   });

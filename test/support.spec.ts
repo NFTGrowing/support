@@ -216,7 +216,7 @@ makeSuite("Support: test support", (testEnv: TestEnv) => {
     //-- updateThemeIssueSchedule
     // https://www.epochconverter.com/
     // Date and time (GMT): Friday, June 2, 2023 0:00:00
-    const baseStartTime = 1685664000;
+    const baseStartTime = 1687478400;
     // Two weeks
     const issueDurationTime = 1209600;
 

@@ -36,7 +36,7 @@ const theme_1 = 1;
 const theme_2 = 2;
 const theme_3 = 3;
 
-const enabled_theme = theme_1;
+const enabled_theme = theme_2;
 
 task("verify:mintApproveAsset", "mint and approve token for support").setAction(async ({}, localBRE) => {
   await localBRE.run("set-DRE");
@@ -196,20 +196,20 @@ task("verify:longTermSupport", "longTermSupport").setAction(async ({}, localBRE)
 
 task("verify:caseByCaseSupport", "caseByCaseSupport").setAction(async ({}, localBRE) => {
   await localBRE.run("set-DRE");
-  const network = <eNetwork>localBRE.network.name;
+  // const network = <eNetwork>localBRE.network.name;
 
-  const addressesProvider = await getCBPAddressesProviderProxy();
+  // const addressesProvider = await getCBPAddressesProviderProxy();
   // const admin = await addressesProvider.getConfigurator();
-  const poolAdminSigner = await getConfiguratorSigner();
+  // const poolAdminSigner = await getConfiguratorSigner();
   const simulateSupporter = await getSupporter();
 
   //   testEnv.support = await getSupport();
   const support = await getSupport();
 
-  const allTokens = await getAllMockedTokens();
-  const weth = allTokens[TokenContractId.WETH];
-  const usdc = allTokens[TokenContractId.USDC];
-  const usdt = allTokens[TokenContractId.USDT];
+  // const allTokens = await getAllMockedTokens();
+  // const weth = allTokens[TokenContractId.WETH];
+  // const usdc = allTokens[TokenContractId.USDC];
+  // const usdt = allTokens[TokenContractId.USDT];
 
   console.log("support the active one");
 
@@ -220,24 +220,30 @@ task("verify:caseByCaseSupport", "caseByCaseSupport").setAction(async ({}, local
   console.log("USDT:", beforeSupport.balances.assetsArray[3]);
 
   // const balanceOfETHCase = await ethers.provider.getBalance(support.address);
-  const balanceOfWETH = await weth.balanceOf(support.address);
-  const balanceOfUSDC = await usdc.balanceOf(support.address);
-  const balanceOfUSDT = await usdt.balanceOf(support.address);
+  // const balanceOfWETH = await weth.balanceOf(support.address);
+  // const balanceOfUSDC = await usdc.balanceOf(support.address);
+  // const balanceOfUSDT = await usdt.balanceOf(support.address);
 
   //-- case by case support
-  const depositSizeCase = parseEther("0.016");
-  const depositWETHCase = await convertToCurrencyDecimals(weth.address, "7.05");
-  const depositUSDCCase = await convertToCurrencyDecimals(usdc.address, "5.05");
-  const depositUSDTCase = await convertToCurrencyDecimals(usdt.address, "6.05");
+  const depositSizeCase = parseEther("0.0016");
+  // const depositWETHCase = await convertToCurrencyDecimals(weth.address, "7.05");
+  // const depositUSDCCase = await convertToCurrencyDecimals(usdc.address, "5.05");
+  // const depositUSDTCase = await convertToCurrencyDecimals(usdt.address, "6.05");
 
-  const supportingIssueNo = 18;
+  const supportingIssueNo = 2;
   console.log("support the active one");
   //Support ETH
-  await waitForTx(
-    await support
-      .connect(simulateSupporter)
-      .caseByCaseSupport(enabled_theme, 0, 0, supportingIssueNo, 2, { value: depositSizeCase })
+  const txResult = await waitForTx(
+    await support.connect(simulateSupporter).caseByCaseSupport(2, 0, 0, 3, 2, { value: depositSizeCase })
+    //.caseByCaseSupport(enabled_theme, 2, 100, supportingIssueNo, 1)
   );
+  console.log(JSON.stringify(txResult.events));
+  // if (txResult.events){
+  //   for( const item in txResult.events){
+  //     console.log("event:", item)
+  //   }
+  // }
+
   // const supportWithETHCase = await support.getThemeSupport(enabled_theme);
   // console.log("ETH:", supportWithETHCase.balances.assetsArray[0]);
   // console.log("WETH:", supportWithETHCase.balances.assetsArray[1]);
@@ -322,12 +328,12 @@ task("verify:tokenRegistry", "tokenRegistry").setAction(async ({}, localBRE) => 
 
   const copyrightRegistry = await getCopyrightRegistry();
 
-  console.log("Setup the service sign address");
+  console.log("depoly copyright tracking token");
   const serviceSigner = await getServiceSigner();
   const registerTokenAcc = await getSupporter();
 
   const testSigStr =
-    "0x5cb14f8552b43b606c85d3cfe1ae831811beb5b1bd67e11d18019fcdf74a7ff868d896fac8ef8cee5aad37bdcaa345386341a38188f536ef986bd858f80ec2791c";
+    "0x6c6134aa31d480ff3711ecd1ad1f7d9701732af7e77640e6c1b9523cb7204fc13f9361c8c232ea5e28bcf952ccde2a0182bc547ac1ffff58c8a3a68c192d9df31c";
 
   // web3.utils.toBN("2000000000000000000000000")
   //  BigNumber.from("2000000000000000000000000")
@@ -335,7 +341,7 @@ task("verify:tokenRegistry", "tokenRegistry").setAction(async ({}, localBRE) => 
   await waitForTx(
     await copyrightRegistry
       .connect(registerTokenAcc)
-      .registerWorkToken(testSigStr, 0, 11, "GOM", "Game of mfers", "2000000000000000000000000")
+      .registerWorkToken(testSigStr, 0, 9, "L13", "only L1 3", "50000000000000000000000000")
   );
 });
 
@@ -344,11 +350,10 @@ task("verify:tokenClaim", "tokenClaim").setAction(async ({}, localBRE) => {
 
   const copyrightRegistry = await getCopyrightRegistry();
 
-  const serviceSigner = await getServiceSigner();
   const supporterSigner = await getSupporter();
 
   const testSigStr =
-    "0x79522c3636b8f0204e8f3546186f1a2c4d62722f328993aae036948a1144e5ea23208472a37e710c04894cd6cabde80376fabc49877d5e290fb69c61f1b5a0c11c";
+    "0x9028dddbdbebb39c32b04a3cd1e8119bdad33ee2e32d84e7c5586ea2651899d0664ee282132a0c62dd51a231b1b2c2d27f1c1fb4dfc6138dafd41c5ccffbb99b1b";
 
   // web3.utils.toBN("2000000000000000000000000")
   //  BigNumber.from("2000000000000000000000000")
@@ -359,9 +364,9 @@ task("verify:tokenClaim", "tokenClaim").setAction(async ({}, localBRE) => {
       .claimWorkToken(
         testSigStr,
         0,
-        [11],
-        "0x515928ded69d2195c7ac13ae18c33793c497c565",
-        ["1000000000000000000000000"],
+        [9],
+        "0x5d919fb1583d50e6ec5bedbd705b1f75ef334173",
+        ["25000000000000000000000000"],
         "0xbf6c5ecae8e092cecb7c058decde09e81098c153"
       )
   );

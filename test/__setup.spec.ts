@@ -25,7 +25,6 @@ import CBPConfig from "../markets/cbp";
 import {
   getSecondSigner,
   getDeploySigner,
-  getAddressProviderProxyAdmin,
   getConfiguratorSigner,
   getOperatorSigner,
   getSupport,
@@ -72,9 +71,16 @@ const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
   const addressesProviderImpl = await deployCBPAddressesProviderImpl();
   const initEncodedData = addressesProviderImpl.interface.encodeFunctionData("initialize");
 
+  // const cbUpgradeableProxy = await deployCBUpgradeableProxy(
+  //   eContractid.CBPAddressesProviderProxy,
+  //   await (await getAddressProviderProxyAdmin()).getAddress(),
+  //   addressesProviderImpl.address,
+  //   initEncodedData
+  // );
+
   const cbUpgradeableProxy = await deployCBUpgradeableProxy(
     eContractid.CBPAddressesProviderProxy,
-    await (await getAddressProviderProxyAdmin()).getAddress(),
+    cbpProxyAdmin.address,
     addressesProviderImpl.address,
     initEncodedData
   );

@@ -330,6 +330,31 @@ contract CopyrightRegistry is Initializable, ICopyrightRegistry, ContextUpgradea
   }
 
   /**
+   * @dev set the work url of the token which could explain itself
+   * @param lv2ID aggregation ID of the work, 0 means no lv2ID
+   * @param id single chapter work id
+   * @param workTokenID addr of the work token
+   * @param workURL work url of the token
+   */
+  function setWorkURL(
+    uint256 lv2ID,
+    uint256 id,
+    address workTokenID,
+    string calldata workURL
+  ) public nonReentrant onlyConfigurator {
+    require(workTokenID != address(0), Errors.C_REGISTRY_WRONG_TOKENID);
+    if (lv2ID != 0) {
+      require(workTokenID == _lv2Registry[lv2ID].lv2TokenID, Errors.C_REGISTRY_WRONG_LV2_TOKENID);
+      CopyrightFixedSupply(_lv2Registry[lv2ID].lv2TokenID).setWorkURL(workURL);
+    } else {
+      address lv1TokenID = _lv2Registry[lv2ID].lv1Registry[id].lv1TokenID;
+      require(workTokenID == lv1TokenID, Errors.C_REGISTRY_WRONG_LV1_TOKENID);
+      CopyrightFixedSupply(lv1TokenID).setWorkURL(workURL);
+    }
+    emit SetWorkURL(lv2ID, id, workTokenID, workURL);
+  }
+
+  /**
    * @dev encode to get the message for registerWorkToken interface
    * @param lv2ID aggregation ID of the work, 0 means no lv2ID
    * @param id ID of the work

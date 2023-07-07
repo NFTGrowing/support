@@ -17,6 +17,7 @@ import {
   getSupport,
   getWETHMocked,
   getConfiguratorSigner,
+  getOperatorSigner,
 } from "../../helpers/contracts-getters";
 import { insertContractAddressInDb } from "../../helpers/contracts-helpers";
 import { Support } from "../../types/Support";
@@ -33,54 +34,54 @@ task("dev:initialize-support", "Initialize support.")
 
     const addressesProvider = await getCBPAddressesProviderProxy();
     // const admin = await addressesProvider.getConfigurator();
-    const poolAdminSigner = await getConfiguratorSigner();
+    const configuratorSigner = await getConfiguratorSigner();
+    // const configuratorSigner = await getOperatorSigner();
 
     //   testEnv.support = await getSupport();
     const support = await getSupport();
+    console.log("get support result is:", support.address);
 
-    const allTokens = await getAllMockedTokens();
-    const weth = allTokens[TokenContractId.WETH];
-    const usdc = allTokens[TokenContractId.USDC];
-    const usdt = allTokens[TokenContractId.USDT];
+    // const allTokens = await getAllMockedTokens();
+    // const weth = allTokens[TokenContractId.WETH];
+    // const usdc = allTokens[TokenContractId.USDC];
+    // const usdt = allTokens[TokenContractId.USDT];
 
     const zeroAddr = Address.zero().toString();
-    const mockedAddrUSDC = usdc.address;
-    const mockedAddrUSDT = usdt.address;
-    const mockedAddrWETH = weth.address;
+    // const mockedAddrUSDC = usdc.address;
+    // const mockedAddrUSDT = usdt.address;
+    // const mockedAddrWETH = weth.address;
 
     console.log("Setup the addr of the supported asset");
-    await waitForTx(
-      await support.connect(poolAdminSigner).setAssetsAddr([zeroAddr, mockedAddrWETH, mockedAddrUSDC, mockedAddrUSDT])
-    );
+    await waitForTx(await support.connect(configuratorSigner).setAssetsAddr([zeroAddr, zeroAddr, zeroAddr, zeroAddr]));
 
     //Enable the mockedAddressActive
     // const mockedAddressActive = createRandomAddress();
     // console.log("the mocked addr is:", mockedAddressActive)
     console.log("Enable the theme 1");
-    await waitForTx(await support.connect(poolAdminSigner).updateStatus([1, 2], true));
+    await waitForTx(await support.connect(configuratorSigner).updateStatus([1, 2], true));
 
     //Enable --
     //-- updateThemeIssueSchedule
     // https://www.epochconverter.com/
-    // Date and time (GMT): Tuesday, January 17, 2023 12:00:00 AM
-    const baseStartTime = 1673913600;
+    // Date and time (GMT): Saturday, June 24, 2023 0:00:00
+    const baseStartTime = 1687564800;
 
     // https://www.epochconverter.com/
-    // Date and time (GMT): Tuesday, January 31, 2023 12:00:00 AM
-    const baseStartTime2 = 1675123200;
+    // Date and time (GMT): Saturday, June 24, 2023 0:00:00
+    const baseStartTime2 = 1687564800;
 
     // Two weeks
-    const issueDurationTime = 1209600;
+    const issueDurationTime = 172800;
 
     //updateCollectionIssueSchedule
     console.log("updateCollectionIssueSchedule to theme 1");
     await waitForTx(
-      await support.connect(poolAdminSigner).updateThemeIssueSchedule(1, 1, baseStartTime, issueDurationTime)
+      await support.connect(configuratorSigner).updateThemeIssueSchedule(1, 1, baseStartTime, issueDurationTime)
     );
 
     console.log("updateCollectionIssueSchedule to theme 2");
     await waitForTx(
-      await support.connect(poolAdminSigner).updateThemeIssueSchedule(2, 1, baseStartTime2, issueDurationTime)
+      await support.connect(configuratorSigner).updateThemeIssueSchedule(2, 1, baseStartTime2, issueDurationTime)
     );
   });
 
@@ -130,5 +131,29 @@ task("dev:setup-themeschedule", "setup theme schedulesupport")
       await support
         .connect(poolAdminSigner)
         .updateThemeIssueSchedule(2, theme2_new_issue, baseStartTimeNew, issueDurationTimeTest)
+    );
+  });
+
+task("dev:set-assetaddress", "Initialize support.")
+  .addFlag("verify", "Verify contracts at Etherscan")
+  .setAction(async ({}, localBRE) => {
+    await localBRE.run("set-DRE");
+
+    // const admin = await addressesProvider.getConfigurator();
+    const configuratorSigner = await getConfiguratorSigner();
+
+    const support = await getSupport();
+    console.log("get support result is:", support.address);
+
+    const zeroAddr = Address.zero().toString();
+    // const mockedAddrUSDC = usdc.address;
+    // const mockedAddrUSDT = usdt.address;
+    // const mockedAddrWETH = weth.address;
+
+    console.log("Setup the addr of the supported asset");
+    await waitForTx(
+      await support
+        .connect(configuratorSigner)
+        .setAssetsAddr([zeroAddr, zeroAddr, "0x4aCEe2AEb2848456a478A6CdBddd8E62113012AB", zeroAddr])
     );
   });

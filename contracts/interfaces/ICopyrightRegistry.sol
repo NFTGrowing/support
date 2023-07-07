@@ -71,6 +71,15 @@ interface ICopyrightRegistry {
   event BurnSupplyForWork(uint256 indexed lv2ID, uint256 indexed id, address workTokenID, uint256 tokenAmount);
 
   /**
+   * @dev Emitted on SetWorkURL
+   * @param lv2ID aggregation ID of the work, 0 means no lv2ID
+   * @param id ID of the work
+   * @param workTokenID ID of the work
+   * @param workURL work url of the token
+   **/
+  event SetWorkURL(uint256 indexed lv2ID, uint256 indexed id, address workTokenID, string workURL);
+
+  /**
    * @dev Emitted in receive funciton for ether depositing
    * @param depositor depositor
    * @param amount amount

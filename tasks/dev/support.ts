@@ -6,10 +6,10 @@ import { getCBPAddressesProviderProxy, getSupport } from "../../helpers/contract
 import { insertContractAddressInDb } from "../../helpers/contracts-helpers";
 import { ConfigNames, loadPoolConfig } from "../../helpers/configuration";
 
-task("dev:deploy-support", "Deploy lend pool for dev enviroment")
+task("dev:deploy-support", "Deploy support for dev enviroment")
   .addFlag("verify", "Verify contracts at Etherscan")
-  .addParam("pool", `Pool name to retrieve configuration, supported: ${Object.values(ConfigNames)}`)
-  .setAction(async ({ verify, pool }, localBRE) => {
+  //.addParam("pool", `Pool name to retrieve configuration, supported: ${Object.values(ConfigNames)}`)
+  .setAction(async ({ verify }, localBRE) => {
     await localBRE.run("set-DRE");
     const addressesProvider = await getCBPAddressesProviderProxy();
     // const poolConfig = loadPoolConfig(pool);
