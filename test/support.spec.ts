@@ -120,9 +120,17 @@ makeSuite("Support: test support", (testEnv: TestEnv) => {
 
     await waitForTx(await support.connect(poolAdminSigner).updateStatus([themeIDActive], true));
 
+    //set theme profile
+    const themeName = "Mfers";
+    const themeAddress = "0x79fcdef22feed20eddacbb2587640e45491b757f";
+    await waitForTx(await support.connect(poolAdminSigner).updateThemeProfile(themeIDActive, themeName, themeAddress));
+
     const SupportActive = await support.getThemeSupport(themeIDActive);
     const SupportNotActive = await support.getThemeSupport(themeIDNotActive);
     expect(SupportActive.supporting, "SupportActive Enabled").to.be.eq(true);
+    expect(SupportActive.themeName, "theme name").to.be.eq(themeName);
+    expect(SupportActive.themeAddress.toLowerCase(), "theme address").to.be.eq(themeAddress);
+
     expect(SupportNotActive.supporting, "SupportNotActive not Enabled").to.be.eq(false);
     //console.log("themeSupportActive", SupportActive.supporting);
     //console.log("themeSupportNotActive", SupportNotActive.supporting);
@@ -216,7 +224,7 @@ makeSuite("Support: test support", (testEnv: TestEnv) => {
     //-- updateThemeIssueSchedule
     // https://www.epochconverter.com/
     // Date and time (GMT): Friday, June 2, 2023 0:00:00
-    const baseStartTime = 1687478400;
+    const baseStartTime = 1688688000;
     // Two weeks
     const issueDurationTime = 1209600;
 

@@ -5,11 +5,6 @@ import {ISupport} from "../interfaces/ISupport.sol";
 
 import {ICBPAddressesProvider} from "../interfaces/ICBPAddressesProvider.sol";
 
-/*
-import {NftConfiguration} from "../libraries/configuration/NftConfiguration.sol";
-import {NftLogic} from "../libraries/logic/NftLogic.sol";
-*/
-
 import {StorageExt} from "./StorageExt.sol";
 import {Errors} from "../libraries/helpers/Errors.sol";
 
@@ -121,6 +116,8 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
   // for return
   struct ThemeSupportView {
     bool supporting;
+    string themeName;
+    address themeAddress;
     uint256 startedTimeStamp;
     IssueSchedule issueSchedule;
     //include long-term & case-by-case part
@@ -224,6 +221,9 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
     ThemeSupport storage themeSupport = _themeSupport[themeID];
 
     themeSupportView.supporting = themeSupport.supporting;
+    themeSupportView.themeName = themeSupport.themeName;
+    themeSupportView.themeAddress = themeSupport.themeAddress;
+
     themeSupportView.startedTimeStamp = themeSupport.startedTimeStamp;
     themeSupportView.issueSchedule = themeSupport.issueSchedule;
 
@@ -343,6 +343,21 @@ contract Support is Initializable, ISupport, ContextUpgradeable, StorageExt {
     _themeSupport[themeID].issueSchedule.baseIssueNo = baseIssueNo;
     _themeSupport[themeID].issueSchedule.baseStartTime = baseStartTime;
     _themeSupport[themeID].issueSchedule.issueDurationTime = issueDurationTime;
+  }
+
+  /**
+   * @dev Update the supporting profile of theme
+   * @param themeID The id of the theme to be updated
+   * @param themeName themeName
+   * @param themeAddress themeAddress
+   **/
+  function updateThemeProfile(
+    uint32 themeID,
+    string calldata themeName,
+    address themeAddress
+  ) external override nonReentrant onlyConfigurator {
+    _themeSupport[themeID].themeName = themeName;
+    _themeSupport[themeID].themeAddress = themeAddress;
   }
 
   /**

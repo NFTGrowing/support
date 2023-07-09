@@ -234,8 +234,8 @@ task("verify:caseByCaseSupport", "caseByCaseSupport").setAction(async ({}, local
   console.log("support the active one");
   //Support ETH
   const txResult = await waitForTx(
-    await support.connect(simulateSupporter).caseByCaseSupport(2, 0, 0, 3, 2, { value: depositSizeCase })
-    //.caseByCaseSupport(enabled_theme, 2, 100, supportingIssueNo, 1)
+    //await support.connect(simulateSupporter).caseByCaseSupport(1, 0, 0, 8, 1, { value: depositSizeCase })
+    await support.connect(simulateSupporter).caseByCaseSupport(1, 3, 100, 8, 1)
   );
   console.log(JSON.stringify(txResult.events));
   // if (txResult.events){

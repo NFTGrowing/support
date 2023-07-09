@@ -164,6 +164,18 @@ interface ISupport {
     uint256 issueDurationTime
   ) external;
 
+  /**
+   * @dev Update the supporting profile of theme
+   * @param themeID The id of the theme to be updated
+   * @param themeName themeName
+   * @param themeAddress themeAddress
+   **/
+  function updateThemeProfile(
+    uint32 themeID,
+    string calldata themeName,
+    address themeAddress
+  ) external;
+
   // Case by case support
   /**
    * @dev Depositor support the theme case by case by ether, usdc, or usdt
