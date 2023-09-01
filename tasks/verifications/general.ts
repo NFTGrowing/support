@@ -36,7 +36,7 @@ const theme_1 = 1;
 const theme_2 = 2;
 const theme_3 = 3;
 
-const enabled_theme = theme_2;
+const enabled_theme = theme_1;
 
 task("verify:mintApproveAsset", "mint and approve token for support").setAction(async ({}, localBRE) => {
   await localBRE.run("set-DRE");
@@ -88,19 +88,31 @@ task("verify:listNewTheme", "Initialize support.").setAction(async ({}, localBRE
   await localBRE.run("set-DRE");
   const network = <eNetwork>localBRE.network.name;
 
-  const addressesProvider = await getCBPAddressesProviderProxy();
+  // const addressesProvider = await getCBPAddressesProviderProxy();
   // const admin = await addressesProvider.getConfigurator();
-  const poolAdminSigner = await getConfiguratorSigner();
-  const simulateSupporter = await getSupporter();
+  const configuratorSigner = await getConfiguratorSigner();
+  // const simulateSupporter = await getSupporter();
 
   //   testEnv.support = await getSupport();
   const support = await getSupport();
 
   //Enable the mockedAddressActive
+  /*
   const mockedAddressActive = createRandomAddress();
   console.log("the mocked addr is:", mockedAddressActive);
   console.log("Enable the mockedAddressActive");
   await waitForTx(await support.connect(poolAdminSigner).updateStatus([mockedAddressActive], true));
+  */
+
+  console.log("Enable the theme 3");
+  await waitForTx(await support.connect(configuratorSigner).updateStatus([3], true));
+  const baseStartTime3 = 1693440000;
+  // two days for test
+  const issueDurationTime = 172800;
+  console.log("updateCollectionIssueSchedule to theme 3");
+  await waitForTx(
+    await support.connect(configuratorSigner).updateThemeIssueSchedule(3, 1, baseStartTime3, issueDurationTime)
+  );
 
   //Enable --
   //-- updateThemeIssueSchedule
@@ -116,17 +128,17 @@ task("verify:listNewTheme", "Initialize support.").setAction(async ({}, localBRE
   // const issueDurationTime = 1209600;
 
   // Date and time (GMT): Tuesday, November 15, 2022 12:00:00 AM
-  const baseStartTime = 1668470400;
+  // const baseStartTime = 1668470400;
   // Two weeks
-  const issueDurationTime = 1209600;
+  // const issueDurationTime = 1209600;
 
   //updateThemeIssueSchedule
-  console.log("updateThemeIssueSchedule");
-  await waitForTx(
-    await support
-      .connect(poolAdminSigner)
-      .updateThemeIssueSchedule(mockedAddressActive, 1, baseStartTime, issueDurationTime)
-  );
+  // console.log("updateThemeIssueSchedule");
+  // await waitForTx(
+  //   await support
+  //     .connect(poolAdminSigner)
+  //     .updateThemeIssueSchedule(mockedAddressActive, 1, baseStartTime, issueDurationTime)
+  // );
 });
 
 task("verify:longTermSupport", "longTermSupport").setAction(async ({}, localBRE) => {
@@ -213,7 +225,7 @@ task("verify:caseByCaseSupport", "caseByCaseSupport").setAction(async ({}, local
 
   console.log("support the active one");
 
-  const beforeSupport = await support.getThemeSupport(enabled_theme);
+  const beforeSupport = await support.getThemeSupport(1);
   console.log("ETH:", beforeSupport.balances.assetsArray[0]);
   console.log("WETH:", beforeSupport.balances.assetsArray[1]);
   console.log("USDC:", beforeSupport.balances.assetsArray[2]);
@@ -234,8 +246,8 @@ task("verify:caseByCaseSupport", "caseByCaseSupport").setAction(async ({}, local
   console.log("support the active one");
   //Support ETH
   const txResult = await waitForTx(
-    //await support.connect(simulateSupporter).caseByCaseSupport(1, 0, 0, 8, 1, { value: depositSizeCase })
-    await support.connect(simulateSupporter).caseByCaseSupport(1, 3, 100, 8, 1)
+    await support.connect(simulateSupporter).caseByCaseSupport(1, 0, 0, 1, 1, { value: depositSizeCase })
+    // await support.connect(simulateSupporter).caseByCaseSupport(1, 3, 100, 8, 1)
   );
   console.log(JSON.stringify(txResult.events));
   // if (txResult.events){
@@ -333,7 +345,7 @@ task("verify:tokenRegistry", "tokenRegistry").setAction(async ({}, localBRE) => 
   const registerTokenAcc = await getSupporter();
 
   const testSigStr =
-    "0x6c6134aa31d480ff3711ecd1ad1f7d9701732af7e77640e6c1b9523cb7204fc13f9361c8c232ea5e28bcf952ccde2a0182bc547ac1ffff58c8a3a68c192d9df31c";
+    "0xed8290d4841ceaf2ba7056322fcd151f5b5a996d3bb13a8e96e29fc1c33064e46526357558ade620f9a1dd51f73549ebcf438c0a2f740b421dec8c67303185ae1b";
 
   // web3.utils.toBN("2000000000000000000000000")
   //  BigNumber.from("2000000000000000000000000")
@@ -341,7 +353,7 @@ task("verify:tokenRegistry", "tokenRegistry").setAction(async ({}, localBRE) => 
   await waitForTx(
     await copyrightRegistry
       .connect(registerTokenAcc)
-      .registerWorkToken(testSigStr, 0, 9, "L13", "only L1 3", "50000000000000000000000000")
+      .registerWorkToken(testSigStr, 0, 7, "L1Test", "L1 for test", "50000000000000000000000000")
   );
 });
 
@@ -353,7 +365,7 @@ task("verify:tokenClaim", "tokenClaim").setAction(async ({}, localBRE) => {
   const supporterSigner = await getSupporter();
 
   const testSigStr =
-    "0x9028dddbdbebb39c32b04a3cd1e8119bdad33ee2e32d84e7c5586ea2651899d0664ee282132a0c62dd51a231b1b2c2d27f1c1fb4dfc6138dafd41c5ccffbb99b1b";
+    "0xffa9c5700dc892d26194117d3478874325e564679d1a86efe15b5f8b1c6691966df945338521e4858eb26c3b67dc15bdae0f6e4ba8791116c2e16c624d0e38011c";
 
   // web3.utils.toBN("2000000000000000000000000")
   //  BigNumber.from("2000000000000000000000000")
@@ -364,10 +376,10 @@ task("verify:tokenClaim", "tokenClaim").setAction(async ({}, localBRE) => {
       .claimWorkToken(
         testSigStr,
         0,
-        [9],
-        "0x5d919fb1583d50e6ec5bedbd705b1f75ef334173",
+        [7],
+        "0xe91a545a0cdcbbdaea1c68ccabf891932deb37a6",
         ["25000000000000000000000000"],
-        "0xbf6c5ecae8e092cecb7c058decde09e81098c153"
+        "0xfB7d8E5c8d1674411eE89667c8e1a252e0262e27"
       )
   );
 });

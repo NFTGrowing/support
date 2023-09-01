@@ -14,6 +14,7 @@ export enum eEthereumNetwork {
   rinkeby = "rinkeby",
   kovan = "kovan",
   sepolia = "sepolia",
+  arbgoerli = "arbgoerli",
   mumbai = "mumbai",
   main = "main",
 }
@@ -357,6 +358,7 @@ export interface iEthereumParamsPerNetwork<T> {
   [eEthereumNetwork.rinkeby]: T;
   [eEthereumNetwork.kovan]: T;
   [eEthereumNetwork.sepolia]: T;
+  [eEthereumNetwork.arbgoerli]: T;
   [eEthereumNetwork.mumbai]: T;
   [eEthereumNetwork.main]: T;
 }

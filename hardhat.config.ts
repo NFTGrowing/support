@@ -111,6 +111,7 @@ const buidlerConfig: HardhatUserConfig = {
     rinkeby: getCommonNetworkConfig(eEthereumNetwork.rinkeby, 4),
     kovan: getCommonNetworkConfig(eEthereumNetwork.kovan, 42),
     sepolia: getCommonNetworkConfig(eEthereumNetwork.sepolia, 11155111),
+    arbgoerli: getCommonNetworkConfig(eEthereumNetwork.arbgoerli, 421613),
     mumbai: getCommonNetworkConfig(eEthereumNetwork.mumbai, 80001),
     main: getCommonNetworkConfig(eEthereumNetwork.main, 1),
     hardhat: {

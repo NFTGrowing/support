@@ -32,7 +32,7 @@ task("dev:initialize-support", "Initialize support.")
     await localBRE.run("set-DRE");
     const network = <eNetwork>localBRE.network.name;
 
-    const addressesProvider = await getCBPAddressesProviderProxy();
+    // const addressesProvider = await getCBPAddressesProviderProxy();
     // const admin = await addressesProvider.getConfigurator();
     const configuratorSigner = await getConfiguratorSigner();
     // const configuratorSigner = await getOperatorSigner();
@@ -57,18 +57,18 @@ task("dev:initialize-support", "Initialize support.")
     //Enable the mockedAddressActive
     // const mockedAddressActive = createRandomAddress();
     // console.log("the mocked addr is:", mockedAddressActive)
-    console.log("Enable the theme 1");
+    console.log("Enable the theme 1, 2");
     await waitForTx(await support.connect(configuratorSigner).updateStatus([1, 2], true));
 
     //Enable --
     //-- updateThemeIssueSchedule
     // https://www.epochconverter.com/
-    // Date and time (GMT): Saturday, June 24, 2023 0:00:00
-    const baseStartTime = 1687564800;
+    // Date and time (GMT): Thursday, August 31, 2023 0:00:00
+    const baseStartTime = 1693440000;
 
     // https://www.epochconverter.com/
-    // Date and time (GMT): Saturday, June 24, 2023 0:00:00
-    const baseStartTime2 = 1687564800;
+    // Date and time (GMT): Thursday, August 31, 2023 0:00:00
+    const baseStartTime2 = 1693440000;
 
     // Two weeks
     const issueDurationTime = 172800;

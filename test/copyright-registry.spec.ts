@@ -78,11 +78,11 @@ makeSuite("CopyrightRegistry: test copyright token registry and claim ", (testEn
     // console.log(" serviceSignAddr", await copyrightRegistry._serviceSignAddr());
 
     //prepare signature and para
-    const lv2ID = 1001;
-    const id = 0;
-    const symbol = "Token1 Symbol";
-    const name_1 = "Token1";
-    const totalSupply = 100000000;
+    const lv2ID = 0;
+    const id = 1;
+    const symbol = "L1Test";
+    const name_1 = "L1 for test";
+    const totalSupply = "50000000000000000000000000";
 
     //Register Token
     console.log("encode RWT");
@@ -116,6 +116,7 @@ makeSuite("CopyrightRegistry: test copyright token registry and claim ", (testEn
     console.log("messageBytes: ", messageBytes);
     const signature_new = await serviceSignAddr.signer.signMessage(messageBytes);
     console.log("signature_new: ", signature_new);
+    console.log("serviceSignAddr", serviceSignAddr.address);
 
     console.log("registerWorkToken");
     const registeredAddr = await waitForTx(
